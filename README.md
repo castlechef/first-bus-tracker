@@ -4,6 +4,6 @@
 [Link to our GDrive](https://drive.google.com/drive/folders/0B25bbM68M88vRDBEQ1dFR1daSGc "First Bus Team")
 [Direct Link to development page](https://drive.google.com/drive/folders/1l34LI5V6XV1m8cJwUz7xwg_2EcnrLjOu "Development")
 
-##Set up
+## Set up
 Make sure that you have Node version 8.9.4
 LTS webstorm, use student account for jetbrains
