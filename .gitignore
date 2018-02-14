@@ -1,5 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
 
+# Floobits files
+.floo
+.flooignore
+
 # IntelliJ project files
 .idea
 *.iml
