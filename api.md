@@ -82,7 +82,6 @@ system generates an id for the bus and returns it in the data object.
     + Body
 ```json
         {
-            "status": "success",
             "data": {
                 "location": {
                     "latitude": 53.003444,
