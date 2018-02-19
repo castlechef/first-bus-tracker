@@ -1,7 +1,8 @@
-import { GPSentenceCode } from "./GPSentenceCode";
+import {GPSentenceCode} from './GPSentenceCode';
+import {GPSPosition} from '../GPSPosition';
 
 export class GPVTG implements GPSentenceCode {
-    parse(tokens, position) {
+    parse(tokens: string[], position: GPSPosition): void {
         position.dir = parseFloat(tokens[3]);
     }
 }

@@ -1,12 +1,30 @@
 export class GPSPosition {
-    private time: number;
-    private lat: number;
-    private lon: number;
-    private fixed: boolean;
-    private quality: number;
-    private dir: number;
-    private altitude: number;
-    private velocity: number;
+    public time: number;
+    public lat: number;
+    public lon: number;
+    public fixed: boolean;
+    public quality: number;
+    public dir: number;
+    public altitude: number;
+    public velocity: number;
+
+    public static latitudeToDecimal(lat: string, NS: string): number {
+        let med = (parseFloat(lat.substring(2)) / 60.0);
+        med += parseFloat(lat.substring(0, 2));
+        if (NS.startsWith('S')) {
+            med = -med;
+        }
+        return med;
+    }
+
+    public static longitudeToDecimal(lon: string, WE: string): number {
+        let med = parseFloat(lon.substring(3)) / 60.0;
+        med += parseFloat(lon.substring(0, 3));
+        if (WE.startsWith('W')) {
+            med = -med;
+        }
+        return med;
+    }
 
     constructor() {
         this.time = 0.0;
@@ -24,24 +42,7 @@ export class GPSPosition {
     }
 
     public toString(): string {
-        return `POSITION lat: ${this.lat}, lon: ${this.lon}, time: ${this.time}, Q: ${this.quality}, dir: ${this.dir}, alt: ${this.altitude}, vel: ${this.velocity}`;
-    }
-
-    public static latitudeToDecimal(lat: string, NS: string): number {
-        let med = (parseFloat(lat.substring(2)) / 60.0);
-        med += parseFloat(lat.substring(0, 2));
-        if (NS.startsWith("S")) {
-            med = -med;
-        }
-        return med;
-    }
-
-    public static longitudeToDecimal(lon: string, WE: string): number {
-        let med = parseFloat(lon.substring(3)) / 60.0;
-        med += parseFloat(lon.substring(0, 3));
-        if (WE.startsWith("W")) {
-            med = -med;
-        }
-        return med;
+        return `POSITION lat: ${this.lat}, lon: ${this.lon}, time: ${this.time}, ` +
+`Q: ${this.quality}, dir: ${this.dir}, alt: ${this.altitude}, vel: ${this.velocity}`;
     }
 }

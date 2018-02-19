@@ -1,3 +1,5 @@
+import {GPSPosition} from '../GPSPosition';
+
 export interface GPSentenceCode {
-    parse: (tokens, position) => void;
+    parse: (tokens: string[], position: GPSPosition) => void;
 }

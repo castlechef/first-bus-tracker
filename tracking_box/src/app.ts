@@ -1,4 +1,4 @@
-import { GPSSensor } from "./GPSSensor";
+import {GPSSensor} from './GPSSensor';
 
 const gpsSensor = new GPSSensor();
 

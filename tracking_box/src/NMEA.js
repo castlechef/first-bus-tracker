@@ -7,14 +7,20 @@ const GPRMC_1 = require("./helpers/GPRMC");
 const GPRMZ_1 = require("./helpers/GPRMZ");
 const GPVTG_1 = require("./helpers/GPVTG");
 class NMEA {
+    static startsWithValidSentenceCode(line) {
+        return /\$GP(GGA|GGL|RMC|RMZ|VTG)/g.test(line);
+    }
+    static extractSentenceCode(line) {
+        return line.substring(1, 6);
+    }
     constructor() {
         this.position = new GPSPosition_1.GPSPosition();
         this.sentenceParsers = new Map([
-            ["GPGGA", new GPGGA_1.GPGGA()],
-            ["GPGGL", new GPGGL_1.GPGGL()],
-            ["GPRMC", new GPRMC_1.GPRMC()],
-            ["GPRMZ", new GPRMZ_1.GPRMZ()],
-            ["GPVTG", new GPVTG_1.GPVTG()],
+            ['GPGGA', new GPGGA_1.GPGGA()],
+            ['GPGGL', new GPGGL_1.GPGGL()],
+            ['GPRMC', new GPRMC_1.GPRMC()],
+            ['GPRMZ', new GPRMZ_1.GPRMZ()],
+            ['GPVTG', new GPVTG_1.GPVTG()],
         ]);
     }
     parse(line) {
@@ -25,12 +31,6 @@ class NMEA {
             this.position.updateFix();
         }
         return this.position;
-    }
-    static startsWithValidSentenceCode(line) {
-        return line.matches(/\$GP(GGA|GGL|RMC|RMZ|VTG)/g);
-    }
-    static extractSentenceCode(line) {
-        return line.substring(1, 6);
     }
 }
 exports.NMEA = NMEA;

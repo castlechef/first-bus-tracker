@@ -1,7 +1,7 @@
 import * as SerialPort from 'serialport';
-import { EventEmitter } from "events";
-import { NMEA } from "./NMEA";
-import { GPSPosition } from "./GPSPosition";
+import {EventEmitter} from 'events';
+import {NMEA} from './NMEA';
+import {GPSPosition} from './GPSPosition';
 
 export class GPSSensor extends EventEmitter {
     private lines: GPSLines;
@@ -16,7 +16,7 @@ export class GPSSensor extends EventEmitter {
         this.port.on('data', this.handleData.bind(this));
     }
 
-    private handleData(data): void {
+    private handleData(data: any): void {
         this.lines.appendData(data);
 
         if (this.lines.containsLocationData()) {
@@ -25,7 +25,7 @@ export class GPSSensor extends EventEmitter {
         }
     }
 
-    private emitLocationUpdate(position): void {
+    private emitLocationUpdate(position: GPSPosition): void {
         this.emit('location', position);
     }
 }
@@ -36,38 +36,30 @@ export class GPSLines {
     private lines: string;
     private nmea: NMEA;
 
-    constructor() {
-        this.nmea = new NMEA();
-        this.resetLines();
-    }
-
-    private resetLines(): void {
-        this.lines = '';
-    }
-
-    public appendData(rawData): void {
-        this.lines += GPSLines.formatLine(rawData);
-    }
-
-    private static formatLine(rawData): string {
+    private static formatLine(rawData: any): string {
         const line = GPSLines.ensureString(rawData);
         return GPSLines.removeWhitespace(line);
     }
 
-    private static ensureString(line): string {
-        return (typeof line === "string") ? line : line.toString();
+    private static ensureString(line: any): string {
+        return (typeof line === 'string') ? line : line.toString();
     }
 
     private static removeWhitespace(line: string): string {
         return line.replace(/\s/g, '');
     }
 
-    public containsLocationData(): boolean {
-        return this.matchesGPSFormat();
+    constructor() {
+        this.nmea = new NMEA();
+        this.resetLines();
     }
 
-    private matchesGPSFormat(): boolean {
-        return (GPSLines.GPS_PATTERN.exec(this.lines) !== null)
+    public appendData(rawData: any): void {
+        this.lines += GPSLines.formatLine(rawData);
+    }
+
+    public containsLocationData(): boolean {
+        return this.matchesGPSFormat();
     }
 
     public extractLatestPosition(): GPSPosition {
@@ -77,5 +69,13 @@ export class GPSLines {
         this.resetLines();
 
         return position;
+    }
+
+    private matchesGPSFormat(): boolean {
+        return (GPSLines.GPS_PATTERN.exec(this.lines) !== null);
+    }
+
+    private resetLines(): void {
+        this.lines = '';
     }
 }

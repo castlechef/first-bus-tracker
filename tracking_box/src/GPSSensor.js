@@ -29,27 +29,21 @@ class GPSLines {
         this.nmea = new NMEA_1.NMEA();
         this.resetLines();
     }
-    resetLines() {
-        this.lines = '';
-    }
-    appendData(rawData) {
-        this.lines += GPSLines.formatLine(rawData);
-    }
     static formatLine(rawData) {
         const line = GPSLines.ensureString(rawData);
         return GPSLines.removeWhitespace(line);
     }
     static ensureString(line) {
-        return (typeof line === "string") ? line : line.toString();
+        return (typeof line === 'string') ? line : line.toString();
     }
     static removeWhitespace(line) {
         return line.replace(/\s/g, '');
     }
+    appendData(rawData) {
+        this.lines += GPSLines.formatLine(rawData);
+    }
     containsLocationData() {
         return this.matchesGPSFormat();
-    }
-    matchesGPSFormat() {
-        return (GPSLines.GPS_PATTERN.exec(this.lines) !== null);
     }
     extractLatestPosition() {
         const words = GPSLines.GPS_PATTERN.exec(this.lines);
@@ -57,6 +51,12 @@ class GPSLines {
         const position = this.nmea.parse(rawString);
         this.resetLines();
         return position;
+    }
+    matchesGPSFormat() {
+        return (GPSLines.GPS_PATTERN.exec(this.lines) !== null);
+    }
+    resetLines() {
+        this.lines = '';
     }
 }
 GPSLines.GPS_PATTERN = /$GPGGA,*\*\d{2}/;
