@@ -22,7 +22,7 @@ router.post('/', (req, res) => {
     let responseData: JsonResponse;
     try {
         const location = req.body.data.location;
-        if (Location.validateLocation(location)) {
+        if (Location.isValidLocation(location)) {
             const bus = buses.newBus(new Location(location));
             res.status(200);
             responseData = Response.factory(true, bus.toJson());

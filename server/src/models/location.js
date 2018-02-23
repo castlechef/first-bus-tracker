@@ -6,11 +6,11 @@ var Location = (function () {
         this.latitude = latitude;
         this.longitude = longitude;
     }
-    Location.validateLocation = function (_a) {
+    Location.isValidLocation = function (_a) {
         var latitude = _a.latitude, longitude = _a.longitude;
-        return Location.validateLatitude(latitude) && Location.validateLongitude(longitude);
+        return Location.isValidLatitude(latitude) && Location.isValidLongitude(longitude);
     };
-    Location.validateLatitude = function (l) {
+    Location.isValidLatitude = function (l) {
         if (!l)
             return false;
         if (typeof l !== 'number')
@@ -19,7 +19,7 @@ var Location = (function () {
             return true;
         return false;
     };
-    Location.validateLongitude = function (l) {
+    Location.isValidLongitude = function (l) {
         if (!l)
             return false;
         if (typeof l !== 'number')

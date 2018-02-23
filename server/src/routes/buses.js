@@ -23,7 +23,7 @@ router.post('/', function (req, res) {
     var responseData;
     try {
         var location_2 = req.body.data.location;
-        if (location_1.Location.validateLocation(location_2)) {
+        if (location_1.Location.isValidLocation(location_2)) {
             var bus = app_1.buses.newBus(new location_1.Location(location_2));
             res.status(200);
             responseData = response_1.Response.factory(true, bus.toJson());

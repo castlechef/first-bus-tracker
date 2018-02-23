@@ -11,21 +11,21 @@ export class Location implements Jsonable {
     public static readonly MAX_LONGITUDE: number = -2.310755;
     public static readonly MIN_LONGITUDE: number = -2.403184;
 
-    latitude: number;
-    longitude: number;
+    private latitude: number;
+    private longitude: number;
 
-    public static validateLocation({latitude, longitude}: ILocation): boolean {
-        return Location.validateLatitude(latitude) && Location.validateLongitude(longitude);
+    public static isValidLocation({latitude, longitude}: ILocation): boolean {
+        return Location.isValidLatitude(latitude) && Location.isValidLongitude(longitude);
     }
 
-    public static validateLatitude(l: number): boolean {
+    private static isValidLatitude(l: number): boolean {
         if (!l) return false;
         if (typeof l !== 'number') return false;
         if (l > Location.MIN_LATITUDE && l < Location.MAX_LATITUDE) return true;
         return false;
     }
 
-    public static validateLongitude(l: number): boolean {
+    private static isValidLongitude(l: number): boolean {
         if (!l) return false;
         if (typeof l !== 'number') return false;
         if (l > Location.MIN_LONGITUDE && l < Location.MAX_LONGITUDE) return true;
