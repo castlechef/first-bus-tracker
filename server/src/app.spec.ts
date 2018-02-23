@@ -42,7 +42,7 @@ describe('post route for locations', () => {
 
 describe('add function for alice :)', () => {
     it('should add positive numbers', () => {
-        expect(add(2, 3)).to.equal(6);
+        expect(add(2, 3)).to.equal(5);
     });
 });
 

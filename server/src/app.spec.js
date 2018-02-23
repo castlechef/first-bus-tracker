@@ -35,7 +35,7 @@ describe('post route for locations', function () {
 });
 describe('add function for alice :)', function () {
     it('should add positive numbers', function () {
-        chai_1.expect(add(2, 3)).to.equal(6);
+        chai_1.expect(add(2, 3)).to.equal(5);
     });
 });
 function add(n1, n2) {

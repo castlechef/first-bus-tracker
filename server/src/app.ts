@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import * as locations from './routes/buses';
+import busesRoute from './routes/buses';
 import {Buses} from './models/buses';
 
 export const app = express();
@@ -11,7 +11,7 @@ app.locals.buses = buses;
 
 app.use(bodyParser.json());
 
-app.use('/buses', locations);
+app.use('/buses', busesRoute);
 
 app.get('/hey', (req, res) => {
     res.json({hello: 'world'});

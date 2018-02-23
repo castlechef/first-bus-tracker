@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var bodyParser = require("body-parser");
-var locations = require("./routes/buses");
-var buses_1 = require("./models/buses");
+var buses_1 = require("./routes/buses");
+var buses_2 = require("./models/buses");
 exports.app = express();
-exports.buses = new buses_1.Buses();
+exports.buses = new buses_2.Buses();
 exports.app.locals.buses = exports.buses;
 exports.app.use(bodyParser.json());
-exports.app.use('/buses', locations);
+exports.app.use('/buses', buses_1.default);
 exports.app.get('/hey', function (req, res) {
     res.json({ hello: 'world' });
 });

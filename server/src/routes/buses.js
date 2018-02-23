@@ -45,4 +45,4 @@ router.put('/{busId}', function (req, res) {
     // check bus exists
     //
 });
-module.exports = router;
+exports.default = router;
