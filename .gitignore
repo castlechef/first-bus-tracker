@@ -1,5 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 
+# App
+/build
+
 # Floobits files
 .floo
 .flooignore
