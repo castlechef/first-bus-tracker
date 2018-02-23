@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {ILocation, Location} from './location';
 import {Buses} from './buses';
 import {Bus} from './bus';
-import {} from 'mocha';
+import 'mocha';
 
 describe('adding a new bus', () => {
     it('should add new bus', () => {

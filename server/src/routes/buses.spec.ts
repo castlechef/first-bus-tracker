@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 import {app} from '../app';
 import {expect} from 'chai';
-import {} from 'mocha';
+import 'mocha';
 import {ILocation, Location} from '../models/location';
 
 beforeEach(() => {

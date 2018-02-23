@@ -1,6 +1,7 @@
 import * as request from 'supertest';
 import {app} from './app';
 import {expect} from 'chai';
+import 'mocha';
 
 describe('testing the api root', () => {
 

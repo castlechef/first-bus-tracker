@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
+require("mocha");
 var location_1 = require("./location");
 var bus_1 = require("./bus");
 describe('adding a new bus', function () {

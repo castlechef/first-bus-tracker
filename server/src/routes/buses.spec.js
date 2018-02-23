@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var request = require("supertest");
 var app_1 = require("../app");
 var chai_1 = require("chai");
+require("mocha");
 var location_1 = require("../models/location");
 beforeEach(function () {
     app_1.app.locals.buses.removeAllBuses();

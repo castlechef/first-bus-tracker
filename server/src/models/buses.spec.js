@@ -4,6 +4,7 @@ var chai_1 = require("chai");
 var location_1 = require("./location");
 var buses_1 = require("./buses");
 var bus_1 = require("./bus");
+require("mocha");
 describe('adding a new bus', function () {
     it('should add new bus', function () {
         var buses = new buses_1.Buses();

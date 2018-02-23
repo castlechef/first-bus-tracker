@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var request = require("supertest");
 var app_1 = require("./app");
 var chai_1 = require("chai");
+require("mocha");
 describe('testing the api root', function () {
     it('should have a nice test', function () {
         chai_1.expect(2).to.equal(2);

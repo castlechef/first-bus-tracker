@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {Location} from './location';
+import 'mocha';
 
 describe('adding a new bus', () => {
     it('should be sensible', () => {
