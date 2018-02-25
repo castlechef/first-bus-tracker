@@ -10,14 +10,14 @@ This API allows buses to update their live location on the First Bus Tracking sy
 + [Google error handling](https://cloud.google.com/storage/docs/json_api/v1/status-codes)
 + [Online markdown editing](https://stackedit.io)
 
-# Group Location
-Group of all location-related resources.
+# Group Bus
+Group of all bus-related resources.
 
-## Locations [/locations/]
+## Buses [/buses/]
     
-### Request Bus Locations [GET]
+### Request all Bus Locations [GET]
 
-Allows clients to get the latest list of bus locations.
+Allows clients to get the latest list of buses and their locations.
 
 + Request (application/json)
 
@@ -82,7 +82,6 @@ system generates an id for the bus and returns it in the data object.
     + Body
 ```json
         {
-            "status": "success",
             "data": {
                 "location": {
                     "latitude": 53.003444,
@@ -125,13 +124,13 @@ system generates an id for the bus and returns it in the data object.
             }
         }
 ```
-## Location [/locations/{busId}]
+## Bus [/buses/{busId}]
 
 + Parameters
 
     + busId (number) - a unique identifier for a specific bus.
 
-### Update a Location [PUT]
+### Update a Bus [PUT]
 
 This allows a registered bus to inform the server of a location
 update.
