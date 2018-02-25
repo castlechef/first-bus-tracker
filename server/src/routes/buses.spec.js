@@ -1,10 +1,11 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var request = require("supertest");
 var app_1 = require("../app");
 var chai_1 = require("chai");
 require("mocha");
 var location_1 = require("../models/location");
+var utils_1 = require("../utils/utils");
 beforeEach(function () {
     app_1.app.locals.buses.removeAllBuses();
 });
@@ -46,9 +47,9 @@ describe('adding a new bus', function () {
 });
 describe('should return list of buses', function () {
     it('should return list of buses', function () {
-        var location0 = generateValidLocation();
-        var location1 = generateValidLocation();
-        var location2 = generateValidLocation();
+        var location0 = utils_1.Utils.location.generateValidLocation();
+        var location1 = utils_1.Utils.location.generateValidLocation();
+        var location2 = utils_1.Utils.location.generateValidLocation();
         var expectedData = {
             'status': 'success',
             'data': [
@@ -77,11 +78,3 @@ describe('should return list of buses', function () {
         });
     });
 });
-function generateValidLocation() {
-    var latitude = (Math.random() * location_1.Location.MAX_LATITUDE) + location_1.Location.MIN_LATITUDE;
-    var longitude = (Math.random() * location_1.Location.MAX_LONGITUDE) + location_1.Location.MIN_LONGITUDE;
-    return {
-        latitude: latitude,
-        longitude: longitude
-    };
-}

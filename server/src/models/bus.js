@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var Bus = (function () {
     function Bus(id, location) {
         this._id = id;

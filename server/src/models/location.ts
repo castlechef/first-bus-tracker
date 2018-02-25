@@ -33,6 +33,8 @@ export class Location implements Jsonable {
     }
 
     constructor({latitude, longitude}: ILocation) {
+        if (!Location.isValidLocation({latitude, longitude}))
+            throw new Error('Invalid ILocation parameter');
         this.latitude = latitude;
         this.longitude = longitude;
     }

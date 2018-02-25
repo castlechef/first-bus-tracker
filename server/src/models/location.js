@@ -1,8 +1,10 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var Location = (function () {
     function Location(_a) {
         var latitude = _a.latitude, longitude = _a.longitude;
+        if (!Location.isValidLocation({ latitude: latitude, longitude: longitude }))
+            throw new Error('Invalid ILocation parameter');
         this.latitude = latitude;
         this.longitude = longitude;
     }

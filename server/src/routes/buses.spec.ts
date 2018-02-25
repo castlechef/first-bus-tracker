@@ -3,6 +3,7 @@ import {app} from '../app';
 import {expect} from 'chai';
 import 'mocha';
 import {ILocation, Location} from '../models/location';
+import {Utils} from '../utils/utils';
 
 beforeEach(() => {
     app.locals.buses.removeAllBuses();
@@ -51,9 +52,9 @@ describe('adding a new bus', () => {
 
 describe('should return list of buses', () => {
     it('should return list of buses', () => {
-        const location0 = generateValidLocation();
-        const location1 = generateValidLocation();
-        const location2 = generateValidLocation();
+        const location0 = Utils.location.generateValidLocation();
+        const location1 = Utils.location.generateValidLocation();
+        const location2 = Utils.location.generateValidLocation();
 
         const expectedData = {
             'status': 'success',
@@ -85,12 +86,3 @@ describe('should return list of buses', () => {
             });
     });
 });
-
-function generateValidLocation(): ILocation {
-    const latitude = (Math.random() * Location.MAX_LATITUDE) + Location.MIN_LATITUDE;
-    const longitude = (Math.random() * Location.MAX_LONGITUDE) + Location.MIN_LONGITUDE;
-    return {
-        latitude,
-        longitude
-    };
-}

@@ -3,20 +3,21 @@ import {ILocation, Location} from './location';
 import {Buses} from './buses';
 import {Bus} from './bus';
 import 'mocha';
+import {Utils} from '../utils/utils';
 
 describe('adding a new bus', () => {
     it('should add new bus', () => {
         const buses = new Buses();
-        const location = new Location({latitude: 52.36, longitude: -2.35});
+        const location = new Location({latitude: 51.36, longitude: -2.35});
 
         const bus = buses.newBus(location);
         expect(bus).to.deep.equal(new Bus(0, location));
     });
 
     it('should return list of Jsoned buses', () => {
-        const location0: ILocation = generateValidLocation();
-        const location1: ILocation = generateValidLocation();
-        const location2: ILocation = generateValidLocation();
+        const location0: ILocation = Utils.location.generateValidLocation();
+        const location1: ILocation = Utils.location.generateValidLocation();
+        const location2: ILocation = Utils.location.generateValidLocation();
 
         const expectedData = [
             {
@@ -41,13 +42,3 @@ describe('adding a new bus', () => {
         expect(buses.toJson()).to.deep.equal(expectedData);
     });
 });
-
-
-function generateValidLocation(): ILocation {
-    const latitude = (Math.random() * Location.MAX_LATITUDE) + Location.MIN_LATITUDE;
-    const longitude = (Math.random() * Location.MAX_LONGITUDE) + Location.MIN_LONGITUDE;
-    return {
-        latitude,
-        longitude
-    };
-}

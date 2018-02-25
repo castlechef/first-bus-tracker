@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var bus_1 = require("./bus");
 var Buses = (function () {
     function Buses() {
