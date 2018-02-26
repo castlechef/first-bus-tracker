@@ -295,6 +295,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ServerProvider = /** @class */ (function () {
     function ServerProvider(http) {
         this.http = http;
+        this.host = 'http://localhost:8080/buses';
         console.log('ServerProvider opened');
     }
     ServerProvider.prototype.load = function () {
@@ -304,7 +305,7 @@ var ServerProvider = /** @class */ (function () {
             return Promise.resolve(this.data);
         }
         return new Promise(function (resolve) {
-            _this.http.get('http://localhost:8080/buses')
+            _this.http.get(_this.host)
                 .subscribe(function (data) {
                 // in this promise is where we get all the data from the api
                 // test server is being used in this instance
@@ -316,9 +317,10 @@ var ServerProvider = /** @class */ (function () {
     };
     ServerProvider = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["A" /* Injectable */])(),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0__angular_common_http__["a" /* HttpClient */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_common_http__["a" /* HttpClient */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_common_http__["a" /* HttpClient */]) === "function" && _a || Object])
     ], ServerProvider);
     return ServerProvider;
+    var _a;
 }());
 
 //# sourceMappingURL=server-provider.js.map

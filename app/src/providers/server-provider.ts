@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class ServerProvider {
   data: any;
+  host = 'http://localhost:8080/buses';
 
   constructor(private http: HttpClient){
     console.log('ServerProvider opened');
@@ -17,7 +18,7 @@ export class ServerProvider {
     }
 
     return new Promise(resolve => {
-      this.http.get('http://localhost:8080/buses')
+      this.http.get(this.host)
         .subscribe(data => {
           // in this promise is where we get all the data from the api
           // test server is being used in this instance

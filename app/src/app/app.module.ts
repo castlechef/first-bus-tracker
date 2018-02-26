@@ -8,7 +8,6 @@ import { Page2 } from '../pages/page2/page2';
 
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-import { HttpHandler} from '@angular/common/http';
 import { ServerProvider} from '../providers/server-provider';
 
 import { StatusBar } from '@ionic-native/status-bar';
