@@ -3,21 +3,21 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Page Two</ion-title>
+    <ion-title>Page Two - Locations</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <button ion-item *ngFor="let item of items" (click)="itemTapped($event, item)">
-      <ion-icon [name]="item.icon" item-start></ion-icon>
-      {{item.title}}
-      <div class="item-note" item-end>
-        {{item.note}}
-      </div>
-    </button>
-  </ion-list>
-  <div *ngIf="selectedItem" padding>
-    You navigated here from <b>{{selectedItem.title}}</b>
-  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col><b>Bus ID</b></ion-col>
+      <ion-col><b>Latitude</b></ion-col>
+      <ion-col><b>Longitude</b></ion-col>
+    </ion-row>
+    <ion-row *ngFor="let bus of buses">
+      <ion-col>{{bus.busId}}</ion-col>
+      <ion-col>{{bus.location.latitude}}</ion-col>
+      <ion-col>{{bus.location.longitude}}</ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
