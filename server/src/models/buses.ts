@@ -1,47 +1,62 @@
-import {Bus} from './bus';
+import {Bus, busId} from './bus';
 import {Location} from './location';
 import {Jsonable} from './response';
 
 export class Buses implements Jsonable {
     private busList: Bus[];
-    private currentId: number;
+    private busMap: Map<busId, Bus>;
+    private currentId: busId;
 
     constructor() {
         this.busList = [];
+        this.busMap = new Map<busId, Bus>();
         this.currentId = 0;
     }
 
-    public constainsBus(id: number): boolean {
-        for (let i = 0; i < this.busList.length; i++) {
-            let bus = this.busList[i];
-            if (bus.id === id) return true;
-        }
-        return false;
+    public containsBus(id: busId): boolean {
+        //return this.busMap.has(id);
+        return this.busList.some(bus => bus.id === id);
     }
 
-    public newBus(location: Location): Bus {
+    public getBus(id: busId): Bus {
+        //const bus = this.busMap.get(id);
+        const bus = this.busList.find(bus => bus.id === id);
+        if (!bus) throw new Error('Bus not found');
+        return bus;
+    }
+
+    public createAndInsertBus(location: Location): Bus {
         const id = this.generateBusId();
         const bus = new Bus(id, location);
         this.busList.push(bus);
+        //this.busMap.set(id, bus);
         return bus;
+    }
+
+    public removeBus(id: busId): void {
+        if (!this.containsBus(id)) throw new Error('bus not found');
+        //this.busMap.delete(id);
+        this.busList.splice(this.busList.indexOf(this.busList.find(bus => bus.id === id)), 1)
     }
 
     public removeAllBuses(): void {
         while (this.busList.length > 0) {
             this.busList.pop();
         }
-        this.currentId = 0;
+        this.currentId -= this.currentId;
+        //this.busMap.clear();
     }
 
     public toJson(): object {
         const jsonList = [];
+        //this.busMap.forEach(bus => jsonList.push(bus.toJson()));
         for (let i = 0; i < this.busList.length; i++) {
             jsonList.push(this.busList[i].toJson());
         }
         return jsonList;
     }
 
-    private generateBusId(): number {
+    private generateBusId(): busId {
         return this.currentId++;
     }
 }

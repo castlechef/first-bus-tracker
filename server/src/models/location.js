@@ -5,8 +5,8 @@ var Location = (function () {
         var latitude = _a.latitude, longitude = _a.longitude;
         if (!Location.isValidLocation({ latitude: latitude, longitude: longitude }))
             throw new Error('Invalid ILocation parameter');
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this._latitude = latitude;
+        this._longitude = longitude;
     }
     Location.isValidLocation = function (_a) {
         var latitude = _a.latitude, longitude = _a.longitude;
@@ -32,14 +32,28 @@ var Location = (function () {
     };
     Location.prototype.toJson = function () {
         return {
-            latitude: this.latitude,
-            longitude: this.longitude
+            latitude: this._latitude,
+            longitude: this._longitude
         };
     };
+    Object.defineProperty(Location.prototype, "latitude", {
+        get: function () {
+            return this._latitude;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Location.prototype, "longitude", {
+        get: function () {
+            return this._longitude;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Location.MAX_LATITUDE = 51.391178;
+    Location.MIN_LATITUDE = 51.355208;
+    Location.MAX_LONGITUDE = -2.310755;
+    Location.MIN_LONGITUDE = -2.403184;
     return Location;
 }());
-Location.MAX_LATITUDE = 51.391178;
-Location.MIN_LATITUDE = 51.355208;
-Location.MAX_LONGITUDE = -2.310755;
-Location.MIN_LONGITUDE = -2.403184;
 exports.Location = Location;

@@ -13,20 +13,6 @@ app.use(bodyParser.json());
 
 app.use('/buses', busesRoute);
 
-app.get('/hey', (req, res) => {
-    res.json({hello: 'world'});
-});
+class A extends Error {
 
-let currentId = 1;
-
-function getNextId(): number {
-    return currentId++;
 }
-
-app.post('/location', (req, res) => {
-
-    const responseData = req.body;
-    responseData.data.busId = getNextId();
-
-    res.json(responseData);
-});
