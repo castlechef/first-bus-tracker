@@ -1,5 +1,6 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Geolocation } from '@ionic-native/geolocation';
 
 /**
  * Generated class for the MapPage page.
@@ -7,6 +8,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
+declare var google;
 
 @IonicPage()
 @Component({
@@ -18,28 +20,39 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-    //const map = new google.maps.Map();
-    /**/
+  constructor(public navCtrl: NavController, public navParams: NavParams, public geolocation: Geolocation) {
   }
 
-  ionViewDidLoad() {
-    console.log(this.mapElement);
-    this.map = new google.maps.Map(
-      this.mapElement.nativeElement,
-      {
-        center: new google.maps.LatLng(48.636111, -53.759722),
+  ionViewDidLoad(){
+    this.loadMap();
+  }
+
+  loadMap(){
+    this.geolocation.getCurrentPosition().then((position) => {
+      let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+      let mapOptions = {
+        center: latLng,
         zoom: 15,
-        styles: [
-          {
-            featureType: "transit.station.bus",
-            stylers: [
-              { visibility: "off" }
-            ]
-          }
-        ]
-      }
-    )
-  }
+        zoomControl: true,
+        mapTypeControl: false,
+        scaleControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
 
+      this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+
+      let userPosition = new google.maps.Marker({
+        map: this.map,
+        position: latLng,
+        title: 'Your Position'
+      });
+
+    }, (err) => {
+      console.log(err);
+    })
+  }
 }
