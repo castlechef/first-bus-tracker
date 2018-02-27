@@ -4,13 +4,13 @@ export interface Jsonable {
     toJson(): object;
 }
 
-export interface JsonResponse {
+export type JsonResponse = {
     status: string;
     data: any;
     error?: JsonResponseError;
 }
 
-export interface JsonResponseError {
+export type JsonResponseError = {
     code: number;
     message: string;
 }

@@ -2,87 +2,92 @@ import * as request from 'supertest';
 import {app} from '../app';
 import {expect} from 'chai';
 import 'mocha';
-import {ILocation, Location} from '../models/location';
 import {Utils} from '../utils/utils';
 
-beforeEach(() => {
-    app.locals.buses.removeAllBuses();
-});
-
-describe('adding a new bus', () => {
-    it('dodgy data', () => {
-
-        const data = {
-            data: {
-                location: {
-                    latitude: 'asdf',
-                    longitude: false
-                }
-            }
-        };
-
-        return request(app)
-            .post('/buses')
-            .send(data)
-            .expect(422)
-            .then((res) => {
-                expect(res.body.error.code).to.equal(422);
-            });
+describe('buses routes', () => {
+    beforeEach(() => {
+        app.locals.buses.removeAllBuses();
     });
 
-    it('should add new bus', () => {
-        const data = {
-            data: {
-                location: {
-                    latitude: 51.36,
-                    longitude: -2.35
-                }
-            }
-        };
+    describe('/buses [POST]', () => {
+        it('dodgy data', () => {
 
-        return request(app)
-            .post('/buses')
-            .send(data)
-            .expect(200)
-            .then((res) => {
-                expect(res.body.data.busId).to.equal(0);
-            });
+            const data = {
+                data: {
+                    location: {
+                        latitude: 'asdf',
+                        longitude: false
+                    }
+                }
+            };
+
+            return request(app)
+                .post('/buses')
+                .send(data)
+                .expect(422)
+                .then((res) => {
+                    expect(res.body.error.code).to.equal(422);
+                });
+        });
+
+        it('should add new bus', () => {
+            const data = {
+                data: {
+                    location: {
+                        latitude: 51.36,
+                        longitude: -2.35
+                    }
+                }
+            };
+
+            return request(app)
+                .post('/buses')
+                .send(data)
+                .expect(200)
+                .then((res) => {
+                    expect(res.body.data.busId).to.equal(0);
+                });
+        });
     });
-});
 
-describe('should return list of buses', () => {
-    it('should return list of buses', () => {
-        const location0 = Utils.location.generateValidLocation();
-        const location1 = Utils.location.generateValidLocation();
-        const location2 = Utils.location.generateValidLocation();
+    describe('/buses [GET]', () => {
+        it('should return list of buses', () => {
+            const location0 = Utils.location.generateValidLocation();
+            const location1 = Utils.location.generateValidLocation();
+            const location2 = Utils.location.generateValidLocation();
 
-        const expectedData = {
-            'status': 'success',
-            'data': [
-                {
-                    'busId': 0,
-                    'location': location0
-                },
-                {
-                    'busId': 1,
-                    'location': location1
-                },
-                {
-                    'busId': 2,
-                    'location': location2
-                }
-            ]
-        };
+            const expectedData = {
+                'status': 'success',
+                'data': [
+                    {
+                        'busId': 0,
+                        'location': location0.toJson()
+                    },
+                    {
+                        'busId': 1,
+                        'location': location1.toJson()
+                    },
+                    {
+                        'busId': 2,
+                        'location': location2.toJson()
+                    }
+                ]
+            };
 
-        const buses = app.locals.buses;
-        buses.newBus(new Location(location0));
-        buses.newBus(new Location(location1));
-        buses.newBus(new Location(location2));
+            const buses = app.locals.buses;
+            buses.createAndInsertBus(location0);
+            buses.createAndInsertBus(location1);
+            buses.createAndInsertBus(location2);
 
-        return request(app).get('/buses')
-            .expect(200)
-            .then(res => {
-                expect(res.body).to.deep.equal(expectedData);
-            });
+            return request(app).get('/buses')
+                .expect(200)
+                .then(res => {
+                    expect(res.body).to.deep.equal(expectedData);
+                });
+        });
+    });
+
+    describe('/buses/{busId} [PUT]', () => {
+
     });
 });

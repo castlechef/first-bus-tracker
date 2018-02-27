@@ -1,6 +1,6 @@
 import {Jsonable} from './response';
 
-export interface ILocation {
+export type ILocation = {
     latitude: number;
     longitude: number;
 }
@@ -11,8 +11,8 @@ export class Location implements Jsonable {
     public static readonly MAX_LONGITUDE: number = -2.310755;
     public static readonly MIN_LONGITUDE: number = -2.403184;
 
-    private latitude: number;
-    private longitude: number;
+    private _latitude: number;
+    private _longitude: number;
 
     public static isValidLocation({latitude, longitude}: ILocation): boolean {
         return Location.isValidLatitude(latitude) && Location.isValidLongitude(longitude);
@@ -35,14 +35,22 @@ export class Location implements Jsonable {
     constructor({latitude, longitude}: ILocation) {
         if (!Location.isValidLocation({latitude, longitude}))
             throw new Error('Invalid ILocation parameter');
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this._latitude = latitude;
+        this._longitude = longitude;
     }
 
     public toJson(): object {
         return {
-            latitude: this.latitude,
-            longitude: this.longitude
+            latitude: this._latitude,
+            longitude: this._longitude
         };
+    }
+
+    get latitude(): number {
+        return this._latitude;
+    }
+
+    get longitude(): number {
+        return this._longitude;
     }
 }
