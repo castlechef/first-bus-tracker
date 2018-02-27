@@ -8,12 +8,14 @@ import { Page2 } from '../pages/page2/page2';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { MapPage } from '../pages/map/map';
 
 @NgModule({
   declarations: [
     MyApp,
     Page1,
-    Page2
+    Page2,
+    MapPage
   ],
   imports: [
     BrowserModule,
@@ -23,7 +25,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   entryComponents: [
     MyApp,
     Page1,
-    Page2
+    Page2,
+    MapPage
   ],
   providers: [
     StatusBar,
