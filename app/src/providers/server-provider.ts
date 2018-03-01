@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Bus } from '../bus';
+import { Bus } from '../bus.interface';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
@@ -12,7 +12,7 @@ export class ServerProvider {
   private _url: string = 'http://localhost:8080/buses';
 
   constructor(private http: HttpClient){
-    console.log('ServerProvider opened');
+
   }
 
   getLocations(): Observable<Bus[]>{

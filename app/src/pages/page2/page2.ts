@@ -10,6 +10,7 @@ import { NavController, NavParams } from 'ionic-angular';
 export class Page2 implements OnInit {
   public buses: any = [];
   public errorMessage;
+  public worked;
 
   constructor(public navCtrl: NavController, public serverService: ServerProvider){
     //this.loadBuses();
@@ -24,20 +25,8 @@ export class Page2 implements OnInit {
         console.log(this.buses);
       },
       error => this.errorMessage = error);
-  }
 
-  /*
-  loadBuses(){
-    this.serverService.load()
-      .then(data => {
-        this.buses = data;
-        // actual data needed is in buses.data
-        this.buses = this.buses.data;
-        console.log(this.buses);
-      });
   }
-  */
-
 
 
 }

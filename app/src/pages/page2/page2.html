@@ -8,7 +8,8 @@
 </ion-header>
 
 <ion-content>
-  <h3>{{errorMessage}}</h3>
+  <h1 *ngIf="errorMessage; else elseBlock">{{errorMessage}}</h1>
+  <ng-template #elseBlock>
   <ion-grid>
     <ion-row>
       <ion-col><b>Bus ID</b></ion-col>
@@ -21,4 +22,5 @@
       <ion-col>{{bus.location.longitude}}</ion-col>
     </ion-row>
   </ion-grid>
+  </ng-template>
 </ion-content>
