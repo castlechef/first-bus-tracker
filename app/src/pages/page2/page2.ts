@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { ServerProvider } from '../../providers/server-provider';
 import { NavController, NavParams } from 'ionic-angular';
 
@@ -7,13 +7,26 @@ import { NavController, NavParams } from 'ionic-angular';
   templateUrl: 'page2.html',
   providers: [ServerProvider]
 })
-export class Page2 {
+export class Page2 implements OnInit {
   public buses: any = [];
+  public errorMessage;
 
   constructor(public navCtrl: NavController, public serverService: ServerProvider){
-    this.loadBuses();
+    //this.loadBuses();
   }
 
+  ngOnInit(){
+    this.serverService.getLocations()
+      .subscribe(data => {
+        this.buses = data;
+        console.log(this.buses.status);
+        this.buses = this.buses.data;
+        console.log(this.buses);
+      },
+      error => this.errorMessage = error);
+  }
+
+  /*
   loadBuses(){
     this.serverService.load()
       .then(data => {
@@ -23,6 +36,16 @@ export class Page2 {
         console.log(this.buses);
       });
   }
+  */
+
 
 
 }
+
+/*
+    <ion-row *ngFor="let bus of buses">
+      <ion-col>{{bus.busId}}</ion-col>
+      <ion-col>{{bus.location.latitude}}</ion-col>
+      <ion-col>{{bus.location.longitude}}</ion-col>
+    </ion-row>
+ */
