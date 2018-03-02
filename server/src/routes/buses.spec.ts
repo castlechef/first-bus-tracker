@@ -4,9 +4,12 @@ import {expect} from 'chai';
 import 'mocha';
 import {Utils} from '../utils/utils';
 
+let buses;
+
 describe('buses routes', () => {
     beforeEach(() => {
-        app.locals.buses.removeAllBuses();
+        buses = app.locals.buses;
+        buses.removeAllBuses();
     });
 
     describe('/buses [POST]', () => {
@@ -88,6 +91,105 @@ describe('buses routes', () => {
     });
 
     describe('/buses/{busId} [PUT]', () => {
+        it('should respond with 200 response when location and busId are valid', () => {
+            const initialLocation = Utils.location.generateValidLocation();
+            const updatedLocation = Utils.location.generateValidLocation();
+            const bus = app.locals.buses.createAndInsertBus(initialLocation);
 
+            const dataToSend = {
+                data: {
+                    location: {
+                        latitude: updatedLocation.latitude,
+                        longitude: updatedLocation.longitude
+                    }
+                }
+            };
+
+            const expectedData = {
+                status: 'success',
+                data: {
+                    busId: bus.id,
+                    location: {
+                        latitude: updatedLocation.latitude,
+                        longitude: updatedLocation.longitude
+                    }
+                }
+            };
+
+            return request(app)
+                .put(`/buses/${bus.id}`)
+                .send(dataToSend)
+                .expect(200)
+                .then(res => {
+                    expect(res.body).to.deep.equal(expectedData);
+                });
+        });
+
+        it('should respond with 404 error when bus with id has been deleted', () => {
+            const location = Utils.location.generateValidLocation();
+            const bus = buses.createAndInsertBus(location);
+            buses.removeBus(bus.id);
+
+            return request(app)
+                .put(`/buses/${bus.id}`)
+                .send({data: {location: location.toJson()}})
+                .expect(404)
+                .then(res => {
+                    expect(res.body).to.deep.equal({
+                        status: 'failure',
+                        data: {
+                            busId: bus.id,
+                            location: {
+                                latitude: location.latitude,
+                                longitude: location.longitude
+                            }
+                        },
+                        error: {
+                            code: 404,
+                            message: 'Not Found'
+                        }
+                    });
+                });
+        });
+
+        describe('should respond with 422 error when sending invalid location', () => {
+            it('should respond with 422 when sending string lat/longs', () => {
+                const busLocation = Utils.location.generateValidLocation();
+                const bus = buses.createAndInsertBus(busLocation);
+
+                const dataToSend = {
+                    data: {
+                        location: {
+                            latitude: 'hello',
+                            longitude: 'world'
+                        }
+                    }
+                };
+                const expectedResponse = {
+                    status: 'failure',
+                    error: {
+                        code: 422,
+                        message: 'Unprocessable Entity'
+                    }
+                };
+
+                return request(app)
+                    .put(`/buses/${bus.id}'`)
+                    .send(dataToSend)
+                    .expect(422)
+                    .then(res => {
+                        expect(res.body).to.deep.equal(expectedResponse);
+                    });
+            });
+
+            it('should respond with 422 when sending no data', () => {
+                const busLocation = Utils.location.generateValidLocation();
+                const bus = buses .createAndInsertBus(busLocation);
+
+                return request(app)
+                    .put(`/buses/${bus.id}`)
+                    .expect(422);
+            })
+        });
     });
 });

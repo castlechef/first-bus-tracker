@@ -5,9 +5,11 @@ var app_1 = require("../app");
 var chai_1 = require("chai");
 require("mocha");
 var utils_1 = require("../utils/utils");
+var buses;
 describe('buses routes', function () {
     beforeEach(function () {
-        app_1.app.locals.buses.removeAllBuses();
+        buses = app_1.app.locals.buses;
+        buses.removeAllBuses();
     });
     describe('/buses [POST]', function () {
         it('dodgy data', function () {
@@ -79,5 +81,95 @@ describe('buses routes', function () {
         });
     });
     describe('/buses/{busId} [PUT]', function () {
+        it('should respond with 200 response when location and busId are valid', function () {
+            var initialLocation = utils_1.Utils.location.generateValidLocation();
+            var updatedLocation = utils_1.Utils.location.generateValidLocation();
+            var bus = app_1.app.locals.buses.createAndInsertBus(initialLocation);
+            var dataToSend = {
+                data: {
+                    location: {
+                        latitude: updatedLocation.latitude,
+                        longitude: updatedLocation.longitude
+                    }
+                }
+            };
+            var expectedData = {
+                status: 'success',
+                data: {
+                    busId: bus.id,
+                    location: {
+                        latitude: updatedLocation.latitude,
+                        longitude: updatedLocation.longitude
+                    }
+                }
+            };
+            return request(app_1.app)
+                .put("/buses/" + bus.id)
+                .send(dataToSend)
+                .expect(200)
+                .then(function (res) {
+                chai_1.expect(res.body).to.deep.equal(expectedData);
+            });
+        });
+        it('should respond with 404 error when bus with id has been deleted', function () {
+            var location = utils_1.Utils.location.generateValidLocation();
+            var bus = buses.createAndInsertBus(location);
+            buses.removeBus(bus.id);
+            return request(app_1.app)
+                .put("/buses/" + bus.id)
+                .send({ data: { location: location.toJson() } })
+                .expect(404)
+                .then(function (res) {
+                chai_1.expect(res.body).to.deep.equal({
+                    status: 'failure',
+                    data: {
+                        busId: bus.id,
+                        location: {
+                            latitude: location.latitude,
+                            longitude: location.longitude
+                        }
+                    },
+                    error: {
+                        code: 404,
+                        message: 'Not Found'
+                    }
+                });
+            });
+        });
+        describe('should respond with 422 error when sending invalid location', function () {
+            it('should respond with 422 when sending string lat/longs', function () {
+                var busLocation = utils_1.Utils.location.generateValidLocation();
+                var bus = buses.createAndInsertBus(busLocation);
+                var dataToSend = {
+                    data: {
+                        location: {
+                            latitude: 'hello',
+                            longitude: 'world'
+                        }
+                    }
+                };
+                var expectedResponse = {
+                    status: 'failure',
+                    error: {
+                        code: 422,
+                        message: 'Unprocessable Entity'
+                    }
+                };
+                return request(app_1.app)
+                    .put("/buses/" + bus.id + "'")
+                    .send(dataToSend)
+                    .expect(422)
+                    .then(function (res) {
+                    chai_1.expect(res.body).to.deep.equal(expectedResponse);
+                });
+            });
+            it('should respond with 422 when sending no data', function () {
+                var busLocation = utils_1.Utils.location.generateValidLocation();
+                var bus = buses.createAndInsertBus(busLocation);
+                return request(app_1.app)
+                    .put("/buses/" + bus.id)
+                    .expect(422);
+            });
+        });
     });
 });

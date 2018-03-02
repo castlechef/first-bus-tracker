@@ -14,7 +14,9 @@ export class Location implements Jsonable {
     private _latitude: number;
     private _longitude: number;
 
-    public static isValidLocation({latitude, longitude}: ILocation): boolean {
+    public static isValidLocation(location: ILocation): boolean {
+        if (!location) return false;
+        const {latitude, longitude} = location;
         return Location.isValidLatitude(latitude) && Location.isValidLongitude(longitude);
     }
 

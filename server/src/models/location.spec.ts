@@ -7,6 +7,8 @@ describe('location', () => {
     describe('isValidLocation', () => {
 
         const tests = [
+            {name: 'undefined location', args: undefined, expected: false},
+            {name: 'null location', args: null, expected: false},
             {name: 'undefined latitude', args: {latitude: undefined, longitude: Utils.location.validLon}, expected: false},
             {name: 'undefined longitude', args: {latitude: Utils.location.validLat, longitude: undefined}, expected: false},
             {name: 'undefined both', args: {latitude: undefined, longitude: undefined}, expected: false},
@@ -33,20 +35,6 @@ describe('location', () => {
                 expect(Location.isValidLocation(test.args)).equal(test.expected);
             });
         });
-
-        it('throws property error when undefined object sent', () => {
-            assert.throws(() => {
-                Location.isValidLocation(undefined)
-            }, Error, 'Cannot read property \'latitude\' of undefined');
-        });
-
-        it('throws property error when null object sent', () => {
-            assert.throws(() => {
-                Location.isValidLocation(null);
-            }, Error, 'Cannot read property \'latitude\' of null');
-        });
-
-
     });
 
     describe('constructor', () => {

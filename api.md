@@ -56,6 +56,7 @@ Allows clients to get the latest list of buses and their locations.
             ]
         }
 ```
+
 + Response 503 (application/json)
 
     + Body
@@ -68,6 +69,7 @@ Allows clients to get the latest list of buses and their locations.
             }
         }
 ```
+
 ### Add a location [POST]
 
 Allows a new bus to register to the server with its location. The
@@ -106,6 +108,19 @@ system generates an id for the bus and returns it in the data object.
         }
 ```
 
++ Response 422 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 422,
+                "message": "Unprocessable Entity"
+            }
+        }
+```
+
 + Response 503 (application/json)
 
     + Body
@@ -124,6 +139,7 @@ system generates an id for the bus and returns it in the data object.
             }
         }
 ```
+
 ## Bus [/buses/{busId}]
 
 + Parameters
@@ -138,7 +154,7 @@ update.
 + Request (application/json)
 
     + Headers
-    
+
             Accept: application/json
     
     + Body
@@ -152,6 +168,7 @@ update.
             }
         }
 ```
+
 + Response 200 (application/json)
     
     + Body
@@ -167,6 +184,7 @@ update.
             }
         }
 ```
+
 + Response 404 (application/json)
         
     + Body
@@ -186,8 +204,22 @@ update.
             }
         }
 ```
+
++ Response 422 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 422,
+                "message": "Unprocessable Entity"
+            }
+        }
+```
+
 + Response 503 (application/json)
-        
+
     + Body
 ```json
         {

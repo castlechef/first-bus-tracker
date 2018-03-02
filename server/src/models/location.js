@@ -8,8 +8,10 @@ var Location = (function () {
         this._latitude = latitude;
         this._longitude = longitude;
     }
-    Location.isValidLocation = function (_a) {
-        var latitude = _a.latitude, longitude = _a.longitude;
+    Location.isValidLocation = function (location) {
+        if (!location)
+            return false;
+        var latitude = location.latitude, longitude = location.longitude;
         return Location.isValidLatitude(latitude) && Location.isValidLongitude(longitude);
     };
     Location.isValidLatitude = function (l) {
