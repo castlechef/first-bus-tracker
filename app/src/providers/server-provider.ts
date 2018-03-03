@@ -11,9 +11,7 @@ export class ServerProvider {
   data: any;
   private _url: string = 'http://localhost:8080/buses';
 
-  constructor(private http: HttpClient){
-
-  }
+  constructor(private http: HttpClient){}
 
   getLocations(): Observable<Bus[]>{
     return this.http.get<Bus[]>(this._url).catch(this.errorHandler);
