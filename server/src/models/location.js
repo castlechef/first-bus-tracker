@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Location = (function () {
     function Location(_a) {
         var latitude = _a.latitude, longitude = _a.longitude;

@@ -1,7 +1,7 @@
 import * as HTTPStatusCodes from 'http-status-codes';
 
 export interface Jsonable {
-    toJson(): object;
+    toJson: () => object;
 }
 
 export type JsonResponse = {

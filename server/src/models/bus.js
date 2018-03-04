@@ -1,17 +1,22 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var location_1 = require("./location");
 var Bus = (function () {
     function Bus(id, location) {
         if (typeof id !== "number" || !(location instanceof location_1.Location))
             throw new Error('invalid parameter');
         this._id = id;
-        this.location = location;
+        this.locations = [];
+        this.updateLocation(location);
     }
     Bus.prototype.updateLocation = function (location) {
         if (!(location instanceof location_1.Location))
             throw new Error('invalid location');
-        this.location = location;
+        //this.location = location;
+        this.locations.push(location);
+    };
+    Bus.prototype.getLatestLocation = function () {
+        return this.locations[this.locations.length - 1];
     };
     Object.defineProperty(Bus.prototype, "id", {
         get: function () {
@@ -23,7 +28,7 @@ var Bus = (function () {
     Bus.prototype.toJson = function () {
         return {
             busId: this.id,
-            location: this.location.toJson()
+            location: this.getLatestLocation().toJson()
         };
     };
     return Bus;

@@ -5,17 +5,23 @@ export type busId = number;
 
 export class Bus implements Jsonable {
     private _id: busId;
-    private location: Location;
+    private locations: Location[];
 
     constructor(id: busId, location: Location) {
         if (typeof id !== "number" || !(location instanceof Location)) throw new Error('invalid parameter');
         this._id = id;
-        this.location = location;
+        this.locations = [];
+        this.updateLocation(location);
     }
 
     public updateLocation(location: Location): void {
         if (!(location instanceof Location)) throw new Error('invalid location');
-        this.location = location;
+        //this.location = location;
+        this.locations.push(location);
+    }
+
+    private getLatestLocation() {
+        return this.locations[this.locations.length - 1];
     }
 
     get id(): busId {
@@ -25,7 +31,7 @@ export class Bus implements Jsonable {
     public toJson(): object {
         return {
             busId: this.id,
-            location: this.location.toJson()
+            location: this.getLatestLocation().toJson()
         };
     }
 

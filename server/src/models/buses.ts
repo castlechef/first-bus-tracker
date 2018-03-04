@@ -1,16 +1,18 @@
 import {Bus, busId} from './bus';
 import {Location} from './location';
 import {Jsonable} from './response';
+import {IdGenerator} from '../utils/id';
 
 export class Buses implements Jsonable {
     private busList: Bus[];
     private busMap: Map<busId, Bus>;
     private currentId: busId;
+    private idGenerator: IdGenerator;
 
     constructor() {
         this.busList = [];
         this.busMap = new Map<busId, Bus>();
-        this.currentId = 0;
+        this.idGenerator = new IdGenerator();
     }
 
     public containsBus(id: busId): boolean {
@@ -26,7 +28,7 @@ export class Buses implements Jsonable {
     }
 
     public createAndInsertBus(location: Location): Bus {
-        const id = this.generateBusId();
+        const id = this.idGenerator.getNextId();
         const bus = new Bus(id, location);
         this.busList.push(bus);
         //this.busMap.set(id, bus);
@@ -43,7 +45,7 @@ export class Buses implements Jsonable {
         while (this.busList.length > 0) {
             this.busList.pop();
         }
-        this.currentId -= this.currentId;
+        this.idGenerator.resetIds();
         //this.busMap.clear();
     }
 
@@ -54,9 +56,5 @@ export class Buses implements Jsonable {
             jsonList.push(this.busList[i].toJson());
         }
         return jsonList;
-    }
-
-    private generateBusId(): busId {
-        return this.currentId++;
     }
 }

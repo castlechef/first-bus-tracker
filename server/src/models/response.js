@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var HTTPStatusCodes = require("http-status-codes");
 var Response = (function () {
     function Response() {
@@ -8,12 +8,12 @@ var Response = (function () {
         var status = success ? 'success' : 'failure';
         var res = {
             status: status,
-            data: data
+            data: data,
         };
         if (errorCode) {
             res.error = {
                 code: errorCode,
-                message: HTTPStatusCodes.getStatusText(errorCode)
+                message: HTTPStatusCodes.getStatusText(errorCode),
             };
         }
         return res;
