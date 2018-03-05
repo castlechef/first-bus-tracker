@@ -32,7 +32,7 @@ export class MapPage {
       });
   }
 
-  loadMap(): Promise<null> {
+  private loadMap(): Promise<null> {
     return new Promise<null>(resolve => {
       this.geolocation.getCurrentPosition()
         .then((position) => {
@@ -48,8 +48,8 @@ export class MapPage {
     });
   }
 
-  createMap(latLng: Object, locationObtained: Boolean) {
-    let mapOptions = {
+  private createMap(latLng: Object, locationObtained: Boolean) {
+    const mapOptions = {
       center: latLng,
       zoom: 15,
       zoomControl: true,
@@ -63,7 +63,7 @@ export class MapPage {
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
-    let userPosition = new google.maps.Marker({
+    const userPosition = new google.maps.Marker({
       map: this.map,
       position: latLng,
       title: 'Your Position',
@@ -71,27 +71,29 @@ export class MapPage {
     });
   }
 
-  addBusStops() {
-    let testStop = new google.maps.Marker({
+  private addBusStops() {
+    const testStop = new google.maps.Marker({
       map: this.map,
       position: new google.maps.LatLng(51.377954, -2.357883),
       title: 'testing stop'
     });
 
-    google.maps.event.addListener(testStop, 'click', () => {
-      this.navCtrl.push(BusStopPage, {
-        stopID: 1
-      });
+    google.maps.event.addListener(testStop, 'click', this.openBusStopPage.bind(this));
+  }
+
+  private openBusStopPage() {
+    this.navCtrl.push(BusStopPage, {
+      stopID: 1
     });
   }
 
-  addBusRoutes() {
-    let exampleBusRouteCoordinates = [
+  private addBusRoutes() {
+    const exampleBusRouteCoordinates = [
       {lat: 51.378739, lng: -2.325066},
       {lat: 51.377843, lng: -2.325291}
     ];
 
-    let exampleBusRoute = new google.maps.Polyline({
+    const exampleBusRoute = new google.maps.Polyline({
       path: exampleBusRouteCoordinates,
       geodesic: true,
       strokeColor: '#ca12ff',
