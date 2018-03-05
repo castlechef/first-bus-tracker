@@ -10,13 +10,15 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { MapPage } from '../pages/map/map';
 import { Geolocation } from '@ionic-native/geolocation';
+import {BusStopPage} from '../pages/bus-stop/bus-stop';
 
 @NgModule({
   declarations: [
     MyApp,
     Page1,
     Page2,
-    MapPage
+    MapPage,
+    BusStopPage
   ],
   imports: [
     BrowserModule,
@@ -27,7 +29,8 @@ import { Geolocation } from '@ionic-native/geolocation';
     MyApp,
     Page1,
     Page2,
-    MapPage
+    MapPage,
+    BusStopPage
   ],
   providers: [
     StatusBar,

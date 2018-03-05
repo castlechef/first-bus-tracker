@@ -1,6 +1,7 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { Geolocation } from '@ionic-native/geolocation';
+import {IonicPage, NavController, NavParams} from 'ionic-angular';
+import {Geolocation} from '@ionic-native/geolocation';
+import {BusStopPage} from '../bus-stop/bus-stop';
 
 /**
  * Generated class for the MapPage page.
@@ -23,36 +24,83 @@ export class MapPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, public geolocation: Geolocation) {
   }
 
-  ionViewDidLoad(){
-    this.loadMap();
+  ionViewDidLoad() {
+    this.loadMap()
+      .then(() => {
+        this.addBusStops();
+        this.addBusRoutes();
+      });
   }
 
-  loadMap(){
-    this.geolocation.getCurrentPosition().then((position) => {
-      let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+  private loadMap(): Promise<null> {
+    return new Promise<null>(resolve => {
+      this.geolocation.getCurrentPosition()
+        .then((position) => {
+          let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          this.createMap(latLng, true);
+          resolve();
+        }, (err) => {
+          let latLng = new google.maps.LatLng(51.377981, -2.359026);
+          this.createMap(latLng, false);
+          console.log(err);
+          resolve();
+        });
+    });
+  }
 
-      let mapOptions = {
-        center: latLng,
-        zoom: 15,
-        zoomControl: true,
-        mapTypeControl: false,
-        scaleControl: false,
-        streetViewControl: false,
-        rotateControl: false,
-        fullscreenControl: false,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      };
+  private createMap(latLng: Object, locationObtained: Boolean) {
+    const mapOptions = {
+      center: latLng,
+      zoom: 15,
+      zoomControl: true,
+      mapTypeControl: false,
+      scaleControl: false,
+      streetViewControl: false,
+      rotateControl: false,
+      fullscreenControl: false,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
 
-      this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+    this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
-      let userPosition = new google.maps.Marker({
-        map: this.map,
-        position: latLng,
-        title: 'Your Position'
-      });
+    const userPosition = new google.maps.Marker({
+      map: this.map,
+      position: latLng,
+      title: 'Your Position',
+      visible: locationObtained
+    });
+  }
 
-    }, (err) => {
-      console.log(err);
-    })
+  private addBusStops() {
+    const testStop = new google.maps.Marker({
+      map: this.map,
+      position: new google.maps.LatLng(51.377954, -2.357883),
+      title: 'testing stop'
+    });
+
+    google.maps.event.addListener(testStop, 'click', this.openBusStopPage.bind(this));
+  }
+
+  private openBusStopPage() {
+    this.navCtrl.push(BusStopPage, {
+      stopID: 1
+    });
+  }
+
+  private addBusRoutes() {
+    const exampleBusRouteCoordinates = [
+      {lat: 51.378739, lng: -2.325066},
+      {lat: 51.377843, lng: -2.325291}
+    ];
+
+    const exampleBusRoute = new google.maps.Polyline({
+      path: exampleBusRouteCoordinates,
+      geodesic: true,
+      strokeColor: '#ca12ff',
+      strokeOpacity: 0.8,
+      strokeWeight: 3
+    });
+
+    exampleBusRoute.setMap(this.map);
   }
 }
