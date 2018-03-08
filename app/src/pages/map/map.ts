@@ -21,7 +21,14 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
+  private busStopMarkers: Map<number, google.maps.Marker>;
+  private busRouteLines: Map<String, google.maps.Polyline>;
+
+  private colors = ["#bb72e0","#90b2ed", "#049310", "#f9f06d", "#ffc36b", "#f7946a", "#ef60ff"];
+
   constructor(public navCtrl: NavController, public navParams: NavParams, public geolocation: Geolocation) {
+    this.busStopMarkers = new Map<number, google.maps.Marker>();
+    this.busRouteLines = new Map<String, google.maps.Polyline>();
   }
 
   ionViewDidLoad() {
@@ -58,7 +65,14 @@ export class MapPage {
       streetViewControl: false,
       rotateControl: false,
       fullscreenControl: false,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      styles: [{
+        featureType: 'transit.station.bus',
+        elementType: 'all',
+        stylers: [{
+          visibility: 'off'
+        }]
+      }]
     };
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
@@ -71,36 +85,102 @@ export class MapPage {
     });
   }
 
-  private addBusStops() {
-    const testStop = new google.maps.Marker({
-      map: this.map,
-      position: new google.maps.LatLng(51.377954, -2.357883),
-      title: 'testing stop'
-    });
+  /*
+   {
+      'busStopId': 1,
+      'busStopName': "University of Bath",
+      'location': {
+        'latitude': 51,377954,
+        'longitude': -2.357883
+      }
+      'routes':[
+       {'name':"U1X", 'position': 1},
+       {'name':"U1", 'position': 1}
+      ]
+    }
+   */
 
-    google.maps.event.addListener(testStop, 'click', this.openBusStopPage.bind(this));
+  private addBusStops() {
+    const busStops = [
+      {
+        'busStopId': 0,
+        'busStopName': 'University of Bath',
+        'location': {
+          'latitude': 51.377954,
+          'longitude': -2.377843
+        },
+        'routes': [
+          {'name': 'U1X', 'position': 1},
+          {'name': 'U1', 'position': 1}
+        ]
+      },
+      {
+        'busStopId': 1,
+        'busStopName': 'University of Bath U2',
+        'location': {
+          'latitude': 51.377957,
+          'longitude': -2.357885
+        },
+        'routes': [
+          {'name': 'U2', 'position': 1}
+        ]
+      }];
+
+    for (let i = 0; i < busStops.length; i++) {
+      let stopMarker = new google.maps.Marker({
+        map: this.map,
+        position: new google.maps.LatLng(busStops[i].location.latitude, busStops[i].location.longitude),
+        title: busStops[i].busStopName
+      });
+
+      this.busStopMarkers.set(busStops[i].busStopId, stopMarker);
+      google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStops[i].busStopId, busStops[i].busStopName));
+    }
   }
 
-  private openBusStopPage() {
+  private openBusStopPage(busStopID, busStopName) {
     this.navCtrl.push(BusStopPage, {
-      stopID: 1
+      stopID: busStopID,
+      stopName: busStopName
     });
   }
 
   private addBusRoutes() {
     const exampleBusRouteCoordinates = [
-      {lat: 51.378739, lng: -2.325066},
-      {lat: 51.377843, lng: -2.325291}
+      {
+        'routeName' : 'U1X',
+        'positions' : [
+          {latitude: 51.378739, longitude: -2.325066},
+          {latitude: 51.377843, longitude: -2.325291}
+        ]
+      },
+      {
+        'routeName': 'U1',
+        'positions' : [
+          {latitude: 51.378739, longitude: -2.325066}, //lat lng
+          {latitude: 51.377843, longitude: -2.325291}
+        ]
+      }
     ];
 
-    const exampleBusRoute = new google.maps.Polyline({
-      path: exampleBusRouteCoordinates,
-      geodesic: true,
-      strokeColor: '#ca12ff',
-      strokeOpacity: 0.8,
-      strokeWeight: 3
-    });
 
-    exampleBusRoute.setMap(this.map);
+    for(let i = 0; i < exampleBusRouteCoordinates.length; i++){
+      let busRoutePath = exampleBusRouteCoordinates[i].positions;
+      const googleMapStyle = busRoutePath.map(({latitude, longitude}) => {
+        return {lat: latitude, lng: longitude}
+      });
+
+      let busRoute = new google.maps.Polyline({
+        path: googleMapStyle,
+        geodesic: true,
+        strokeColor: this.colors[i%7],
+        strokeOpacity: 0.8,
+        strokeWeight: 3
+      });
+
+      this.busRouteLines.set(exampleBusRouteCoordinates[i].routeName, busRoute);
+
+      busRoute.setMap(this.map);
+    }
   }
 }
