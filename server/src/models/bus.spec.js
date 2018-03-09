@@ -1,89 +1,90 @@
 "use strict";
-exports.__esModule = true;
-var chai_1 = require("chai");
+Object.defineProperty(exports, "__esModule", { value: true });
+const chai_1 = require("chai");
 require("mocha");
-var bus_1 = require("./bus");
-var utils_1 = require("../utils/utils");
-describe('bus', function () {
-    describe('constructor', function () {
-        describe('should throw error with invalid id type', function () {
-            var location = utils_1.Utils.location.generateValidLocation();
-            var tests = [
+const bus_1 = require("./bus");
+const utils_1 = require("../utils/utils");
+const busStops_1 = require("./busStops");
+describe('bus', () => {
+    describe('constructor', () => {
+        describe('should throw error with invalid id type', () => {
+            const location = utils_1.Utils.location.generateValidLocation();
+            const tests = [
                 { testName: ' null', id: null },
                 { testName: 'n undefined', id: undefined },
                 { testName: 'n alphanumeric', id: 'sdfe23' },
                 { testName: ' string number', id: '11' },
                 { testName: 'n object containing id property', id: { id: 11 } }
             ];
-            tests.forEach(function (_a) {
-                var name = _a.testName, id = _a.id;
-                it("should throw error with a" + name + " valued id", function () {
-                    chai_1.expect(function () { return new bus_1.Bus(id, location); }).to["throw"](Error, 'invalid parameter');
+            tests.forEach(({ testName: name, id }) => {
+                it(`should throw error with a${name} valued id`, () => {
+                    chai_1.expect(() => new bus_1.Bus(id, location)).to.throw(Error, 'invalid parameter');
                 });
             });
         });
-        describe('should throw error with invalid location', function () {
-            var validId = 0;
-            var tests = [
+        describe('should throw error with invalid location', () => {
+            const validId = 0;
+            const tests = [
                 { locationType: 'undefined', location: undefined },
                 { locationType: 'null', location: null },
-                { locationType: 'POJO location', location: utils_1.Utils.location.generateValidLocation().toJson() },
+                { locationType: 'POJO location', location: utils_1.Utils.location.generateValidLocation().toJSON() },
                 { locationType: 'string', location: 'latitude: 12, longitude: 52' }
             ];
-            tests.forEach(function (_a) {
-                var locationType = _a.locationType, location = _a.location;
-                it("should not allow " + locationType + " type location", function () {
-                    chai_1.expect(function () { return new bus_1.Bus(validId, location); }).to["throw"](Error, 'invalid parameter');
+            tests.forEach(({ locationType, location }) => {
+                it(`should not allow ${locationType} type location`, () => {
+                    chai_1.expect(() => new bus_1.Bus(validId, location)).to.throw(Error, 'invalid parameter');
                 });
             });
         });
     });
-    describe('updateLocation', function () {
-        describe('should reject invalid locations', function () {
-            var validId = 0;
-            var bus = new bus_1.Bus(validId, utils_1.Utils.location.generateValidLocation());
-            var tests = [
+    describe('updateLocation', () => {
+        describe('should reject invalid locations', () => {
+            const validId = 0;
+            const bus = new bus_1.Bus(validId, utils_1.Utils.location.generateValidLocation());
+            const tests = [
                 { locationType: 'undefined', location: undefined },
                 { locationType: 'null', location: null },
-                { locationType: 'POJO location', location: utils_1.Utils.location.generateValidLocation().toJson() },
+                { locationType: 'POJO location', location: utils_1.Utils.location.generateValidLocation().toJSON() },
                 { locationType: 'string', location: 'latitude: 12, longitude: 52' }
             ];
-            tests.forEach(function (_a) {
-                var locationType = _a.locationType, location = _a.location;
-                it("should not allow " + locationType + " type location", function () {
-                    chai_1.expect(function () { return bus.updateLocation(location); }).to["throw"](Error, 'invalid location');
+            tests.forEach(({ locationType, location }) => {
+                it(`should not allow ${locationType} type location`, () => {
+                    chai_1.expect(() => bus.updateLocation(location)).to.throw(Error, 'invalid location');
                 });
             });
         });
     });
-    describe('toJson', function () {
-        it('should return valid json data of object', function () {
-            var validId = 0;
-            var validLocation = utils_1.Utils.location.generateValidLocation();
-            var bus = new bus_1.Bus(validId, validLocation);
-            var expectedJson = {
+    describe('toJSON', () => {
+        it('should return valid json data of object', () => {
+            const validId = 0;
+            const validLocation = utils_1.Utils.location.generateValidLocation();
+            const bus = new bus_1.Bus(validId, validLocation, busStops_1.BusRouteName.U1_ABBEY);
+            const expectedJson = {
                 busId: validId,
                 location: {
                     latitude: validLocation.latitude,
                     longitude: validLocation.longitude
-                }
+                },
+                routeName: busStops_1.BusRouteName.U1_ABBEY
             };
-            chai_1.expect(bus.toJson()).to.deep.equal(expectedJson);
+            chai_1.expect(bus.toJSON()).to.deep.equal(expectedJson);
         });
-        it('should return valid json data after location update', function () {
-            var validId = 0;
-            var validLocation1 = utils_1.Utils.location.generateValidLocation();
-            var validLocation2 = utils_1.Utils.location.generateValidLocation();
-            var bus = new bus_1.Bus(validId, validLocation1);
+        it('should return valid json data after location update', () => {
+            const validId = 0;
+            const validLocation1 = utils_1.Utils.location.generateValidLocation();
+            const validLocation2 = utils_1.Utils.location.generateValidLocation();
+            const bus = new bus_1.Bus(validId, validLocation1, busStops_1.BusRouteName.U1_CITY);
             bus.updateLocation(validLocation2);
-            var expectedJson = {
+            const expectedJson = {
                 busId: validId,
                 location: {
                     latitude: validLocation2.latitude,
                     longitude: validLocation2.longitude
-                }
+                },
+                routeName: busStops_1.BusRouteName.U1_CITY
             };
-            chai_1.expect(bus.toJson()).to.deep.equal(expectedJson);
+            chai_1.expect(bus.toJSON()).to.deep.equal(expectedJson);
         });
     });
 });
+//# sourceMappingURL=bus.spec.js.map

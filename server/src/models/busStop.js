@@ -1,22 +1,31 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var BusStop = (function () {
-    function BusStop(id, name, location, busRouteNames) {
+class BusStop {
+    constructor(id, name, location, busRouteData) {
         this.id = id;
-        this.name = name;
+        this._name = name;
         this.location = location;
-        this.busRouteNames = busRouteNames;
+        this.busRoutePositions = busRouteData;
     }
-    BusStop.prototype.hasRoute = function (busRoute) {
-        return this.busRouteNames.includes(busRoute);
-    };
-    BusStop.prototype.toJson = function () {
+    get name() {
+        return this._name;
+    }
+    hasRoute(busRoute) {
+        return this.busRoutePositions.some(pair => pair.name === busRoute);
+    }
+    getPositionOfRoute(busRoute) {
+        if (!this.hasRoute(busRoute))
+            throw new Error('Stop does not have route');
+        return this.busRoutePositions.find(pair => pair.name === busRoute).position;
+    }
+    toJSON() {
         return {
             busStopId: this.id,
-            busStopName: this.name,
-            location: this.location.toJson()
+            busStopName: this._name,
+            location: this.location.toJSON(),
+            routes: this.busRoutePositions
         };
-    };
-    return BusStop;
-}());
+    }
+}
 exports.BusStop = BusStop;
+//# sourceMappingURL=busStop.js.map

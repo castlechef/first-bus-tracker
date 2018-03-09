@@ -1,4 +1,4 @@
-import {assert, expect} from 'chai';
+import {expect} from 'chai';
 import {ILocation, Location} from './location';
 import 'mocha';
 import {Utils} from '../utils/utils';
@@ -47,10 +47,10 @@ describe('location', () => {
         });
     });
 
-    describe('toJson', () => {
+    describe('toJSON', () => {
         it('should return json object with correct data', () => {
             const location = Utils.location.generateValidLocation();
-            const jsonLocation = location.toJson();
+            const jsonLocation = location.toJSON();
             const {latitude, longitude} = location;
 
             const testData = {

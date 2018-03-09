@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "start": "node src/server",
     "test": "mocha --require ts-node/register  'src/**/*.spec.ts'"
   },
   "author": "",

@@ -6,7 +6,7 @@ export class IdGenerator {
     }
 
     public getNextId(): number {
-        return currentId++;
+        return this.currentId++;
     }
 
     public resetIds(): void {

@@ -3,6 +3,7 @@ import {app} from '../app';
 import {expect} from 'chai';
 import 'mocha';
 import {Utils} from '../utils/utils';
+import {BusRouteName} from '../models/busStops';
 
 let buses;
 
@@ -13,14 +14,32 @@ describe('buses routes', () => {
     });
 
     describe('/buses [POST]', () => {
-        it('dodgy data', () => {
+        it('dodgy location data', () => {
 
             const data = {
                 data: {
                     location: {
                         latitude: 'asdf',
                         longitude: false
-                    }
+                    },
+                    routeName: BusRouteName.U1X
+                }
+            };
+
+            return request(app)
+                .post('/buses')
+                .send(data)
+                .expect(422)
+                .then((res) => {
+                    expect(res.body.error.code).to.equal(422);
+                });
+        });
+
+        it('dodgy route name', () => {
+            const data = {
+                data: {
+                    location: Utils.location.generateValidLocation().toJSON(),
+                    routeName: "Fail please"
                 }
             };
 
@@ -36,10 +55,8 @@ describe('buses routes', () => {
         it('should add new bus', () => {
             const data = {
                 data: {
-                    location: {
-                        latitude: 51.36,
-                        longitude: -2.35
-                    }
+                    location: Utils.location.generateValidLocation().toJSON(),
+                    routeName: BusRouteName.U1X
                 }
             };
 
@@ -64,23 +81,26 @@ describe('buses routes', () => {
                 'data': [
                     {
                         'busId': 0,
-                        'location': location0.toJson()
+                        'location': location0.toJSON(),
+                        'routeName': BusRouteName.U1_OLDFIELD
                     },
                     {
                         'busId': 1,
-                        'location': location1.toJson()
+                        'location': location1.toJSON(),
+                        'routeName': BusRouteName.U2
                     },
                     {
                         'busId': 2,
-                        'location': location2.toJson()
+                        'location': location2.toJSON(),
+                        'routeName': BusRouteName.U1X
                     }
                 ]
             };
 
             const buses = app.locals.buses;
-            buses.createAndInsertBus(location0);
-            buses.createAndInsertBus(location1);
-            buses.createAndInsertBus(location2);
+            buses.createAndInsertBus(location0, BusRouteName.U1_OLDFIELD);
+            buses.createAndInsertBus(location1, BusRouteName.U2);
+            buses.createAndInsertBus(location2, BusRouteName.U1X);
 
             return request(app).get('/buses')
                 .expect(200)
@@ -94,7 +114,7 @@ describe('buses routes', () => {
         it('should respond with 200 response when location and busId are valid', () => {
             const initialLocation = Utils.location.generateValidLocation();
             const updatedLocation = Utils.location.generateValidLocation();
-            const bus = app.locals.buses.createAndInsertBus(initialLocation);
+            const bus = app.locals.buses.createAndInsertBus(initialLocation, BusRouteName.U2);
 
             const dataToSend = {
                 data: {
@@ -112,7 +132,8 @@ describe('buses routes', () => {
                     location: {
                         latitude: updatedLocation.latitude,
                         longitude: updatedLocation.longitude
-                    }
+                    },
+                    routeName: BusRouteName.U2
                 }
             };
 
@@ -127,12 +148,12 @@ describe('buses routes', () => {
 
         it('should respond with 404 error when bus with id has been deleted', () => {
             const location = Utils.location.generateValidLocation();
-            const bus = buses.createAndInsertBus(location);
+            const bus = buses.createAndInsertBus(location, BusRouteName.U2);
             buses.removeBus(bus.id);
 
             return request(app)
                 .put(`/buses/${bus.id}`)
-                .send({data: {location: location.toJson()}})
+                .send({data: {location: location.toJSON()}})
                 .expect(404)
                 .then(res => {
                     expect(res.body).to.deep.equal({
@@ -155,7 +176,7 @@ describe('buses routes', () => {
         describe('should respond with 422 error when sending invalid location', () => {
             it('should respond with 422 when sending string lat/longs', () => {
                 const busLocation = Utils.location.generateValidLocation();
-                const bus = buses.createAndInsertBus(busLocation);
+                const bus = buses.createAndInsertBus(busLocation, BusRouteName.U2);
 
                 const dataToSend = {
                     data: {
@@ -184,7 +205,7 @@ describe('buses routes', () => {
 
             it('should respond with 422 when sending no data', () => {
                 const busLocation = Utils.location.generateValidLocation();
-                const bus = buses .createAndInsertBus(busLocation);
+                const bus = buses .createAndInsertBus(busLocation, BusRouteName.U2);
 
                 return request(app)
                     .put(`/buses/${bus.id}`)

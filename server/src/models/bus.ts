@@ -1,38 +1,43 @@
 import {Location} from './location';
-import {Jsonable} from './response';
+import {JSONable} from './response';
+import {BusRouteName} from './busStops';
+import {BusStop} from './busStop';
 
 export type busId = number;
 
-export class Bus implements Jsonable {
-    private _id: busId;
+export class Bus implements JSONable {
     private locations: Location[];
+    private busRoute: BusRouteName;
 
-    constructor(id: busId, location: Location) {
-        if (typeof id !== "number" || !(location instanceof Location)) throw new Error('invalid parameter');
+    constructor(id: busId, location: Location, busRouteName: BusRouteName) {
+        if (typeof id !== 'number' || !(location instanceof Location)) throw new Error('invalid parameter');
         this._id = id;
         this.locations = [];
         this.updateLocation(location);
+        this.busRoute = busRouteName;
     }
 
-    public updateLocation(location: Location): void {
-        if (!(location instanceof Location)) throw new Error('invalid location');
-        //this.location = location;
-        this.locations.push(location);
-    }
-
-    private getLatestLocation() {
-        return this.locations[this.locations.length - 1];
-    }
+    private _id: busId;
 
     get id(): busId {
         return this._id;
     }
 
-    public toJson(): object {
+    public updateLocation(location: Location): void {
+        if (!(location instanceof Location)) throw new Error('invalid location');
+        this.locations.push(location);
+    }
+
+    public toJSON(): object {
         return {
             busId: this.id,
-            location: this.getLatestLocation().toJson()
+            location: this.getLatestLocation().toJSON(),
+            routeName: this.busRoute
         };
+    }
+
+    private getLatestLocation() {
+        return this.locations[this.locations.length - 1];
     }
 
 }
