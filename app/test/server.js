@@ -29,6 +29,8 @@ app.get('/buses', function (req, res) {
                     'longitude': -2.276247
                 },
                 'routeName': 'U1X'
+                },
+
             }
         ]
     };
@@ -36,5 +38,5 @@ app.get('/buses', function (req, res) {
     res.json(testData);
 });
 app.listen(8080, function () {
-    console.log('mockup server listening on port 8080');
+    console.log('mockup server listening on port 8080, routes added');
 });
