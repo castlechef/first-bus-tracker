@@ -1,23 +1,21 @@
 "use strict";
-exports.__esModule = true;
-var HTTPStatusCodes = require("http-status-codes");
-var Response = (function () {
-    function Response() {
-    }
-    Response.factory = function (success, data, errorCode) {
-        var status = success ? 'success' : 'failure';
-        var res = {
-            status: status,
-            data: data
+Object.defineProperty(exports, "__esModule", { value: true });
+const HTTPStatusCodes = require("http-status-codes");
+class Response {
+    static factory(success, data, errorCode) {
+        const status = success ? 'success' : 'failure';
+        const res = {
+            status,
+            data,
         };
         if (errorCode) {
             res.error = {
                 code: errorCode,
-                message: HTTPStatusCodes.getStatusText(errorCode)
+                message: HTTPStatusCodes.getStatusText(errorCode),
             };
         }
         return res;
-    };
-    return Response;
-}());
+    }
+}
 exports.Response = Response;
+//# sourceMappingURL=response.js.map

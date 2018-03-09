@@ -1,10 +1,11 @@
 import {expect} from 'chai';
-import {ILocation, Location} from './location';
+import {Location} from './location';
 import {Buses} from './buses';
 import {Bus} from './bus';
 import 'mocha';
 import {Utils} from '../utils/utils';
 import generateValidLocations = Utils.location.generateValidLocations;
+import {BusRouteName} from './busStops';
 
 let buses;
 
@@ -23,7 +24,7 @@ describe('buses', () => {
             const expectedBusId = 0;
 
             expect(buses.containsBus(expectedBusId)).to.be.false;
-            const bus = buses.createAndInsertBus(validLocation);
+            const bus = buses.createAndInsertBus(validLocation, BusRouteName.U2);
             expect(bus.id).to.equal(expectedBusId);
             expect(buses.containsBus(expectedBusId)).to.be.true;
         });
@@ -32,7 +33,7 @@ describe('buses', () => {
             const validLocation = Utils.location.generateValidLocation();
 
             expect(buses.containsBus(0)).to.be.false;
-            buses.createAndInsertBus(validLocation);
+            buses.createAndInsertBus(validLocation, BusRouteName.U2);
             expect(buses.containsBus(0)).to.be.true;
             buses.removeBus(0);
             expect(buses.containsBus(0)).to.be.false;
@@ -45,21 +46,21 @@ describe('buses', () => {
         });
 
         it('should return the bus after it has been inserted', () => {
-            const bus = buses.createAndInsertBus(Utils.location.generateValidLocation());
+            const bus = buses.createAndInsertBus(Utils.location.generateValidLocation(), BusRouteName.U2);
             expect(buses.getBus(bus.id)).to.deep.equal(bus);
         });
     });
 
     describe('createAndInsertBus', () => {
         it('should throw error if location is invalid', () => {
-            expect(() => buses.createAndInsertBus(undefined)).to.throw(Error, 'invalid parameter');
+            expect(() => buses.createAndInsertBus(undefined, BusRouteName.U2)).to.throw(Error, 'Invalid bus');
         });
 
         it('should return new bus once added', () => {
             const location = Utils.location.generateValidLocation();
 
-            const bus = buses.createAndInsertBus(location);
-            expect(bus).to.deep.equal(new Bus(bus.id, location));
+            const bus = buses.createAndInsertBus(location, BusRouteName.U2);
+            expect(bus).to.deep.equal(new Bus(bus.id, location, BusRouteName.U2));
         });
     });
 
@@ -69,14 +70,14 @@ describe('buses', () => {
 
             const locations = generateValidLocations(numberOfBuses);
             const bus = [];
-            locations.forEach(location => bus.push(buses.createAndInsertBus(location)));
+            locations.forEach(location => bus.push(buses.createAndInsertBus(location, BusRouteName.U2)));
             bus.forEach(bus => expect(buses.containsBus(bus.id)).to.be.true);
             buses.removeAllBuses();
             bus.forEach(bus => expect(buses.containsBus(bus.id)).to.be.false);
         });
     });
 
-    describe('toJson', () => {
+    describe('toJSON', () => {
         it('should return list of Jsoned buses', () => {
             const location0: Location = Utils.location.generateValidLocation();
             const location1: Location = Utils.location.generateValidLocation();
@@ -85,27 +86,30 @@ describe('buses', () => {
             const expectedData = [
                 {
                     busId: 0,
-                    location: location0.toJson()
+                    location: location0.toJSON(),
+                    routeName: BusRouteName.U1X
                 },
                 {
                     busId: 1,
-                    location: location1.toJson()
+                    location: location1.toJSON(),
+                    routeName: BusRouteName.U1X
                 },
                 {
                     busId: 2,
-                    location: location2.toJson()
+                    location: location2.toJSON(),
+                    routeName: BusRouteName.U1X
                 }
             ];
 
-            buses.createAndInsertBus(location0);
-            buses.createAndInsertBus(location1);
-            buses.createAndInsertBus(location2);
+            buses.createAndInsertBus(location0, BusRouteName.U1X);
+            buses.createAndInsertBus(location1, BusRouteName.U1X);
+            buses.createAndInsertBus(location2, BusRouteName.U1X);
 
-            expect(buses.toJson()).to.deep.equal(expectedData);
+            expect(buses.toJSON()).to.deep.equal(expectedData);
         });
 
         it('should empty array when empty', () => {
-            expect(buses.toJson()).to.deep.equal([]);
+            expect(buses.toJSON()).to.deep.equal([]);
         });
     });
 });

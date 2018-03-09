@@ -3,6 +3,7 @@ import 'mocha';
 import {Bus, busId} from './bus';
 import {Utils} from '../utils/utils';
 import {Location} from './location';
+import {BusRouteName} from './busStops';
 
 describe('bus', () => {
     describe('constructor', () => {
@@ -32,7 +33,7 @@ describe('bus', () => {
             const tests = [
                 {locationType: 'undefined', location: undefined},
                 {locationType: 'null', location: null},
-                {locationType: 'POJO location', location: Utils.location.generateValidLocation().toJson()},
+                {locationType: 'POJO location', location: Utils.location.generateValidLocation().toJSON()},
                 {locationType: 'string', location: 'latitude: 12, longitude: 52'}
             ] as {
                 locationType: string, location: Location
@@ -54,7 +55,7 @@ describe('bus', () => {
             const tests = [
                 {locationType: 'undefined', location: undefined},
                 {locationType: 'null', location: null},
-                {locationType: 'POJO location', location: Utils.location.generateValidLocation().toJson()},
+                {locationType: 'POJO location', location: Utils.location.generateValidLocation().toJSON()},
                 {locationType: 'string', location: 'latitude: 12, longitude: 52'}
             ] as {
                 locationType: string, location: Location
@@ -68,28 +69,29 @@ describe('bus', () => {
         })
     });
 
-    describe('toJson', () => {
+    describe('toJSON', () => {
         it('should return valid json data of object', () => {
             const validId = 0;
             const validLocation = Utils.location.generateValidLocation();
-            const bus = new Bus(validId, validLocation);
+            const bus = new Bus(validId, validLocation, BusRouteName.U1_ABBEY);
 
             const expectedJson = {
                 busId: validId,
                 location: {
                     latitude: validLocation.latitude,
                     longitude: validLocation.longitude
-                }
+                },
+                routeName: BusRouteName.U1_ABBEY
             };
 
-            expect(bus.toJson()).to.deep.equal(expectedJson);
+            expect(bus.toJSON()).to.deep.equal(expectedJson);
         });
 
         it('should return valid json data after location update', () => {
             const validId = 0;
             const validLocation1 = Utils.location.generateValidLocation();
             const validLocation2 = Utils.location.generateValidLocation();
-            const bus = new Bus(validId, validLocation1);
+            const bus = new Bus(validId, validLocation1, BusRouteName.U1_CITY);
             bus.updateLocation(validLocation2);
 
             const expectedJson = {
@@ -97,10 +99,11 @@ describe('bus', () => {
                 location: {
                     latitude: validLocation2.latitude,
                     longitude: validLocation2.longitude
-                }
+                },
+                routeName: BusRouteName.U1_CITY
             };
 
-            expect(bus.toJson()).to.deep.equal(expectedJson);
+            expect(bus.toJSON()).to.deep.equal(expectedJson);
         });
     });
 });
