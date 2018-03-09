@@ -5,7 +5,8 @@ export interface Bus {
       locations: {
         latitude: number,
         longitude: number
-      }
+      },
+      routeName: string
     }
     ]
 
