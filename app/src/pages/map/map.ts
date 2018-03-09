@@ -1,5 +1,5 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {IonicPage, NavController, NavParams} from 'ionic-angular';
+import {IonicPage, NavController, NavParams, ModalController} from 'ionic-angular';
 import {BusStopPage} from '../bus-stop/bus-stop';
 
 /**
@@ -24,7 +24,7 @@ export class MapPage {
   private busRouteLines: Map<String, google.maps.Polyline>;
   private colors = ["#bb72e0","#90b2ed", "#049310", "#f9f06d", "#ffc36b", "#f7946a", "#ef60ff"];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalctrl: ModalController) {
     this.busStopMarkers = new Map<number, google.maps.Marker>();
     this.busRouteLines = new Map<String, google.maps.Polyline>();
   }
@@ -144,10 +144,13 @@ export class MapPage {
   }
 
   private openBusStopPage(busStopID, busStopName) {
-    this.navCtrl.push(BusStopPage, {
+    let tryModal = this.modalctrl.create(BusStopPage, {stopID: busStopID, stopName: busStopName});
+    tryModal.present();
+
+    /*this.navCtrl.push(BusStopPage, {
       stopID: busStopID,
       stopName: busStopName
-    });
+    });*/
   }
 
   private addBusRoutes() {
