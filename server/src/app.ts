@@ -5,6 +5,15 @@ import busStopsRoute from './routes/busStops';
 import {Buses} from './models/buses';
 import {BusRouteName, BusStops} from './models/busStops';
 import {IBusStop} from './models/busStop';
+import * as cors from 'cors';
+
+const corsOptions: cors.CorsOptions = {
+    allowedHeaders: ["Origin"],
+    credentials: true,
+    methods: "GET,PUT,POST",
+    origin: "*",
+    preflightContinue: false
+};
 
 export const app = express();
 
@@ -17,6 +26,7 @@ app.locals.buses = buses;
 app.locals.busStops = busStops;
 
 app.use(bodyParser.json());
+app.use(cors(corsOptions));
 
 app.use('/buses', busesRoute);
 
