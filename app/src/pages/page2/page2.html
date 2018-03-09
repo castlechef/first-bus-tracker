@@ -7,17 +7,21 @@
   </ion-navbar>
 </ion-header>
 
+
+<h1 style="color:skyblue;">New Title</h1>
 <ion-content>
   <h1 *ngIf="errorMessage; else elseBlock">{{errorMessage}}</h1>
   <ng-template #elseBlock>
   <ion-grid>
     <ion-row>
       <ion-col><b>Bus ID</b></ion-col>
+      <ion-col><b>Bus Route</b></ion-col>
       <ion-col><b>Latitude</b></ion-col>
       <ion-col><b>Longitude</b></ion-col>
     </ion-row>
     <ion-row *ngFor="let bus of buses">
       <ion-col>{{bus.busId}}</ion-col>
+      <ion-col>{{bus.routeName}}</ion-col>
       <ion-col>{{bus.location.latitude}}</ion-col>
       <ion-col>{{bus.location.longitude}}</ion-col>
     </ion-row>
