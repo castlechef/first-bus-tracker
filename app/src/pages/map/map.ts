@@ -1,6 +1,5 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {IonicPage, NavController, NavParams} from 'ionic-angular';
-import {Geolocation} from '@ionic-native/geolocation';
+import {IonicPage, NavController, NavParams, ModalController} from 'ionic-angular';
 import {BusStopPage} from '../bus-stop/bus-stop';
 
 /**
@@ -23,39 +22,40 @@ export class MapPage {
 
   private busStopMarkers: Map<number, google.maps.Marker>;
   private busRouteLines: Map<String, google.maps.Polyline>;
-
   private colors = ["#bb72e0","#90b2ed", "#049310", "#f9f06d", "#ffc36b", "#f7946a", "#ef60ff"];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public geolocation: Geolocation) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalctrl: ModalController) {
     this.busStopMarkers = new Map<number, google.maps.Marker>();
     this.busRouteLines = new Map<String, google.maps.Polyline>();
   }
 
+
   ionViewDidLoad() {
     this.loadMap()
-      .then(() => {
+      .then((latLng) => {
+        if(latLng != null) this.addUserPositionMarker(latLng);
         this.addBusStops();
         this.addBusRoutes();
       });
   }
 
-  private loadMap(): Promise<null> {
-    return new Promise<null>(resolve => {
-      this.geolocation.getCurrentPosition()
-        .then((position) => {
-          let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          this.createMap(latLng, true);
-          resolve();
-        }, (err) => {
-          let latLng = new google.maps.LatLng(51.377981, -2.359026);
-          this.createMap(latLng, false);
-          console.log(err);
-          resolve();
-        });
+  private loadMap(): Promise<object> {
+    let geo = navigator.geolocation;
+    return new Promise<object>(resolve => {
+      geo.getCurrentPosition((position) => {
+        let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        this.createMap(latLng);
+        resolve(latLng);
+      }, () => {
+        let latLng = new google.maps.LatLng(51.377981, -2.359026);
+        this.createMap(latLng);
+        console.log("Permission denied");
+        resolve(null);
+      });
     });
   }
 
-  private createMap(latLng: Object, locationObtained: Boolean) {
+  private createMap(latLng: Object) {
     const mapOptions = {
       center: latLng,
       zoom: 15,
@@ -76,12 +76,17 @@ export class MapPage {
     };
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+  }
 
-    const userPosition = new google.maps.Marker({
+  private addUserPositionMarker(latLng){
+    let userPosition = new google.maps.Marker({
       map: this.map,
       position: latLng,
       title: 'Your Position',
-      visible: locationObtained
+    });
+
+    navigator.geolocation.watchPosition((position) =>{
+      userPosition.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
     });
   }
 
@@ -139,10 +144,13 @@ export class MapPage {
   }
 
   private openBusStopPage(busStopID, busStopName) {
-    this.navCtrl.push(BusStopPage, {
+    let tryModal = this.modalctrl.create(BusStopPage, {stopID: busStopID, stopName: busStopName});
+    tryModal.present();
+
+    /*this.navCtrl.push(BusStopPage, {
       stopID: busStopID,
       stopName: busStopName
-    });
+    });*/
   }
 
   private addBusRoutes() {

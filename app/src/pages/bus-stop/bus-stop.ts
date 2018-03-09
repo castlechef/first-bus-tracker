@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { App } from 'ionic-angular';
+import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angular';
 
 /**
  * Generated class for the BusStopPage page.
@@ -18,12 +17,18 @@ export class BusStopPage {
 
   public title = "BusStop";
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private app: App) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController) {
+    this.title = navParams.get('stopName');
   }
 
   ionViewDidLoad() {
-    this.title = this.navParams.get('stopName');
     console.log('ionViewDidLoad BusStopPage');
   }
 
+  closeModal(){
+    this.viewctrl.dismiss();
+  }
 }
+
+
+
