@@ -29,11 +29,3 @@ export class Page2 implements OnInit {
 
 
 }
-
-/*
-    <ion-row *ngFor="let bus of buses">
-      <ion-col>{{bus.busId}}</ion-col>
-      <ion-col>{{bus.location.latitude}}</ion-col>
-      <ion-col>{{bus.location.longitude}}</ion-col>
-    </ion-row>
- */

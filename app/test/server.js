@@ -29,9 +29,7 @@ app.get('/buses', function (req, res) {
                     'longitude': -2.276247
                 },
                 'routeName': 'U1X'
-                },
-
-            }
+            },
         ]
     };
     res.status(200);

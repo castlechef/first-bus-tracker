@@ -9,18 +9,16 @@ import * as cors from 'cors';
 
 let app = express();
 
-/*
+
 const options:cors.CorsOptions = {
-  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Access-Token"],
+  allowedHeaders: ["Origin"],
   credentials: true,
-  methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
-  origin: "http;//localhost:8100/",
+  methods: "GET,PUT,POST",
+  origin: "*",
   preflightContinue: false
 };
 
 app.use(cors(options));
-app.options("*", cors(options));
-*/
 
 app.get('/buses', (req, res) => {
   const testData = {
