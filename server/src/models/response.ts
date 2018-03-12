@@ -1,16 +1,16 @@
 import * as HTTPStatusCodes from 'http-status-codes';
 
-export interface Jsonable {
-    toJson(): object;
+export interface JSONable {
+    toJSON: () => object;
 }
 
-export interface JsonResponse {
+export type JsonResponse = {
     status: string;
     data: any;
     error?: JsonResponseError;
 }
 
-export interface JsonResponseError {
+export type JsonResponseError = {
     code: number;
     message: string;
 }

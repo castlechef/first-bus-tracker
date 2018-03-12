@@ -1,15 +1,16 @@
 "use strict";
-exports.__esModule = true;
-var express = require("express");
-var location_1 = require("../models/location");
-var response_1 = require("../models/response");
-var app_1 = require("../app");
-var router = express.Router();
-router.get('/', function (req, res) {
-    var responseData;
+Object.defineProperty(exports, "__esModule", { value: true });
+const express = require("express");
+const location_1 = require("../models/location");
+const response_1 = require("../models/response");
+const app_1 = require("../app");
+const busStops_1 = require("../models/busStops");
+const router = express.Router();
+router.get('/', (req, res) => {
+    let responseData;
     try {
         res.status(200);
-        responseData = response_1.Response.factory(true, app_1.buses.toJson());
+        responseData = response_1.Response.factory(true, app_1.buses.toJSON());
     }
     catch (e) {
         res.status(503);
@@ -19,14 +20,15 @@ router.get('/', function (req, res) {
         res.json(responseData);
     }
 });
-router.post('/', function (req, res) {
-    var responseData;
+router.post('/', (req, res) => {
+    let responseData;
     try {
-        var location = req.body.data.location;
-        if (location_1.Location.isValidLocation(location)) {
-            var bus = app_1.buses.newBus(new location_1.Location(location));
+        const location = req.body.data.location;
+        const route = req.body.data.routeName;
+        if (location_1.Location.isValidLocation(location) && route in busStops_1.BusRouteName) {
+            const bus = app_1.buses.createAndInsertBus(new location_1.Location(location), route);
             res.status(200);
-            responseData = response_1.Response.factory(true, bus.toJson());
+            responseData = response_1.Response.factory(true, bus.toJSON());
         }
         else {
             res.status(422);
@@ -41,8 +43,39 @@ router.post('/', function (req, res) {
         res.json(responseData);
     }
 });
-router.put('/{busId}', function (req, res) {
-    // check bus exists
-    //
+router.put('/:busId', (req, res) => {
+    const busId = parseInt(req.params.busId);
+    let responseData;
+    const location = (req.body.data && req.body.data.location);
+    try {
+        if (app_1.buses.containsBus(busId)) {
+            if (location_1.Location.isValidLocation(location)) {
+                const bus = app_1.buses.getBus(busId);
+                bus.updateLocation(new location_1.Location(location));
+                res.status(200);
+                responseData = response_1.Response.factory(true, bus.toJSON());
+            }
+            else {
+                res.status(422);
+                responseData = response_1.Response.factory(false, undefined, 422);
+            }
+        }
+        else {
+            res.status(404);
+            const data = {
+                busId
+            };
+            data.location = (location_1.Location.isValidLocation(location)) ? new location_1.Location(location).toJSON() : undefined;
+            responseData = response_1.Response.factory(false, data, 404);
+        }
+    }
+    catch (e) {
+        res.status(503);
+        responseData = response_1.Response.factory(false, undefined, 503);
+    }
+    finally {
+        res.json(responseData);
+    }
 });
-exports["default"] = router;
+exports.default = router;
+//# sourceMappingURL=buses.js.map

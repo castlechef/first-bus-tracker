@@ -1,0 +1,26 @@
+{
+  "busStops": [
+    {
+      "name": "bus stop 1",
+      "location": {
+        "latitude": 51.3553,
+        "longitude": -2.395
+      },
+      "routes": [
+        {"name": "U1X", "position": 1},
+        {"name": "U1 City Centre", "position": 1},
+        {"name": "U1 Bath Abbey", "position": 1}
+      ]
+    },
+    {
+      "name": "bus stop 2",
+      "location": {
+        "latitude": 51.3554,
+        "longitude": -2.39
+      },
+      "routes": [
+        {"name": "U2", "position": 1}
+      ]
+    }
+  ]
+}

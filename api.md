@@ -16,7 +16,6 @@ Group of all bus-related resources.
 ## Buses [/buses/]
     
 ### Request all Bus Locations [GET]
-
 Allows clients to get the latest list of buses and their locations.
 
 + Request (application/json)
@@ -37,25 +36,29 @@ Allows clients to get the latest list of buses and their locations.
                     "location": {
                         "latitude": 53.003444,
                         "longitude": -2.273507
-                    }
+                    },
+                    "routeName": "U2"
                 },
                 {
                     "busId": 2,
                     "location": {
                         "latitude": 53.9643824,
                         "longitude": -2.295362
-                    }
+                    },
+                    "routeName": "U2"
                 },
                 {
                     "busId": 3,
                     "location": {
                         "latitude": 53.837285,
                         "longitude": -2.276247
-                    }
+                    },
+                    "routeName": "U1X"
                 }
             ]
         }
 ```
+
 + Response 503 (application/json)
 
     + Body
@@ -68,6 +71,7 @@ Allows clients to get the latest list of buses and their locations.
             }
         }
 ```
+
 ### Add a location [POST]
 
 Allows a new bus to register to the server with its location. The
@@ -86,7 +90,8 @@ system generates an id for the bus and returns it in the data object.
                 "location": {
                     "latitude": 53.003444,
                     "longitude": -2.273507 
-                }
+                },
+                "routeName": "U1 City Centre"
             }
         }
 ```
@@ -101,7 +106,21 @@ system generates an id for the bus and returns it in the data object.
                 "location": {
                     "latitude": 53.003444,
                     "longitude": -2.273507
-                }
+                },
+                "routeName": "U1 City Centre"
+            }
+        }
+```
+
++ Response 422 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 422,
+                "message": "Unprocessable Entity"
             }
         }
 ```
@@ -116,7 +135,8 @@ system generates an id for the bus and returns it in the data object.
                 "location": {
                     "latitude": 53.003444,
                     "longitude": -2.273507
-                }
+                },
+                "routeName": "U1 City Centre"
             },
             "error": {
                 "code": 503,
@@ -124,6 +144,7 @@ system generates an id for the bus and returns it in the data object.
             }
         }
 ```
+
 ## Bus [/buses/{busId}]
 
 + Parameters
@@ -138,7 +159,7 @@ update.
 + Request (application/json)
 
     + Headers
-    
+
             Accept: application/json
     
     + Body
@@ -152,6 +173,7 @@ update.
             }
         }
 ```
+
 + Response 200 (application/json)
     
     + Body
@@ -163,10 +185,12 @@ update.
                 "location": {
                     "latitude": 53.003444,
                     "longitude": -2.273507
-                }
+                },
+                "routeName": "U1 City Centre"
             }
         }
 ```
+
 + Response 404 (application/json)
         
     + Body
@@ -186,8 +210,22 @@ update.
             }
         }
 ```
+
++ Response 422 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 422,
+                "message": "Unprocessable Entity"
+            }
+        }
+```
+
 + Response 503 (application/json)
-        
+
     + Body
 ```json
         {
@@ -197,7 +235,8 @@ update.
                 "location": {
                     "latitude": 53.003444,
                     "longitude": -2.273507 
-                }
+                },
+                "routeName": "U1 City Centre"
             },
             "error": {
                 "code": 503,
@@ -205,3 +244,132 @@ update.
             }
         }
 ```
+
+# Group Bus Stop
+Group of all bus stop-related resources.
+
+## Bus stops [/busStops/]
+
+### Request all Bus Stops [GET]
+Allows clients to get a list of all University bus stops in Bath.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+
++ Response 200 (application/json)
+
+    + Body
+```json
+        {
+            "status": "success",
+            "data": [
+                {
+                    "busStopId": 1,
+                    "busStopName": "Junction Road",
+                    "location": {
+                        "latitude": 52.35546,
+                        "longitude": -1.3452
+                    },
+                    "busRoutePosition": [
+                        {
+                            "name": "U1X",
+                            "position": 1
+                        },
+                        {
+                            "name": "U2",
+                            "position": 4
+                        }
+                    ]
+                },
+                {
+                    "busStopId": 2,
+                    "busStopName": "University of Bath",
+                    "location": {
+                        "latitude": 52.3456546,
+                        "longitude": -1.3465544
+                    },
+                    "busRoutePosition": [
+                        {
+                            "name": "U1X",
+                            "position": 4
+                        },
+                        {
+                            "name": "U2",
+                            "position": 7
+                        }
+                    ]
+                }
+            ]
+        }
+```
+
++ Response 503 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 503,
+                "message": "Service Unavailable"
+            }
+        }
+```
+
+## Bus stop [/busStops/{busStopId}]
+
++ Parameters
+
+    + busStopId (number) - a unique identifier for a specific bus stop.
+
+### Request a specific bus stop [GET]
+Allows the client to receive data specific to a bus stop, including location and arrival times for nearby buses.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+
++ Response 200 (application/json)
+
+    + Body
+```json
+        {
+            "status": "success",
+            "data": {
+                "busStopId": 1,
+                "busStopName": "Junction Road",
+                "location": {
+                    "latitude": 52.3456546,
+                    "longitude": -1.3465544
+                },
+                "busRoutePosition": [
+                    {
+                        "name": "U1X",
+                        "position": 4
+                    },
+                    {
+                        "name": "U1",
+                        "position": 7
+                    }
+                ],
+                "arrivals": [
+                    {
+                        "busId": 1,
+                        "routeName": "U1",
+                        "arrivalTime": "09:50"
+                    },
+                    {
+                        "busId": 2,
+                        "routeName": "U1X",
+                        "arrivalTime": "09:53"
+                    }
+                ]
+            }
+        }
+```
+

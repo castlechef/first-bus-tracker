@@ -1,47 +1,56 @@
-import {Bus} from './bus';
+import {Bus, busId} from './bus';
 import {Location} from './location';
-import {Jsonable} from './response';
+import {JSONable} from './response';
+import {IdGenerator} from '../utils/id';
+import {BusRouteName} from './busStops';
 
-export class Buses implements Jsonable {
-    private busList: Bus[];
-    private currentId: number;
+export class Buses implements JSONable {
+    private busMap: Map<busId, Bus>;
+    private idGenerator: IdGenerator;
 
     constructor() {
-        this.busList = [];
-        this.currentId = 0;
+        this.busMap = new Map<busId, Bus>();
+        this.idGenerator = new IdGenerator();
     }
 
-    public constainsBus(id: number): boolean {
-        for (let i = 0; i < this.busList.length; i++) {
-            let bus = this.busList[i];
-            if (bus.id === id) return true;
+    public containsBus(id: busId): boolean {
+        return this.busMap.has(id);
+    }
+
+    public getBus(id: busId): Bus {
+        const bus = this.busMap.get(id);
+        if (!bus) throw new Error('Bus not found');
+        return bus;
+    }
+
+    public createAndInsertBus(location: Location, route: BusRouteName): Bus {
+        if (!Location.isValidLocation(location) || !Buses.isValidBusRouteName(route)) throw new Error('Invalid bus');
+        const id = this.idGenerator.getNextId();
+        const bus = new Bus(id, location, route);
+        this.busMap.set(id, bus);
+        return bus;
+    }
+
+    static isValidBusRouteName(route: any): boolean {
+        for (let thing in BusRouteName) {
+            if (BusRouteName[thing] === route) return true;
         }
         return false;
     }
 
-    public newBus(location: Location): Bus {
-        const id = this.generateBusId();
-        const bus = new Bus(id, location);
-        this.busList.push(bus);
-        return bus;
+    public removeBus(id: busId): void {
+        if (!this.containsBus(id)) throw new Error('bus not found');
+        this.busMap.delete(id);
     }
 
     public removeAllBuses(): void {
-        while (this.busList.length > 0) {
-            this.busList.pop();
-        }
-        this.currentId = 0;
+        this.idGenerator.resetIds();
+        this.busMap.clear();
     }
 
-    public toJson(): object {
+    public toJSON(): object {
         const jsonList = [];
-        for (let i = 0; i < this.busList.length; i++) {
-            jsonList.push(this.busList[i].toJson());
-        }
+        this.busMap.forEach(bus => jsonList.push(bus.toJSON()));
         return jsonList;
-    }
-
-    private generateBusId(): number {
-        return this.currentId++;
     }
 }

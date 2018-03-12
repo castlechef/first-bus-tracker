@@ -12,12 +12,17 @@ import { ServerProvider} from '../providers/server-provider';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { MapPage } from '../pages/map/map';
+import { Geolocation } from '@ionic-native/geolocation';
+import {BusStopPage} from '../pages/bus-stop/bus-stop';
 
 @NgModule({
   declarations: [
     MyApp,
     Page1,
-    Page2
+    Page2,
+    MapPage,
+    BusStopPage
   ],
   imports: [
     BrowserModule,
@@ -29,6 +34,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     MyApp,
     Page1,
     Page2,
+    MapPage,
+    BusStopPage
   ],
   providers: [
     StatusBar,
@@ -37,6 +44,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     HttpClient,
     HttpClientModule,
     ServerProvider,
+    Geolocation,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
 
   ]
