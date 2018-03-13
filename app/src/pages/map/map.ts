@@ -1,6 +1,7 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {IonicPage, NavController, NavParams, ModalController} from 'ionic-angular';
 import {BusStopPage} from '../bus-stop/bus-stop';
+import {} from "@types/googlemaps"; //This import is necessary otherwise angular complains about namespaces
 
 /**
  * Generated class for the MapPage page.
@@ -20,15 +21,15 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
-  private colors = ['#bb72e0', '#90b2ed', '#049310', '#f9f06d', '#ffc36b', '#f7946a', '#ef60ff'];
+  private busStopMarkers: Map<number, google.maps.Marker>;
+  private busRouteLines: Map<String, google.maps.Polyline>;
+  private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalctrl: ModalController) {
     this.busStopMarkers = new Map<number, google.maps.Marker>();
     this.busRouteLines = new Map<String, google.maps.Polyline>();
   }
 
-  private busStopMarkers: Map<number, google.maps.Marker>;
-  private busRouteLines: Map<String, google.maps.Polyline>;
 
 
   ionViewDidLoad() {
@@ -109,7 +110,7 @@ export class MapPage {
   private addBusStops() {
     const busStops = [
       {
-        'busStopID': 0,
+        'busStopId': 0,
         'busStopName': 'Arrivals Square (Stop C)',
         'location': {
           'latitude': 51.378845,
@@ -123,7 +124,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 1,
+        'busStopId': 1,
         'busStopName': 'The Avenue (Southbound)',
         'location': {
           'latitude': 51.3760679,
@@ -145,7 +146,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 2,
+        'busStopId': 2,
         'busStopName': 'Rainbow Wood Farm',
         'location': {
           'latitude': 51.3725468,
@@ -159,7 +160,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 3,
+        'busStopId': 3,
         'busStopName': 'Brassknocker Hill',
         'location': {
           'latitude': 51.365948,
@@ -173,7 +174,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 4,
+        'busStopId': 4,
         'busStopName': 'Flatwoods Road',
         'location': {
           'latitude': 51.3653829,
@@ -186,7 +187,7 @@ export class MapPage {
           }
         ]
       },
-      {'busStopID': 5,
+      {'busStopId': 5,
         'busStopName': 'Ralph Allen School',
         'location': {
           'latitude': 51.3637848,
@@ -200,7 +201,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 6,
+        'busStopId': 6,
         'busStopName': 'Shaft Road',
         'location': {
           'latitude': 51.3629001,
@@ -214,7 +215,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 7,
+        'busStopId': 7,
         'busStopName': 'Tyning Road',
         'location': {
           'latitude': 51.362556,
@@ -228,7 +229,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 8,
+        'busStopId': 8,
         'busStopName': 'Hadley Arms',
         'location': {
           'latitude': 51.3620745,
@@ -242,7 +243,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 9,
+        'busStopId': 9,
         'busStopName': 'The Firs',
         'location': {
           'latitude': 51.3611789,
@@ -256,7 +257,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 10,
+        'busStopId': 10,
         'busStopName': 'Combe Road',
         'location': {
           'latitude': 51.3604349,
@@ -270,7 +271,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 11,
+        'busStopId': 11,
         'busStopName': 'Mulberry Park',
         'location': {
           'latitude': 51.3600254,
@@ -284,7 +285,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 12,
+        'busStopId': 12,
         'busStopName': 'Foxhill House',
         'location': {
           'latitude': 51.3591582,
@@ -298,7 +299,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 13,
+        'busStopId': 13,
         'busStopName': 'Bradford Road Shops',
         'location': {
           'latitude': 51.3589099,
@@ -312,7 +313,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 14,
+        'busStopId': 14,
         'busStopName': 'Entry Hill',
         'location': {
           'latitude': 51.358376,
@@ -326,7 +327,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 15,
+        'busStopId': 15,
         'busStopName': 'Sainsbury\'s',
         'location': {
           'latitude': 51.356926,
@@ -340,7 +341,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 16,
+        'busStopId': 16,
         'busStopName': 'Fosseway School',
         'location': {
           'latitude': 51.358173,
@@ -354,7 +355,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 17,
+        'busStopId': 17,
         'busStopName': 'Red Lion',
         'location': {
           'latitude': 51.358837,
@@ -368,7 +369,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 18,
+        'busStopId': 18,
         'busStopName': 'Noads Corner',
         'location': {
           'latitude': 51.360344,
@@ -382,7 +383,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 19,
+        'busStopId': 19,
         'busStopName': 'Barrow Road',
         'location': {
           'latitude': 51.3615302,
@@ -396,7 +397,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 20,
+        'busStopId': 20,
         'busStopName': 'Somerdale View',
         'location': {
           'latitude': 51.3621745,
@@ -410,7 +411,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 21,
+        'busStopId': 21,
         'busStopName': 'Bath Community Academy',
         'location': {
           'latitude': 51.3644329,
@@ -424,7 +425,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 22,
+        'busStopId': 22,
         'busStopName': 'Padleigh Turn',
         'location': {
           'latitude': 51.3661729,
@@ -438,7 +439,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 23,
+        'busStopId': 23,
         'busStopName': 'Southdown Road',
         'location': {
           'latitude': 51.3671529,
@@ -452,7 +453,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 24,
+        'busStopId': 24,
         'busStopName': 'Sladebrook Court',
         'location': {
           'latitude': 51.3682598,
@@ -466,7 +467,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 25,
+        'busStopId': 25,
         'busStopName': 'Trowbridge House',
         'location': {
           'latitude': 51.370792,
@@ -480,7 +481,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 26,
+        'busStopId': 26,
         'busStopName': 'Happy Garden',
         'location': {
           'latitude': 51.3724062,
@@ -494,7 +495,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 27,
+        'busStopId': 27,
         'busStopName': 'Ascension Church',
         'location': {
           'latitude': 51.3744351,
@@ -508,7 +509,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 28,
+        'busStopId': 28,
         'busStopName': 'Bridge Road',
         'location': {
           'latitude': 51.3758088,
@@ -522,7 +523,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 29,
+        'busStopId': 29,
         'busStopName': 'Mayfield Road',
         'location': {
           'latitude': 51.3759691,
@@ -536,7 +537,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 30,
+        'busStopId': 30,
         'busStopName': 'Moorland Road',
         'location': {
           'latitude': 51.3774219,
@@ -550,7 +551,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 31,
+        'busStopId': 31,
         'busStopName': 'Arlington Road',
         'location': {
           'latitude': 51.3781929,
@@ -564,7 +565,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 32,
+        'busStopId': 32,
         'busStopName': 'Brougham Hayes',
         'location': {
           'latitude': 51.3810272,
@@ -586,7 +587,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 33,
+        'busStopId': 33,
         'busStopName': 'Pines Way',
         'location': {
           'latitude': 51.3806422,
@@ -608,7 +609,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 34,
+        'busStopId': 34,
         'busStopName': 'Riverside Road',
         'location': {
           'latitude': 51.378719,
@@ -626,7 +627,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 35,
+        'busStopId': 35,
         'busStopName': 'Oak Street (Eastbound)',
         'location': {
           'latitude': 51.3784901,
@@ -644,7 +645,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 36,
+        'busStopId': 36,
         'busStopName': 'Rossiter Road',
         'location': {
           'latitude': 51.3770055,
@@ -662,7 +663,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 37,
+        'busStopId': 37,
         'busStopName': 'Pulteney Court (Northbound)',
         'location': {
           'latitude': 51.3781389,
@@ -680,7 +681,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 38,
+        'busStopId': 38,
         'busStopName': 'Pulteney Gardens (Northbound)',
         'location': {
           'latitude': 51.3799901,
@@ -698,7 +699,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 39,
+        'busStopId': 39,
         'busStopName': 'St Mary\'s Church',
         'location': {
           'latitude': 51.3839299,
@@ -720,7 +721,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 40,
+        'busStopId': 40,
         'busStopName': 'Sydney Buildings',
         'location': {
           'latitude': 51.3826899,
@@ -742,7 +743,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 41,
+        'busStopId': 41,
         'busStopName': 'Cleveland Walk (Eastbound)',
         'location': {
           'latitude': 51.3809891,
@@ -764,7 +765,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 42,
+        'busStopId': 42,
         'busStopName': 'White Lodge (Eastbound)',
         'location': {
           'latitude': 51.379757,
@@ -786,7 +787,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 43,
+        'busStopId': 43,
         'busStopName': 'Youth Hostel (Eastbound)',
         'location': {
           'latitude': 51.3785859,
@@ -808,7 +809,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 44,
+        'busStopId': 44,
         'busStopName': 'Smallcombe House (Eastbound)',
         'location': {
           'latitude': 51.3778652,
@@ -830,7 +831,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 45,
+        'busStopId': 45,
         'busStopName': 'Woodland Place (Eastbound)',
         'location': {
           'latitude': 51.3774341,
@@ -852,7 +853,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 46,
+        'busStopId': 46,
         'busStopName': 'North Road (Eastbound)',
         'location': {
           'latitude': 51.3766062,
@@ -874,7 +875,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 47,
+        'busStopId': 47,
         'busStopName': 'Oakley',
         'location': {
           'latitude': 51.3742409,
@@ -896,7 +897,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 48,
+        'busStopId': 48,
         'busStopName': 'The Avenue (Northbound)',
         'location': {
           'latitude': 51.375916,
@@ -918,7 +919,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 49,
+        'busStopId': 49,
         'busStopName': 'Arrivals Square (Stop A)',
         'location': {
           'latitude': 51.379070,
@@ -936,7 +937,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 50,
+        'busStopId': 50,
         'busStopName': 'Oakley',
         'location': {
           'latitude': 51.3744091,
@@ -954,7 +955,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 51,
+        'busStopId': 51,
         'busStopName': 'North Road (Westbound)',
         'location': {
           'latitude': 51.3768272,
@@ -972,7 +973,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 52,
+        'busStopId': 52,
         'busStopName': 'Woodland Place (Westbound)',
         'location': {
           'latitude': 51.3775061,
@@ -990,7 +991,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 53,
+        'busStopId': 53,
         'busStopName': 'Smallcombe House (Westbound)',
         'location': {
           'latitude': 51.3777919,
@@ -1008,7 +1009,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 54,
+        'busStopId': 54,
         'busStopName': 'Youth Hostel (Westbound)',
         'location': {
           'latitude': 51.3786659,
@@ -1026,7 +1027,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 55,
+        'busStopId': 55,
         'busStopName': 'White Lodge (Westbound)',
         'location': {
           'latitude': 51.3799131,
@@ -1044,7 +1045,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 56,
+        'busStopId': 56,
         'busStopName': 'Cleveland Walk (Westbound)',
         'location': {
           'latitude': 51.3809171,
@@ -1062,7 +1063,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 57,
+        'busStopId': 57,
         'busStopName': 'Raby Gardens',
         'location': {
           'latitude': 51.3832779,
@@ -1080,7 +1081,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 58,
+        'busStopId': 58,
         'busStopName': 'Pulteney Gardens (Southbound)',
         'location': {
           'latitude': 51.3795619,
@@ -1094,7 +1095,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 59,
+        'busStopId': 59,
         'busStopName': 'Pulteney Court (Southbound)',
         'location': {
           'latitude': 51.3783988,
@@ -1108,7 +1109,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 60,
+        'busStopId': 60,
         'busStopName': 'Lyncombe Hill',
         'location': {
           'latitude': 51.376576,
@@ -1122,7 +1123,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 61,
+        'busStopId': 61,
         'busStopName': 'Oak Street (Westbound)',
         'location': {
           'latitude': 51.3784101,
@@ -1140,7 +1141,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 62,
+        'busStopId': 62,
         'busStopName': 'Cheltenham Street',
         'location': {
           'latitude': 51.3783842,
@@ -1158,7 +1159,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 63,
+        'busStopId': 63,
         'busStopName': 'Hayesfield School',
         'location': {
           'latitude': 51.377144,
@@ -1176,7 +1177,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 64,
+        'busStopId': 64,
         'busStopName': 'Junction Road',
         'location': {
           'latitude': 51.3776212,
@@ -1194,7 +1195,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 65,
+        'busStopId': 65,
         'busStopName': 'North Parade',
         'location': {
           'latitude': 51.3807489,
@@ -1208,7 +1209,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 66,
+        'busStopId': 66,
         'busStopName': 'Dorchester Street (Westbound)',
         'location': {
           'latitude': 51.377869,
@@ -1222,7 +1223,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 67,
+        'busStopId': 67,
         'busStopName': 'Green Park',
         'location': {
           'latitude': 51.3805472,
@@ -1236,7 +1237,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 68,
+        'busStopId': 68,
         'busStopName': 'Corn Street',
         'location': {
           'latitude': 51.3792108,
@@ -1250,7 +1251,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 69,
+        'busStopId': 69,
         'busStopName': 'Dorchester Street (Eastbound)',
         'location': {
           'latitude': 51.3780439,
@@ -1264,7 +1265,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 70,
+        'busStopId': 70,
         'busStopName': 'Guildhall',
         'location': {
           'latitude': 51.3816805,
@@ -1278,7 +1279,7 @@ export class MapPage {
         ]
       },
       {
-        'busStopID': 71,
+        'busStopId': 71,
         'busStopName': 'The Pavilion',
         'location': {
           'latitude': 51.3809008,
@@ -1300,17 +1301,17 @@ export class MapPage {
         title: busStops[i].busStopName
       });
 
-      this.busStopMarkers.set(busStops[i].busStopID, stopMarker);
-      google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStops[i].busStopID, busStops[i].busStopName));
+      this.busStopMarkers.set(busStops[i].busStopId, stopMarker);
+      google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStops[i].busStopId, busStops[i].busStopName));
     }
   }
 
-  private openBusStopPage(busStopID, busStopName) {
-    let tryModal = this.modalctrl.create(BusStopPage, {stopID: busStopID, stopName: busStopName});
+  private openBusStopPage(busStopId, busStopName) {
+    let tryModal = this.modalctrl.create(BusStopPage, {stopID: busStopId, stopName: busStopName});
     tryModal.present();
 
     /*this.navCtrl.push(BusStopPage, {
-      stopID: busStopID,
+      stopID: busStopId,
       stopName: busStopName
     });*/
   }
