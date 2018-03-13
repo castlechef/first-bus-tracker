@@ -1,6 +1,7 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {IonicPage, NavController, NavParams, ModalController} from 'ionic-angular';
 import {BusStopPage} from '../bus-stop/bus-stop';
+import {} from "@types/googlemaps"; //This import is necessary otherwise angular complains about namespaces
 
 /**
  * Generated class for the MapPage page.
@@ -20,6 +21,8 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
+  private busStopMarkers: Map<number, google.maps.Marker>;
+  private busRouteLines: Map<String, google.maps.Polyline>;
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalctrl: ModalController) {
@@ -27,8 +30,6 @@ export class MapPage {
     this.busRouteLines = new Map<String, google.maps.Polyline>();
   }
 
-  private busStopMarkers: Map<number, google.maps.Marker>;
-  private busRouteLines: Map<String, google.maps.Polyline>;
 
 
   ionViewDidLoad() {
