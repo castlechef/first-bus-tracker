@@ -1,9 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var express = require("express");
-var app = express();
-app.get('/buses', function (req, res) {
-    var testData = {
+const express = require("express");
+const cors = require("cors");
+/**
+ * to run this server on localhost install the chrome extension
+ * https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi
+ * otherwise it won't work when doing a get request
+ */
+let app = express();
+const options = {
+    allowedHeaders: ["Origin"],
+    credentials: true,
+    methods: "GET,PUT,POST",
+    origin: "*",
+    preflightContinue: false
+};
+app.use(cors(options));
+app.get('/buses', (req, res) => {
+    const testData = {
         'status': 'success',
         'data': [
             {
@@ -29,12 +43,58 @@ app.get('/buses', function (req, res) {
                     'longitude': -2.276247
                 },
                 'routeName': 'U1X'
-            },
+            }
         ]
     };
     res.status(200);
     res.json(testData);
 });
-app.listen(8080, function () {
-    console.log('mockup server listening on port 8080, routes added');
+app.get('/busStops', (req, res) => {
+    const testData = {
+        "status": "success",
+        "data": [
+            {
+                "busStopId": 1,
+                "busStopName": "Junction Road",
+                "location": {
+                    "latitude": 52.35546,
+                    "longitude": -1.3452
+                },
+                "busRoutePosition": [
+                    {
+                        "name": "U1X",
+                        "position": 1
+                    },
+                    {
+                        "name": "U2",
+                        "position": 4
+                    }
+                ]
+            },
+            {
+                "busStopId": 2,
+                "busStopName": "University of Bath",
+                "location": {
+                    "latitude": 52.3456546,
+                    "longitude": -1.3465544
+                },
+                "busRoutePosition": [
+                    {
+                        "name": "U1X",
+                        "position": 4
+                    },
+                    {
+                        "name": "U2",
+                        "position": 7
+                    }
+                ]
+            }
+        ]
+    };
+    res.status(200);
+    res.json(testData);
 });
+app.listen(8080, () => {
+    console.log('mockup server listening on port 8080');
+});
+//# sourceMappingURL=server.js.map
