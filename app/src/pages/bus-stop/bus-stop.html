@@ -6,14 +6,14 @@
 -->
 <ion-header>
 
-  <ion-navbar color="custPink">
+  <ion-navbar>
     <ion-title>
       {{title}}
     </ion-title>
 
     <ion-buttons start>
       <button ion-button icon-only color="light" (click)="closeModal()">
-        <ion-icon color="light" name="arrow-back"></ion-icon>
+        <ion-icon color="dark" name="arrow-back"></ion-icon>
       </button>
     </ion-buttons>
 
@@ -22,11 +22,6 @@
 </ion-header>
 
 
-<ion-content>
-  <ion-list>
-    <button ion-item *ngFor="let bus of buses">
-      {{ bus.busRoute }}
-      {{bus.arrivalTime}}
-    </button>
-  </ion-list>
+<ion-content padding>
+
 </ion-content>
