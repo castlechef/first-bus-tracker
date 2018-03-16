@@ -347,16 +347,6 @@ Allows the client to receive data specific to a bus stop, including location and
                     "latitude": 52.3456546,
                     "longitude": -1.3465544
                 },
-                "busRoutePosition": [
-                    {
-                        "name": "U1X",
-                        "position": 4
-                    },
-                    {
-                        "name": "U1",
-                        "position": 7
-                    }
-                ],
                 "arrivals": [
                     {
                         "busId": 1,
