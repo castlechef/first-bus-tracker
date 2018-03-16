@@ -26,14 +26,6 @@ describe('Page2', () => {
     });
   });
 
-  it('should have a blue background', () => {
-    const fixture = TestBed.createComponent(Page2);
-    const comp = fixture.componentInstance;
-    const h1: HTMLElement = fixture.nativeElement.querySelector('h1');
-    const bgColor = h1.style.color;
-    expect(bgColor).toBe("skyblue", 'Title should have a blue background');
-  });
-
   it('should have locations in title', () => {
     const fixture = TestBed.createComponent(Page2);
     const comp = fixture.componentInstance;
