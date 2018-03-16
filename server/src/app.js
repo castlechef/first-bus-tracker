@@ -1,28 +1,27 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-exports.__esModule = true;
-var express = require("express");
-var bodyParser = require("body-parser");
-var buses_1 = require("./routes/buses");
-var buses_2 = require("./models/buses");
+Object.defineProperty(exports, "__esModule", { value: true });
+const express = require("express");
+const bodyParser = require("body-parser");
+const buses_1 = require("./routes/buses");
+const busStops_1 = require("./routes/busStops");
+const buses_2 = require("./models/buses");
+const busStops_2 = require("./models/busStops");
+const cors = require("cors");
+const corsOptions = {
+    allowedHeaders: ["Origin"],
+    credentials: true,
+    methods: "GET,PUT,POST",
+    origin: "*",
+    preflightContinue: false
+};
 exports.app = express();
 exports.buses = new buses_2.Buses();
+const data = require('../data.json');
+exports.busStops = new busStops_2.BusStops(data.busStops);
 exports.app.locals.buses = exports.buses;
+exports.app.locals.busStops = exports.busStops;
 exports.app.use(bodyParser.json());
-exports.app.use('/buses', buses_1["default"]);
-var A = (function (_super) {
-    __extends(A, _super);
-    function A() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return A;
-}(Error));
+exports.app.use(cors(corsOptions));
+exports.app.use('/buses', buses_1.default);
+exports.app.use('/busStops', busStops_1.default);
+//# sourceMappingURL=app.js.map

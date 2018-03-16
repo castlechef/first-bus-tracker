@@ -1,31 +1,33 @@
 "use strict";
-exports.__esModule = true;
-var location_1 = require("./location");
-var Bus = (function () {
-    function Bus(id, location) {
-        if (typeof id !== "number" || !(location instanceof location_1.Location))
+Object.defineProperty(exports, "__esModule", { value: true });
+const location_1 = require("./location");
+class Bus {
+    constructor(id, location, busRouteName) {
+        if (typeof id !== 'number' || !(location instanceof location_1.Location))
             throw new Error('invalid parameter');
         this._id = id;
-        this.location = location;
+        this.locations = [];
+        this.updateLocation(location);
+        this.busRoute = busRouteName;
     }
-    Bus.prototype.updateLocation = function (location) {
+    get id() {
+        return this._id;
+    }
+    updateLocation(location) {
         if (!(location instanceof location_1.Location))
             throw new Error('invalid location');
-        this.location = location;
-    };
-    Object.defineProperty(Bus.prototype, "id", {
-        get: function () {
-            return this._id;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Bus.prototype.toJson = function () {
+        this.locations.push(location);
+    }
+    toJSON() {
         return {
             busId: this.id,
-            location: this.location.toJson()
+            location: this.getLatestLocation().toJSON(),
+            routeName: this.busRoute
         };
-    };
-    return Bus;
-}());
+    }
+    getLatestLocation() {
+        return this.locations[this.locations.length - 1];
+    }
+}
 exports.Bus = Bus;
+//# sourceMappingURL=bus.js.map
