@@ -6,6 +6,7 @@ import {StatusBar} from '@ionic-native/status-bar';
 import {SplashScreen} from '@ionic-native/splash-screen';
 import {PlatformMock, SplashScreenMock, StatusBarMock} from '../../../test-config/mocks-ionic';
 import {HttpClient, HttpHandler} from '@angular/common/http';
+import {} from 'jasmine';
 
 describe('Page2', () => {
 

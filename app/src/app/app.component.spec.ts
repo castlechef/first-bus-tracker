@@ -7,6 +7,8 @@ import {SplashScreen} from '@ionic-native/splash-screen';
 import {MyApp} from './app.component';
 import {PlatformMock, SplashScreenMock, StatusBarMock} from '../../test-config/mocks-ionic';
 
+import {} from 'jasmine';
+
 describe('MyApp Component', () => {
   let fixture;
   let component;
