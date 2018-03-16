@@ -2,6 +2,7 @@ import {Component, ElementRef, ViewChild} from '@angular/core';
 import {IonicPage, NavController, NavParams, ModalController} from 'ionic-angular';
 import {BusStopPage} from '../bus-stop/bus-stop';
 import {} from "@types/googlemaps"; //This import is necessary otherwise angular complains about namespaces
+import { BusPage } from '../bus/bus';
 
 /**
  * Generated class for the MapPage page.
@@ -23,11 +24,13 @@ export class MapPage {
 
   private busStopMarkers: Map<number, google.maps.Marker>;
   private busRouteLines: Map<String, google.maps.Polyline>;
+  private busMarkers: Map<number, google.maps.Marker>;
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalctrl: ModalController) {
     this.busStopMarkers = new Map<number, google.maps.Marker>();
     this.busRouteLines = new Map<String, google.maps.Polyline>();
+    this.busMarkers = new Map<number, google.maps.Marker>();
   }
 
 
@@ -38,6 +41,7 @@ export class MapPage {
         if (latLng != null) this.addUserPositionMarker(latLng);
         this.addBusStops();
         this.addBusRoutes();
+        this.addBuses();
       });
   }
 
@@ -85,6 +89,10 @@ export class MapPage {
       map: this.map,
       position: latLng,
       title: 'Your Position',
+      icon: {
+        scale: 5,
+        path: google.maps.SymbolPath.CIRCLE
+      }
     });
 
     navigator.geolocation.watchPosition((position) => {
@@ -1298,7 +1306,11 @@ export class MapPage {
       let stopMarker = new google.maps.Marker({
         map: this.map,
         position: new google.maps.LatLng(busStops[i].location.latitude, busStops[i].location.longitude),
-        title: busStops[i].busStopName
+        title: busStops[i].busStopName,
+        icon: {
+          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          scale: 3
+        }
       });
 
       this.busStopMarkers.set(busStops[i].busStopId, stopMarker);
@@ -2008,5 +2020,40 @@ export class MapPage {
 
       busRoute.setMap(this.map);
     }
+  }
+
+  private addBuses(){
+    const exampleBuses = [
+      {
+      "busId": 1,
+      "location": {
+        "latitude": 51.368600,
+        "longitude": -2.336717
+      },
+      "routeName": "U1X"
+    },
+      {
+        "busId": 2,
+        "location": {
+          "latitude": 51.368438,
+          "longitude": -2.355729
+        },
+        "routeName": "U2"
+      }];
+    for (let i = 0; i < exampleBuses.length; i++) {
+      let busMarker = new google.maps.Marker({
+        map: this.map,
+        position: new google.maps.LatLng(exampleBuses[i].location.latitude, exampleBuses[i].location.longitude),
+        title: exampleBuses[i].routeName
+      });
+
+      this.busMarkers.set(exampleBuses[i].busId, busMarker);
+      google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(exampleBuses[i].busId, exampleBuses[i].routeName));
+    }
+  }
+
+  private openBusPage(busId, route) {
+    let tryModal = this.modalctrl.create(BusPage, {stopID: busId, routeName: route});
+    tryModal.present();
   }
 }
