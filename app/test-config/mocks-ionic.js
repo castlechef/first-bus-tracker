@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -9,9 +8,8 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-exports.__esModule = true;
-var status_bar_1 = require("@ionic-native/status-bar");
-var splash_screen_1 = require("@ionic-native/splash-screen");
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
 var PlatformMock = (function () {
     function PlatformMock() {
     }
@@ -40,7 +38,7 @@ var PlatformMock = (function () {
             paddingLeft: '10',
             paddingTop: '10',
             paddingRight: '10',
-            paddingBottom: '10'
+            paddingBottom: '10',
         };
     };
     PlatformMock.prototype.onResize = function (callback) {
@@ -66,7 +64,7 @@ var PlatformMock = (function () {
     };
     return PlatformMock;
 }());
-exports.PlatformMock = PlatformMock;
+export { PlatformMock };
 var StatusBarMock = (function (_super) {
     __extends(StatusBarMock, _super);
     function StatusBarMock() {
@@ -76,8 +74,8 @@ var StatusBarMock = (function (_super) {
         return;
     };
     return StatusBarMock;
-}(status_bar_1.StatusBar));
-exports.StatusBarMock = StatusBarMock;
+}(StatusBar));
+export { StatusBarMock };
 var SplashScreenMock = (function (_super) {
     __extends(SplashScreenMock, _super);
     function SplashScreenMock() {
@@ -87,8 +85,8 @@ var SplashScreenMock = (function (_super) {
         return;
     };
     return SplashScreenMock;
-}(splash_screen_1.SplashScreen));
-exports.SplashScreenMock = SplashScreenMock;
+}(SplashScreen));
+export { SplashScreenMock };
 var NavMock = (function () {
     function NavMock() {
     }
@@ -105,8 +103,8 @@ var NavMock = (function () {
     NavMock.prototype.getActive = function () {
         return {
             'instance': {
-                'model': 'something'
-            }
+                'model': 'something',
+            },
         };
     };
     NavMock.prototype.setRoot = function () {
@@ -117,10 +115,11 @@ var NavMock = (function () {
     };
     return NavMock;
 }());
-exports.NavMock = NavMock;
+export { NavMock };
 var DeepLinkerMock = (function () {
     function DeepLinkerMock() {
     }
     return DeepLinkerMock;
 }());
-exports.DeepLinkerMock = DeepLinkerMock;
+export { DeepLinkerMock };
+//# sourceMappingURL=mocks-ionic.js.map

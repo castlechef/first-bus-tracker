@@ -16,16 +16,16 @@
   <ng-template #elseBlock>
   <ion-grid>
     <ion-row>
-      <ion-col><b>Bus ID</b></ion-col>
-      <ion-col><b>Bus Route</b></ion-col>
+      <ion-col><b>Bus Stop</b></ion-col>
+      <ion-col><b>Bus Id</b></ion-col>
       <ion-col><b>Latitude</b></ion-col>
       <ion-col><b>Longitude</b></ion-col>
     </ion-row>
-    <ion-row *ngFor="let bus of buses">
-      <ion-col>{{bus.busId}}</ion-col>
-      <ion-col>{{bus.routeName}}</ion-col>
-      <ion-col>{{bus.location.latitude}}</ion-col>
-      <ion-col>{{bus.location.longitude}}</ion-col>
+    <ion-row *ngFor="let stop of stops">
+      <ion-col>{{stop.busStopName}}</ion-col>
+      <ion-col>{{stop.busStopId}}</ion-col>
+      <ion-col>{{stop.location.latitude}}</ion-col>
+      <ion-col>{{stop.location.longitude}}</ion-col>
     </ion-row>
   </ion-grid>
   </ng-template>

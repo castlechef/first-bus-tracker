@@ -1,35 +1,34 @@
-"use strict";
-exports.__esModule = true;
-var testing_1 = require("@angular/core/testing");
-var ionic_angular_1 = require("ionic-angular");
-var status_bar_1 = require("@ionic-native/status-bar");
-var splash_screen_1 = require("@ionic-native/splash-screen");
-var app_component_1 = require("./app.component");
-var mocks_ionic_1 = require("../../test-config/mocks-ionic");
+import { async, TestBed } from '@angular/core/testing';
+import { IonicModule, Platform } from 'ionic-angular';
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { MyApp } from './app.component';
+import { PlatformMock, SplashScreenMock, StatusBarMock } from '../../test-config/mocks-ionic';
 describe('MyApp Component', function () {
     var fixture;
     var component;
-    beforeEach(testing_1.async(function () {
-        testing_1.TestBed.configureTestingModule({
-            declarations: [app_component_1.MyApp],
+    beforeEach(async(function () {
+        TestBed.configureTestingModule({
+            declarations: [MyApp],
             imports: [
-                ionic_angular_1.IonicModule.forRoot(app_component_1.MyApp)
+                IonicModule.forRoot(MyApp)
             ],
             providers: [
-                { provide: status_bar_1.StatusBar, useClass: mocks_ionic_1.StatusBarMock },
-                { provide: splash_screen_1.SplashScreen, useClass: mocks_ionic_1.SplashScreenMock },
-                { provide: ionic_angular_1.Platform, useClass: mocks_ionic_1.PlatformMock }
+                { provide: StatusBar, useClass: StatusBarMock },
+                { provide: SplashScreen, useClass: SplashScreenMock },
+                { provide: Platform, useClass: PlatformMock }
             ]
         });
     }));
     beforeEach(function () {
-        fixture = testing_1.TestBed.createComponent(app_component_1.MyApp);
+        fixture = TestBed.createComponent(MyApp);
         component = fixture.componentInstance;
     });
     it('should be created', function () {
-        expect(component instanceof app_component_1.MyApp).toBe(true);
+        expect(component instanceof MyApp).toBe(true);
     });
     it('should have two pages', function () {
         expect(component.pages.length).toBe(3);
     });
 });
+//# sourceMappingURL=app.component.spec.js.map

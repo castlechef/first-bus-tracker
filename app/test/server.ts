@@ -55,6 +55,53 @@ app.get('/buses', (req, res) => {
   res.json(testData);
 });
 
+app.get('/busStops', (req, res) => {
+  const testData =         {
+    "status": "success",
+    "data": [
+      {
+        "busStopId": 1,
+        "busStopName": "Junction Road",
+        "location": {
+          "latitude": 52.35546,
+          "longitude": -1.3452
+        },
+        "busRoutePosition": [
+          {
+            "name": "U1X",
+            "position": 1
+          },
+          {
+            "name": "U2",
+            "position": 4
+          }
+        ]
+      },
+      {
+        "busStopId": 2,
+        "busStopName": "University of Bath",
+        "location": {
+          "latitude": 52.3456546,
+          "longitude": -1.3465544
+        },
+        "busRoutePosition": [
+          {
+            "name": "U1X",
+            "position": 4
+          },
+          {
+            "name": "U2",
+            "position": 7
+          }
+        ]
+      }
+    ]
+  }
+
+  res.status(200);
+  res.json(testData);
+});
+
 app.listen(8080, () => {
   console.log('mockup server listening on port 8080');
 });
