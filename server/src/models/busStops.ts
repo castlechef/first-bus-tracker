@@ -5,6 +5,7 @@ import {IdGenerator} from '../utils/id';
 import {Utils} from '../utils/utils';
 import zip = Utils.arrays.zip;
 import {BusArrival} from './buses';
+import convertUnixTimeToNiceTime = Utils.time.convertUnixTimeToNiceTime;
 
 export enum BusRouteName {
     U1_CITY = 'U1 City Centre',
@@ -119,12 +120,6 @@ export class BusStops implements JSONable {
     }
 
     public arrivalsToJSON(arrivals: BusArrival[]): object {
-        function convertUnixTimeToNiceTime(unixTime: number): string {
-            const dateTime = new Date(unixTime);
-            const hours = '0' + dateTime.getHours();
-            const minutes = '0' + dateTime.getMinutes();
-            return hours.substr(-2) + ':' + minutes.substr(-2);
-        }
         return arrivals.map( arrival => {return {busId: arrival.bus.id, routeName: arrival.bus.busRoute, arrivalTime: convertUnixTimeToNiceTime(arrival.arrivalTime)}});
     }
 

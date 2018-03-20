@@ -43,6 +43,27 @@ router.post('/', (req, res) => {
         res.json(responseData);
     }
 });
+router.get('/:busId', (req, res) => {
+    const busId = parseInt(req.params.busId);
+    let responseData;
+    try {
+        if (app_1.buses.containsBus(busId)) {
+            const bus = app_1.buses.getBus(busId);
+            responseData = response_1.Response.factory(true, bus.toDetailedJSON());
+        }
+        else {
+            res.status(404);
+            responseData = response_1.Response.factory(false, undefined, 404);
+        }
+    }
+    catch (e) {
+        res.status(503);
+        responseData = response_1.Response.factory(false, undefined, 503);
+    }
+    finally {
+        res.json(responseData);
+    }
+});
 router.put('/:busId', (req, res) => {
     const busId = parseInt(req.params.busId);
     let responseData;
@@ -54,6 +75,7 @@ router.put('/:busId', (req, res) => {
                 bus.updateLocation(new location_1.Location(location));
                 res.status(200);
                 responseData = response_1.Response.factory(true, bus.toJSON());
+                console.log(bus.toDetailedJSON());
             }
             else {
                 res.status(422);

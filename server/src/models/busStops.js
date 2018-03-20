@@ -5,6 +5,7 @@ const location_1 = require("./location");
 const id_1 = require("../utils/id");
 const utils_1 = require("../utils/utils");
 var zip = utils_1.Utils.arrays.zip;
+var convertUnixTimeToNiceTime = utils_1.Utils.time.convertUnixTimeToNiceTime;
 var BusRouteName;
 (function (BusRouteName) {
     BusRouteName["U1_CITY"] = "U1 City Centre";
@@ -101,12 +102,6 @@ class BusStops {
         return this.stops.filter(stop => stop.id === id).length === 1;
     }
     arrivalsToJSON(arrivals) {
-        function convertUnixTimeToNiceTime(unixTime) {
-            const dateTime = new Date(unixTime);
-            const hours = '0' + dateTime.getHours();
-            const minutes = '0' + dateTime.getMinutes();
-            return hours.substr(-2) + ':' + minutes.substr(-2);
-        }
         return arrivals.map(arrival => { return { busId: arrival.bus.id, routeName: arrival.bus.busRoute, arrivalTime: convertUnixTimeToNiceTime(arrival.arrivalTime) }; });
     }
     toJSON() {

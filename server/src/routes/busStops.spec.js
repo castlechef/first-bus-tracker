@@ -30,6 +30,7 @@ describe('busStops routes', () => {
                 ]
             };
             const busStopsData = [busStop1, busStop2];
+            const busStopsTemp = app_1.app.locals.busStops;
             app_1.app.locals.busStops = new busStops_1.BusStops(busStopsData);
             busStop1.busStopId = 0;
             busStop2.busStopId = 1;
@@ -45,12 +46,14 @@ describe('busStops routes', () => {
                 .expect(200)
                 .then((res) => {
                 chai_1.expect(res.body).to.deep.equal(expectedData);
+                app_1.app.locals.busStops = busStopsTemp;
             });
         });
     });
     describe('/busStops/{busStopId} [GET]', () => {
         it('should return arrival time at bus stop', () => {
             const routeU2 = app_1.app.locals.busStops.getStopsWithRoute(busStops_1.BusRouteName.U2);
+            console.log(routeU2);
             const location0 = routeU2[5].location;
             const location1 = routeU2[6].location;
             const bus = app_1.app.locals.buses.createAndInsertBus(location0, busStops_1.BusRouteName.U2);

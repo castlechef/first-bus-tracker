@@ -56,5 +56,15 @@ var Utils;
         }
         arrays.zip = zip;
     })(arrays = Utils.arrays || (Utils.arrays = {}));
+    let time;
+    (function (time) {
+        function convertUnixTimeToNiceTime(unixTime) {
+            const dateTime = new Date(unixTime);
+            const hours = '0' + dateTime.getHours();
+            const minutes = '0' + dateTime.getMinutes();
+            return hours.substr(-2) + ':' + minutes.substr(-2);
+        }
+        time.convertUnixTimeToNiceTime = convertUnixTimeToNiceTime;
+    })(time = Utils.time || (Utils.time = {}));
 })(Utils = exports.Utils || (exports.Utils = {}));
 //# sourceMappingURL=utils.js.map

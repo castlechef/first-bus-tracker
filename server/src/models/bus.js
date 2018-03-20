@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const location_1 = require("./location");
+const utils_1 = require("../utils/utils");
+var convertUnixTimeToNiceTime = utils_1.Utils.time.convertUnixTimeToNiceTime;
 class Bus {
     constructor(id, location, busRouteName, busStops) {
         if (typeof id !== 'number' || !(location instanceof location_1.Location))
@@ -16,21 +18,24 @@ class Bus {
         this.updateLocation(location);
     }
     establishRoutePosition() {
-        const stopsInRange = this.getStopsWithinRange(Bus.proximityToStopAtStop);
+        const stopsInRange = this.getStopsWithinRange(Bus.PROXIMITY_TO_STOP_AT_STOP);
         stopsInRange.forEach(s => {
-            if (!this.visitedBusStops.includes(s)) {
-                this.visitedBusStops.push(s);
+            if (!this.visitedBusStops.some(({ busStop }) => busStop === s)) {
+                this.visitedBusStops.push({ busStop: s, departureTime: Date.now() });
             }
         });
         if (this.visitedBusStops.length < 2)
             return;
         for (let i = 0; i < this.visitedBusStops.length - 1; i++) {
             for (let j = i + 1; j < this.visitedBusStops.length; j++) {
-                const positionJ = this.visitedBusStops[j].getPositionOfRoute(this._busRoute);
-                const positionI = this.visitedBusStops[i].getPositionOfRoute(this._busRoute);
+                const positionJ = this.visitedBusStops[j].busStop.getPositionOfRoute(this._busRoute);
+                const positionI = this.visitedBusStops[i].busStop.getPositionOfRoute(this._busRoute);
                 if (positionJ === positionI + 1) {
-                    this.nextBusStop = this.getBusStopAfterStop(this.visitedBusStops[j]);
+                    // TODO Time Stamp and add to departure times
+                    this.nextBusStop = this.getBusStopAfterStop(this.visitedBusStops[j].busStop);
                     this.establishedRoutePosition = !this.establishedRoutePosition;
+                    this.busStopDepartureTimes.push(this.visitedBusStops[i]);
+                    this.busStopDepartureTimes.push(this.visitedBusStops[j]);
                     this.updateBusStopArrivalTimes();
                 }
             }
@@ -68,7 +73,7 @@ class Bus {
         }
         else {
             let currentTime = Date.now(); // Date in unix time.
-            if (this.getDistanceToStop(this.getNextBusStop()) <= Bus.proximityToStopAtStop) {
+            if (this.getDistanceToStop(this.getNextBusStop()) <= Bus.PROXIMITY_TO_STOP_AT_STOP) {
                 this.busStopDepartureTimes.push({ busStop: this.nextBusStop, departureTime: currentTime });
                 this.nextBusStop = this.getBusStopAfterStop(this.nextBusStop);
             }
@@ -77,7 +82,7 @@ class Bus {
     }
     updateBusStopArrivalTimes() {
         let currentTime = Date.now(); // Date in unix time.
-        this.busStopArrivalTimes = this.busStops.map(s => { return { busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.busSpeed / 1000)) }; });
+        this.busStopArrivalTimes = this.busStops.map(s => { return { busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED / 1000)) }; });
     }
     getPredictedArrival(busStop) {
         this.enforceBusRoutePositionEstablished();
@@ -131,11 +136,52 @@ class Bus {
         return {
             busId: this.id,
             location: this.getLatestLocation().toJSON(),
-            routeName: this._busRoute
+            routeName: this.busRoute
+        };
+    }
+    toDetailedJSON() {
+        // busId, location, routeName, departureTimes (busStopId, busStopName, departureTime), arrivalTimes (busStopId, busStopName, arrivalTime)
+        const departureTimes = this.busStopDepartureTimes
+            .sort(({ busStop: busStop1, departureTime: t1 }, { busStop: busStop2, departureTime: t2 }) => {
+            return t2 - t1;
+        })
+            .filter(({ busStop, departureTime }, index) => {
+            return index < Bus.NUMBER_OF_DEPARTURE_TIMES_TO_SEND;
+        })
+            .map(({ busStop, departureTime }) => {
+            return {
+                busStopId: busStop.id,
+                busStopsName: busStop.name,
+                departureTime: convertUnixTimeToNiceTime(departureTime)
+            };
+        })
+            .reverse();
+        const arrivalTimes = this.busStopArrivalTimes
+            .sort(({ busStop: busStop1, arrivalTime: t1 }, { busStop: busStop2, arrivalTime: t2 }) => {
+            return t1 - t2;
+        })
+            .filter(({ busStop, arrivalTime }, index) => {
+            return index < Bus.NUMBER_OF_ARRIVAL_TIMES_TO_SEND;
+        })
+            .map(({ busStop, arrivalTime }) => {
+            return {
+                busStopId: busStop.id,
+                busStopsName: busStop.name,
+                arrivalTime: convertUnixTimeToNiceTime(arrivalTime)
+            };
+        });
+        return {
+            busId: this.id,
+            location: this.getLatestLocation().toJSON(),
+            routeName: this.busRoute,
+            departureTimes,
+            arrivalTimes
         };
     }
 }
-Bus.proximityToStopAtStop = 10; // in metres
-Bus.busSpeed = 4.2; // in metres per second
+Bus.NUMBER_OF_DEPARTURE_TIMES_TO_SEND = 2;
+Bus.NUMBER_OF_ARRIVAL_TIMES_TO_SEND = 10;
+Bus.PROXIMITY_TO_STOP_AT_STOP = 10; // in metres
+Bus.BUS_SPEED = 4.2; // in metres per second
 exports.Bus = Bus;
 //# sourceMappingURL=bus.js.map

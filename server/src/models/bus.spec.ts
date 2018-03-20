@@ -10,7 +10,6 @@ import generateValidLocation = Utils.location.generateValidLocation;
 
 describe('bus', () => {
 
-
     describe('constructor', () => {
         describe('should throw error when invalid bus route', () => {
             it('should not accept names which are not in BusRouteNames', () => {

@@ -225,6 +225,80 @@ system generates an id for the bus and returns it in the data object.
 
     + busId (number) - a unique identifier for a specific bus.
 
+### Get a Bus [GET]
+This allows client to view location of bus and expected arrival
+times at each of it's stops, and up to two previous bus stop
+departure times.
+
++ Response 200 (application/json)
+        
+    + Body
+```json
+        {
+            "data": {
+                "busId": 0,
+                "location": {
+                    "latitude": 53.003444,
+                    "longitude": -2.273507
+                },
+                "routeName": "U1",
+                "departureTimes": [
+                    {
+                        "busStopId": 32,
+                        "busStopName": "A bus stop",
+                        "departureTime": "12:19"
+                    },
+                    {
+                       "busStopId": 33,
+                       "busStopName": "Another bus stop",
+                       "departureTime": "12:21"
+                    }
+                ],
+                "expectedArrivals": [
+                    {
+                        "busStopId": 1,
+                        "busStopName": "Junction Road",
+                        "arrivalTime": "12:23"
+                    },
+                    {
+                        "busStopId": 2,
+                        "busStopName": "Brougham Hayes",
+                        "arrivalTime": "12:25"
+                    }
+                ]
+            }
+        }
+```
+
++ Response 404 (application/json)
+        
+    + Body
+```json
+        {
+            "status": "failure",
+            "data": {
+                "busId": 1
+            },
+            "error": {
+                "code": 404,
+                "message": "Not Found"
+            }
+        }
+```
+
++ Response 503 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 503,
+                "message": "Service Unavailable"
+            }
+        }
+```
+
 ### Update a Bus [PUT]
 
 This allows a registered bus to inform the server of a location

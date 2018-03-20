@@ -4,6 +4,7 @@ import {expect} from 'chai';
 import 'mocha';
 import {Utils} from '../utils/utils';
 import {BusRouteName} from '../models/busStops';
+import {Location} from '../models/location';
 
 let buses;
 
@@ -106,6 +107,65 @@ describe('buses routes', () => {
                 .expect(200)
                 .then(res => {
                     expect(res.body).to.deep.equal(expectedData);
+                });
+        });
+    });
+
+    describe('/buses/{busId} [GET]', () => {
+        it('should return empty arrival times when bus route is not established', () => {
+            const location = new Location({latitude: 51.362944, longitude: -2.339107});
+            const routeName = BusRouteName.U2;
+            const bus = app.locals.buses.createAndInsertBus(location, routeName);
+
+            return request(app)
+                .get(`/buses/${bus.id}`)
+                .expect(200)
+                .then(res => {
+                    const data = res.body.data;
+                    const expectedData = {
+                        busId: bus.id,
+                        location: location.toJSON(),
+                        routeName,
+                        departureTimes: [],
+                        arrivalTimes: []
+                    };
+                    expect(data).to.deep.equal(expectedData);
+                });
+        });
+
+        it('should return 10 next arrival times and 2 latest departure times once bus is established', () => {
+            const location = new Location({latitude: 51.362944, longitude: -2.339107});
+            const location2 = new Location({latitude: 51.362587, longitude: -2.342343});
+            const routeName = BusRouteName.U2;
+            const bus = app.locals.buses.createAndInsertBus(location, routeName);
+            bus.updateLocation(location2);
+
+            return request(app)
+                .get(`/buses/${bus.id}`)
+                .expect(200)
+                .then(res => {
+                    const data = res.body.data;
+                    expect(data.arrivalTimes.length).to.equal(10);
+                    expect(data.departureTimes.length).to.equal(2);
+                });
+        });
+
+        it('should return 10 next arrival times and most recent 2 departure times after more than 2 departures', () => {
+            const location = new Location({latitude: 51.362944, longitude: -2.339107});
+            const location1 = new Location({latitude: 51.362587, longitude: -2.342343});
+            const location2 = new Location({latitude: 51.362089, longitude: -2.346247});
+            const routeName = BusRouteName.U2;
+            const bus = app.locals.buses.createAndInsertBus(location, routeName);
+            bus.updateLocation(location1);
+            bus.updateLocation(location2);
+
+            return request(app)
+                .get(`/buses/${bus.id}`)
+                .expect(200)
+                .then(res => {
+                    const data = res.body.data;
+                    expect(data.arrivalTimes.length).to.equal(10);
+                    expect(data.departureTimes.length).to.equal(2);
                 });
         });
     });

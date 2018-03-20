@@ -54,4 +54,13 @@ export namespace Utils {
             });
         }
     }
+
+    export namespace time {
+        export function convertUnixTimeToNiceTime(unixTime: number): string {
+            const dateTime = new Date(unixTime);
+            const hours = '0' + dateTime.getHours();
+            const minutes = '0' + dateTime.getMinutes();
+            return hours.substr(-2) + ':' + minutes.substr(-2);
+        }
+    }
 }
