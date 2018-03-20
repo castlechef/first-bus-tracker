@@ -62,10 +62,11 @@ router.put('/:busId', (req, res) => {
         }
         else {
             res.status(404);
+            const locationJSON = (location_1.Location.isValidLocation(location)) ? new location_1.Location(location).toJSON() : undefined;
             const data = {
-                busId
+                busId,
+                location: locationJSON
             };
-            data.location = (location_1.Location.isValidLocation(location)) ? new location_1.Location(location).toJSON() : undefined;
             responseData = response_1.Response.factory(false, data, 404);
         }
     }

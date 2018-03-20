@@ -57,10 +57,11 @@ router.put('/:busId', (req, res) => {
             }
         } else {
             res.status(404);
+            const locationJSON = (Location.isValidLocation(location)) ? new Location(location).toJSON() : undefined;
             const data = {
-                busId
+                busId,
+                location: locationJSON
             };
-            data.location = (Location.isValidLocation(location)) ? new Location(location).toJSON() : undefined;
             responseData = Response.factory(false, data, 404);
         }
     } catch (e) {

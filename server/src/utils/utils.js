@@ -43,5 +43,18 @@ var Utils;
         }
         location.generateValidLocations = generateValidLocations;
     })(location = Utils.location || (Utils.location = {}));
+    let arrays;
+    (function (arrays) {
+        function zip(...arrs) {
+            const args = arrs; //[].slice.call(arguments);
+            const shortest = args.length == 0 ? [] : args.reduce((a, b) => a.length < b.length ? a : b);
+            return shortest.map((_, i) => {
+                return args.map(array => {
+                    return array[i];
+                });
+            });
+        }
+        arrays.zip = zip;
+    })(arrays = Utils.arrays || (Utils.arrays = {}));
 })(Utils = exports.Utils || (exports.Utils = {}));
 //# sourceMappingURL=utils.js.map

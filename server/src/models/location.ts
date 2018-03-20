@@ -1,4 +1,5 @@
 import {JSONable} from './response';
+import {BusStop} from './busStop';
 
 export type ILocation = {
     latitude: number;
@@ -12,8 +13,10 @@ export class Location implements JSONable {
     public static readonly MIN_LONGITUDE: number = -2.403184;
 
     constructor({latitude, longitude}: ILocation) {
-        if (!Location.isValidLocation({latitude, longitude}))
+        if (!Location.isValidLocation({latitude, longitude})) {
+            console.log({latitude, longitude});
             throw new Error('Invalid ILocation parameter');
+        }
         this._latitude = latitude;
         this._longitude = longitude;
     }
@@ -56,7 +59,7 @@ export class Location implements JSONable {
         };
     }
 
-    public distatnceFrom(otherLocation: Location): number {
+    public distanceFrom(otherLocation: Location): number {
         function toRadians(n: number): number { return n * Math.PI / 180; }
         const R = 6371e3;
         const theta1 = toRadians(this.latitude);
@@ -66,5 +69,17 @@ export class Location implements JSONable {
         const a = (Math.sin(deltaTheta / 2) ** 2) + (Math.cos(theta1) * Math.cos(theta2) * (Math.sin(deltaLamda / 2) ** 2));
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+
+    public static distanceBetweenN(locations: Location[]) {
+        let total = 0;
+        for (let i = 0; i < locations.length - 1; i++) {
+            total += locations[i].distanceFrom(locations[i + 1]);
+        }
+        return total;
+    }
+
+    public static nearestBusStopToLocation(location: Location, busStops: BusStop[]): BusStop {
+        return busStops.reduce((t, e) => t = (t && location.distanceFrom(t.location) < location.distanceFrom(e.location)) ? t : e);
     }
 }

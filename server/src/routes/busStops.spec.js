@@ -48,5 +48,20 @@ describe('busStops routes', () => {
             });
         });
     });
+    describe('/busStops/{busStopId} [GET]', () => {
+        it('should return arrival time at bus stop', () => {
+            const routeU2 = app_1.app.locals.busStops.getStopsWithRoute(busStops_1.BusRouteName.U2);
+            const location0 = routeU2[5].location;
+            const location1 = routeU2[6].location;
+            const bus = app_1.app.locals.buses.createAndInsertBus(location0, busStops_1.BusRouteName.U2);
+            bus.updateLocation(location1);
+            return request(app_1.app)
+                .get(`/busStops/${routeU2[7].id}`)
+                .expect(200)
+                .then(res => {
+                chai_1.expect(res.body.data.arrivals.length).to.equal(1);
+            });
+        });
+    });
 });
 //# sourceMappingURL=busStops.spec.js.map

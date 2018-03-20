@@ -3,8 +3,9 @@ import {app} from '../app';
 import {expect} from 'chai';
 import 'mocha';
 import {Utils} from '../utils/utils';
-import {BusStops} from '../models/busStops';
+import {BusRouteName, BusStops} from '../models/busStops';
 import {IBusStop} from '../models/busStop';
+import {Location} from '../models/location';
 
 let busStops: BusStops;
 
@@ -48,6 +49,24 @@ describe('busStops routes', () => {
                 .expect(200)
                 .then((res) => {
                     expect(res.body).to.deep.equal(expectedData)
+                });
+        });
+    });
+
+    describe('/busStops/{busStopId} [GET]', () => {
+        it('should return arrival time at bus stop', () => {
+            const routeU2 = app.locals.busStops.getStopsWithRoute(BusRouteName.U2);
+            const location0 = routeU2[5].location;
+            const location1 = routeU2[6].location;
+
+            const bus = app.locals.buses.createAndInsertBus(location0, BusRouteName.U2);
+            bus.updateLocation(location1);
+
+            return request(app)
+                .get(`/busStops/${routeU2[7].id}`)
+                .expect(200)
+                .then(res => {
+                    expect(res.body.data.arrivals.length).to.equal(1);
                 });
         });
     });
