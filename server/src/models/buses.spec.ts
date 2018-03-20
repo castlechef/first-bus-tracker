@@ -5,13 +5,15 @@ import {Bus} from './bus';
 import 'mocha';
 import {Utils} from '../utils/utils';
 import generateValidLocations = Utils.location.generateValidLocations;
-import {BusRouteName} from './busStops';
+import {BusRouteName, BusStops} from './busStops';
+import {IBusStop} from './busStop';
 
-let buses;
+let buses, busStops;
 
 describe('buses', () => {
     beforeEach(() => {
-        buses = new Buses();
+        busStops = new BusStops([]);
+        buses = new Buses(busStops);
     });
 
     describe('containsBus', () => {
@@ -60,7 +62,7 @@ describe('buses', () => {
             const location = Utils.location.generateValidLocation();
 
             const bus = buses.createAndInsertBus(location, BusRouteName.U2);
-            expect(bus).to.deep.equal(new Bus(bus.id, location, BusRouteName.U2));
+            expect(bus).to.deep.equal(new Bus(bus.id, location, BusRouteName.U2, busStops.getStopsWithRoute(BusRouteName.U2)));
         });
     });
 
@@ -110,6 +112,30 @@ describe('buses', () => {
 
         it('should empty array when empty', () => {
             expect(buses.toJSON()).to.deep.equal([]);
+        });
+    });
+
+    describe('getExpectedArrivalsAtStop', () => {
+        const data: { busStops: IBusStop[] } = require('../../data.json');
+        const busStops = new BusStops(data.busStops);
+        buses = new Buses(busStops);
+
+        it('Should return arrival times of 2 buses', () => {
+            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const busStops = new BusStops(data.busStops);
+            const routeU2 = busStops.getStopsWithRoute(BusRouteName.U2);
+            buses = new Buses(busStops);
+
+            let bus0 = buses.createAndInsertBus(routeU2[0].location, BusRouteName.U2);
+            let bus1 = buses.createAndInsertBus(routeU2[6].location, BusRouteName.U2);
+
+            bus0.updateLocation(routeU2[1].location);
+            bus1.updateLocation(routeU2[7].location);
+
+            bus0.updateLocation(routeU2[2].location);
+            bus1.updateLocation(routeU2[8].location);
+
+            console.log(buses.getExpectedArrivalsAtStop(routeU2[9]));
         });
     });
 });

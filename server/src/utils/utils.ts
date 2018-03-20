@@ -28,16 +28,30 @@ export namespace Utils {
             {name: 'min boundary latitude', location: {latitude: Location.MIN_LATITUDE, longitude: validLon}},
             {name: 'max boundary longitude', location: {latitude: validLat, longitude: Location.MAX_LONGITUDE}},
             {name: 'min boundary longitude', location: {latitude: validLat, longitude: Location.MIN_LONGITUDE}}
-        ] as {name: string, location: ILocation}[];
+        ] as { name: string, location: ILocation }[];
 
         export function generateValidLocation(): Location {
             const latitude = Numeric.randomBetweenNumbers(Location.MIN_LATITUDE, Location.MAX_LATITUDE);
             const longitude = Numeric.randomBetweenNumbers(Location.MIN_LONGITUDE, Location.MAX_LONGITUDE);
-            return new Location({ latitude, longitude });
+            return new Location({latitude, longitude});
         }
 
         export function generateValidLocations(length): Location[] {
             return Array.from({length}, generateValidLocation);
+        }
+    }
+
+    export namespace arrays {
+        export function zip(...arrs: any[]) {
+            const args = arrs;//[].slice.call(arguments);
+            const shortest =
+                args.length == 0 ? [] : args.reduce((a, b) => a.length < b.length ? a : b);
+
+            return shortest.map((_, i) => {
+                return args.map(array => {
+                    return array[i]
+                })
+            });
         }
     }
 }

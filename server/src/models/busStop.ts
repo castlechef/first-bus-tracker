@@ -16,20 +16,29 @@ export type BusRoutePosition = {
 }
 
 export class BusStop implements JSONable {
-    private id: number;
+    private _id: number;
     private _name: string;
-    private location: Location;
+    private _location: Location;
     private busRoutePositions: BusRoutePosition[];
 
     constructor(id: number, name: string, location: Location, busRouteData: BusRoutePosition[]) {
-        this.id = id;
+        this._id = id;
         this._name = name;
-        this.location = location;
+        this._location = location;
         this.busRoutePositions = busRouteData;
+    }
+
+
+    get id(): number {
+        return this._id;
     }
 
     get name(): string {
         return this._name;
+    }
+
+    get location(): Location {
+        return this._location;
     }
 
     public hasRoute(busRoute: BusRouteName): boolean {
@@ -43,9 +52,9 @@ export class BusStop implements JSONable {
 
     public toJSON(): object {
         return {
-            busStopId: this.id,
+            busStopId: this._id,
             busStopName: this._name,
-            location: this.location.toJSON(),
+            location: this._location.toJSON(),
             routes: this.busRoutePositions
         }
     }

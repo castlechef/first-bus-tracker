@@ -2,8 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Location {
     constructor({ latitude, longitude }) {
-        if (!Location.isValidLocation({ latitude, longitude }))
+        if (!Location.isValidLocation({ latitude, longitude })) {
+            console.log({ latitude, longitude });
             throw new Error('Invalid ILocation parameter');
+        }
         this._latitude = latitude;
         this._longitude = longitude;
     }
@@ -43,7 +45,7 @@ class Location {
             longitude: this._longitude
         };
     }
-    distatnceFrom(otherLocation) {
+    distanceFrom(otherLocation) {
         function toRadians(n) { return n * Math.PI / 180; }
         const R = 6371e3;
         const theta1 = toRadians(this.latitude);
@@ -53,6 +55,16 @@ class Location {
         const a = (Math.sin(deltaTheta / 2) ** 2) + (Math.cos(theta1) * Math.cos(theta2) * (Math.sin(deltaLamda / 2) ** 2));
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+    static distanceBetweenN(locations) {
+        let total = 0;
+        for (let i = 0; i < locations.length - 1; i++) {
+            total += locations[i].distanceFrom(locations[i + 1]);
+        }
+        return total;
+    }
+    static nearestBusStopToLocation(location, busStops) {
+        return busStops.reduce((t, e) => t = (t && location.distanceFrom(t.location) < location.distanceFrom(e.location)) ? t : e);
     }
 }
 Location.MAX_LATITUDE = 51.391178;
