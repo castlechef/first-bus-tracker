@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const location_1 = require("../models/location");
+const response_1 = require("../models/response");
 var Utils;
 (function (Utils) {
     let Numeric;
@@ -66,5 +67,27 @@ var Utils;
         }
         time.convertUnixTimeToNiceTime = convertUnixTimeToNiceTime;
     })(time = Utils.time || (Utils.time = {}));
+    let routes;
+    (function (routes) {
+        class RouteError {
+            constructor(statusCode, responseData) {
+                this.statusCode = statusCode;
+                this.responseData = responseData;
+            }
+            getResponse() {
+                return response_1.Response.factory(this.responseData, this.statusCode);
+            }
+            static Notfound(responseData) {
+                return new RouteError(404, responseData);
+            }
+            static UnprocessableEntity(responseData) {
+                return new RouteError(422, responseData);
+            }
+            static ServiceUnavailable(responseData) {
+                return new RouteError(503, responseData);
+            }
+        }
+        routes.RouteError = RouteError;
+    })(routes = Utils.routes || (Utils.routes = {}));
 })(Utils = exports.Utils || (exports.Utils = {}));
 //# sourceMappingURL=utils.js.map

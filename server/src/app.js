@@ -8,6 +8,8 @@ const buses_2 = require("./models/buses");
 const busStops_2 = require("./models/busStops");
 const cors = require("cors");
 const logger = require("morgan");
+const utils_1 = require("./utils/utils");
+var RouteError = utils_1.Utils.routes.RouteError;
 const corsOptions = {
     allowedHeaders: ['Origin'],
     credentials: true,
@@ -26,4 +28,13 @@ exports.app.use(cors(corsOptions));
 exports.app.use(logger('dev'));
 exports.app.use('/buses', buses_1.default);
 exports.app.use('/busStops', busStops_1.default);
+exports.app.use('*', (err, req, res, next) => {
+    if (err instanceof RouteError) {
+        res.status(err.statusCode);
+        res.json(err.getResponse());
+    }
+    else {
+        next();
+    }
+});
 //# sourceMappingURL=app.js.map

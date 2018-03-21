@@ -7,6 +7,8 @@ import {BusStops} from './models/busStops';
 import {IBusStop} from './models/busStop';
 import * as cors from 'cors';
 import * as logger from 'morgan';
+import {Utils} from './utils/utils';
+import RouteError = Utils.routes.RouteError;
 
 const corsOptions: cors.CorsOptions = {
     allowedHeaders: ['Origin'],
@@ -32,3 +34,11 @@ app.use(logger('dev'));
 
 app.use('/buses', busesRoute);
 app.use('/busStops', busStopsRoute);
+app.use('*', (err, req, res, next) => {
+    if (err instanceof RouteError) {
+        res.status(err.statusCode);
+        res.json(err.getResponse());
+    } else {
+        next();
+    }
+});

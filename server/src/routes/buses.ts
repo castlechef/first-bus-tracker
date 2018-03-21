@@ -3,92 +3,73 @@ import {Location} from '../models/location';
 import {JsonResponse, Response} from '../models/response';
 import {buses} from '../app';
 import {BusRouteName} from '../models/busStops';
+import {Utils} from '../utils/utils';
+import RouteError = Utils.routes.RouteError;
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    let responseData: JsonResponse;
+router.get('/', (req, res, next) => {
     try {
         res.status(200);
-        responseData = Response.factory(true, buses.toJSON());
-    } catch (e) {
-        res.status(503);
-        responseData = Response.factory(false, undefined, 503);
-    } finally {
+        const responseData: JsonResponse = Response.factory(buses.toJSON());
         res.json(responseData);
+    } catch (e) {
+        next(RouteError.ServiceUnavailable());
     }
 });
 
-router.post('/', (req, res) => {
-    let responseData: JsonResponse;
+router.post('/', (req, res, next) => {
     try {
         const location = req.body.data.location;
-        const route:BusRouteName = req.body.data.routeName;
+        const route: BusRouteName = req.body.data.routeName;
+
         if (Location.isValidLocation(location) && route in BusRouteName) {
             const bus = buses.createAndInsertBus(new Location(location), route);
             res.status(200);
-            responseData = Response.factory(true, bus.toJSON());
+            const responseData: JsonResponse = Response.factory(bus.toJSON());
+            res.json(responseData);
         } else {
-            res.status(422);
-            responseData = Response.factory(false, location, 422);
+            next(RouteError.UnprocessableEntity(location));
         }
-    } catch (e) {
-        res.status(503);
-        responseData = Response.factory(false, undefined, 503);
-    } finally {
-        res.json(responseData);
+    }  catch (e) {
+        next(RouteError.ServiceUnavailable());
     }
 });
 
-router.get('/:busId', (req, res) => {
+router.get('/:busId', (req, res, next) => {
     const busId = parseInt(req.params.busId);
-    let responseData: JsonResponse;
     try {
         if (buses.containsBus(busId)) {
             const bus = buses.getBus(busId);
-            responseData = Response.factory(true, bus.toDetailedJSON());
+            const responseData: JsonResponse = Response.factory(bus.toDetailedJSON());
+            res.json(responseData);
         } else {
-            res.status(404);
-            responseData = Response.factory(false, undefined, 404);
+            next(RouteError.Notfound());
         }
     } catch (e) {
-        res.status(503);
-        responseData = Response.factory(false, undefined, 503);
-    } finally {
-        res.json(responseData);
+        next(RouteError.ServiceUnavailable());
     }
 });
 
-router.put('/:busId', (req, res) => {
+router.put('/:busId', (req, res, next) => {
     const busId = parseInt(req.params.busId);
     let responseData: JsonResponse;
     const location = (req.body.data && req.body.data.location);
     try {
-        if (buses.containsBus(busId)) {
-            if (Location.isValidLocation(location)) {
-                const bus = buses.getBus(busId);
-                bus.updateLocation(new Location(location));
-                res.status(200);
-                responseData = Response.factory(true, bus.toJSON());
-                console.log(bus.toDetailedJSON());
-            } else {
-                res.status(422);
-                responseData = Response.factory(false, undefined, 422);
-            }
-        } else {
-            res.status(404);
+        if (buses.containsBus(busId) && Location.isValidLocation(location)) {
+            const bus = buses.getBus(busId);
+            bus.updateLocation(new Location(location));
+            res.status(200);
+            responseData = Response.factory(bus.toJSON());
+            res.json(responseData);
+        } else if (Location.isValidLocation(location)) {
             const locationJSON = (Location.isValidLocation(location)) ? new Location(location).toJSON() : undefined;
-            const data = {
-                busId,
-                location: locationJSON
-            };
-            responseData = Response.factory(false, data, 404);
+            next(RouteError.Notfound({busId, location: locationJSON}));
+        } else {
+            next(RouteError.UnprocessableEntity());
         }
     } catch (e) {
-        res.status(503);
-        responseData = Response.factory(false, undefined, 503);
-    } finally {
-        res.json(responseData);
+        next(RouteError.ServiceUnavailable());
     }
 });
 

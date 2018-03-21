@@ -1,4 +1,5 @@
 import {ILocation, Location} from '../models/location';
+import {Response} from '../models/response';
 
 export namespace Utils {
     export namespace Numeric {
@@ -61,6 +62,24 @@ export namespace Utils {
             const hours = '0' + dateTime.getHours();
             const minutes = '0' + dateTime.getMinutes();
             return hours.substr(-2) + ':' + minutes.substr(-2);
+        }
+    }
+
+    export namespace routes {
+        export class RouteError {
+            constructor (public statusCode: number, private responseData?: object) { }
+            getResponse() {
+                return Response.factory(this.responseData, this.statusCode);
+            }
+            static Notfound(responseData?: object) {
+                return new RouteError(404, responseData);
+            }
+            static UnprocessableEntity(responseData?: object) {
+                return new RouteError(422, responseData);
+            }
+            static ServiceUnavailable(responseData?: object) {
+                return new RouteError(503, responseData);
+            }
         }
     }
 }

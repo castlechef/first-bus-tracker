@@ -16,8 +16,8 @@ export type JsonResponseError = {
 }
 
 export class Response {
-    public static factory(success: boolean, data: any, errorCode?: number): JsonResponse {
-        const status = success ? 'success' : 'failure';
+    public static factory(data: any, errorCode?: number): JsonResponse {
+        const status = (errorCode) ? 'failure' : 'success';
         const res: JsonResponse = {
             status,
             data,
