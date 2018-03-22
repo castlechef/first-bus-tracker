@@ -53,7 +53,6 @@ describe('busStops routes', () => {
     describe('/busStops/{busStopId} [GET]', () => {
         it('should return arrival time at bus stop', () => {
             const routeU2 = app_1.app.locals.busStops.getStopsWithRoute(busStops_1.BusRouteName.U2);
-            console.log(routeU2);
             const location0 = routeU2[5].location;
             const location1 = routeU2[6].location;
             const bus = app_1.app.locals.buses.createAndInsertBus(location0, busStops_1.BusRouteName.U2);

@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class Location {
     constructor({ latitude, longitude }) {
         if (!Location.isValidLocation({ latitude, longitude })) {
-            console.log({ latitude, longitude });
             throw new Error('Invalid ILocation parameter');
         }
         this._latitude = latitude;

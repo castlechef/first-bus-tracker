@@ -242,6 +242,7 @@ departure times.
                     "longitude": -2.273507
                 },
                 "routeName": "U1",
+                "capacity": "FULL",
                 "departureTimes": [
                     {
                         "busStopId": 32,

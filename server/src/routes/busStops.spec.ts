@@ -58,7 +58,6 @@ describe('busStops routes', () => {
     describe('/busStops/{busStopId} [GET]', () => {
         it('should return arrival time at bus stop', () => {
             const routeU2 = app.locals.busStops.getStopsWithRoute(BusRouteName.U2);
-            console.log(routeU2);
             const location0 = routeU2[5].location;
             const location1 = routeU2[6].location;
 

@@ -110,7 +110,6 @@ describe('buses', () => {
             bus1.updateLocation(routeU2[7].location);
             bus0.updateLocation(routeU2[2].location);
             bus1.updateLocation(routeU2[8].location);
-            console.log(buses.getExpectedArrivalsAtStop(routeU2[9]));
         });
     });
 });

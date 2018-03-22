@@ -104,6 +104,7 @@ describe('buses routes', () => {
         it('should return empty arrival times when bus route is not established', () => {
             const location = new location_1.Location({ latitude: 51.362944, longitude: -2.339107 });
             const routeName = busStops_1.BusRouteName.U2;
+            const capacity = 'UNKNOWN';
             const bus = app_1.app.locals.buses.createAndInsertBus(location, routeName);
             return request(app_1.app)
                 .get(`/buses/${bus.id}`)
@@ -114,6 +115,7 @@ describe('buses routes', () => {
                     busId: bus.id,
                     location: location.toJSON(),
                     routeName,
+                    capacity,
                     departureTimes: [],
                     arrivalTimes: []
                 };
@@ -150,6 +152,28 @@ describe('buses routes', () => {
                 const data = res.body.data;
                 chai_1.expect(data.arrivalTimes.length).to.equal(10);
                 chai_1.expect(data.departureTimes.length).to.equal(2);
+            });
+        });
+        it('should return empty arrival times when bus route is not established and capacity is FULL', () => {
+            const location = new location_1.Location({ latitude: 51.362944, longitude: -2.339107 });
+            const routeName = busStops_1.BusRouteName.U2;
+            const capacity = 'FULL';
+            const bus = app_1.app.locals.buses.createAndInsertBus(location, routeName);
+            bus.updateCapacity(capacity);
+            return request(app_1.app)
+                .get(`/buses/${bus.id}`)
+                .expect(200)
+                .then(res => {
+                const data = res.body.data;
+                const expectedData = {
+                    busId: bus.id,
+                    location: location.toJSON(),
+                    routeName,
+                    capacity,
+                    departureTimes: [],
+                    arrivalTimes: []
+                };
+                chai_1.expect(data).to.deep.equal(expectedData);
             });
         });
     });

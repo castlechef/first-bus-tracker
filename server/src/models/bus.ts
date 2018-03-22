@@ -5,6 +5,7 @@ import {BusStop} from './busStop';
 import {Utils} from '../utils/utils';
 import convertUnixTimeToNiceTime = Utils.time.convertUnixTimeToNiceTime;
 import {BusCapacity, Capacity} from './busCapacity';
+import {Buses} from './buses';
 
 export type busId = number;
 
@@ -36,6 +37,7 @@ export class Bus implements JSONable {
 
     constructor(id: busId, location: Location, busRouteName: BusRouteName, busStops: BusStop[]) {
         if (typeof id !== 'number' || !(location instanceof Location)) throw new Error('invalid parameter');
+        if (!Buses.isValidBusRouteName(busRouteName)) throw new Error();
         this._id = id;
         this.locations = [];
         this._busRoute = busRouteName;
@@ -234,6 +236,7 @@ export class Bus implements JSONable {
             busId: this.id,
             location: this.getLatestLocation().toJSON(),
             routeName: this.busRoute,
+            capacity: this.busCapacity.toJSON(),
             departureTimes,
             arrivalTimes
         }

@@ -4,10 +4,13 @@ const location_1 = require("./location");
 const utils_1 = require("../utils/utils");
 var convertUnixTimeToNiceTime = utils_1.Utils.time.convertUnixTimeToNiceTime;
 const busCapacity_1 = require("./busCapacity");
+const buses_1 = require("./buses");
 class Bus {
     constructor(id, location, busRouteName, busStops) {
         if (typeof id !== 'number' || !(location instanceof location_1.Location))
             throw new Error('invalid parameter');
+        if (!buses_1.Buses.isValidBusRouteName(busRouteName))
+            throw new Error();
         this._id = id;
         this.locations = [];
         this._busRoute = busRouteName;
@@ -182,6 +185,7 @@ class Bus {
             busId: this.id,
             location: this.getLatestLocation().toJSON(),
             routeName: this.busRoute,
+            capacity: this.busCapacity.toJSON(),
             departureTimes,
             arrivalTimes
         };
