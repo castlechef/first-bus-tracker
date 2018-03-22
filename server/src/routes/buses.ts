@@ -51,7 +51,7 @@ router.get('/:busId', (req, res, next) => {
     }
 });
 
-router.put('/:busId', (req, res, next) => {
+router.put('/:busId/location', (req, res, next) => {
     const busId = parseInt(req.params.busId);
     let responseData: JsonResponse;
     const location = (req.body.data && req.body.data.location);

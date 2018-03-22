@@ -52,7 +52,7 @@ router.get('/:busId', (req, res, next) => {
         next(RouteError.ServiceUnavailable());
     }
 });
-router.put('/:busId', (req, res, next) => {
+router.put('/:busId/location', (req, res, next) => {
     const busId = parseInt(req.params.busId);
     let responseData;
     const location = (req.body.data && req.body.data.location);

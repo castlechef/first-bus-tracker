@@ -299,7 +299,9 @@ departure times.
         }
 ```
 
-### Update a Bus [PUT]
+## Bus Location [/buses/{busId}/location]
+
+### Update a Bus Location [PUT]
 
 This allows a registered bus to inform the server of a location
 update.
@@ -386,6 +388,82 @@ update.
                 },
                 "routeName": "U1 City Centre"
             },
+            "error": {
+                "code": 503,
+                "message": "Service Unavailable"
+            }
+        }
+```
+
+## Bus Capacity [/buses/{busId}/capacity]
+
+### Update a Bus Capacity
+
+This allows a client to send the capacity of a specific bus.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+    
+    + Body
+```json
+        {
+            "data": {
+                "capacity": "EMPTY"
+            }
+        }
+```
+
++ Response 200 (application/json)
+
+    + Body
+```json
+        {
+            "data": {
+                "busId": 1,
+                "capacity": "EMPTY"
+            }
+        }
+```
+
++ Response 404 (application/json)
+        
+    + Body
+```json
+        {
+            "status": "failure",
+            "data": {
+                "busId": 1,
+                "capacity": "EMPTY"
+            },
+            "error": {
+                "code": 404,
+                "message": "Not Found"
+            }
+        }
+```
+
++ Response 422 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 422,
+                "message": "Unprocessable Entity"
+            }
+        }
+```
+
++ Response 503 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
             "error": {
                 "code": 503,
                 "message": "Service Unavailable"

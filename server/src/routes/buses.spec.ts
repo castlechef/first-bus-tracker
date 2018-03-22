@@ -170,7 +170,7 @@ describe('buses routes', () => {
         });
     });
 
-    describe('/buses/{busId} [PUT]', () => {
+    describe('/buses/{busId}/location [PUT]', () => {
         it('should respond with 200 response when location and busId are valid', () => {
             const initialLocation = Utils.location.generateValidLocation();
             const updatedLocation = Utils.location.generateValidLocation();
@@ -198,7 +198,7 @@ describe('buses routes', () => {
             };
 
             return request(app)
-                .put(`/buses/${bus.id}`)
+                .put(`/buses/${bus.id}/location`)
                 .send(dataToSend)
                 .expect(200)
                 .then(res => {
@@ -212,7 +212,7 @@ describe('buses routes', () => {
             buses.removeBus(bus.id);
 
             return request(app)
-                .put(`/buses/${bus.id}`)
+                .put(`/buses/${bus.id}/location`)
                 .send({data: {location: location.toJSON()}})
                 .expect(404)
                 .then(res => {
@@ -255,7 +255,7 @@ describe('buses routes', () => {
                 };
 
                 return request(app)
-                    .put(`/buses/${bus.id}'`)
+                    .put(`/buses/${bus.id}/location`)
                     .send(dataToSend)
                     .expect(422)
                     .then(res => {
@@ -268,7 +268,7 @@ describe('buses routes', () => {
                 const bus = buses .createAndInsertBus(busLocation, BusRouteName.U2);
 
                 return request(app)
-                    .put(`/buses/${bus.id}`)
+                    .put(`/buses/${bus.id}/location`)
                     .expect(422);
             })
         });
