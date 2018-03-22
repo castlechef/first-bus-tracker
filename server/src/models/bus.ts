@@ -4,6 +4,7 @@ import {BusRouteName} from './busStops';
 import {BusStop} from './busStop';
 import {Utils} from '../utils/utils';
 import convertUnixTimeToNiceTime = Utils.time.convertUnixTimeToNiceTime;
+import {BusCapacity, Capacity} from './busCapacity';
 
 export type busId = number;
 
@@ -31,6 +32,7 @@ export class Bus implements JSONable {
     private visitedBusStops: BusStopDeparture[];
     private busStopDepartureTimes: BusStopDeparture[];
     private busStopArrivalTimes: BusStopArrival[];
+    private busCapacity: BusCapacity;
 
     constructor(id: busId, location: Location, busRouteName: BusRouteName, busStops: BusStop[]) {
         if (typeof id !== 'number' || !(location instanceof Location)) throw new Error('invalid parameter');
@@ -42,6 +44,7 @@ export class Bus implements JSONable {
         this.visitedBusStops = [];
         this.busStopDepartureTimes = [];
         this.busStopArrivalTimes = [];
+        this.busCapacity = new BusCapacity();
         this.updateLocation(location);
     }
 
@@ -54,8 +57,8 @@ export class Bus implements JSONable {
         });
         if (this.visitedBusStops.length < 2) return;
 
-        for (let i = 0; i<this.visitedBusStops.length - 1; i++) {
-            for (let j = i + 1; j<this.visitedBusStops.length; j++) {
+        for (let i = 0; i < this.visitedBusStops.length - 1; i++) {
+            for (let j = i + 1; j < this.visitedBusStops.length; j++) {
                 const positionJ = this.visitedBusStops[j].busStop.getPositionOfRoute(this._busRoute);
                 const positionI = this.visitedBusStops[i].busStop.getPositionOfRoute(this._busRoute);
                 if (positionJ === positionI + 1) {
@@ -71,7 +74,7 @@ export class Bus implements JSONable {
     }
 
     private enforceBusRoutePositionEstablished(): void {
-        if (!this.establishedRoutePosition) throw new Error ('Bus route position not established');
+        if (!this.establishedRoutePosition) throw new Error('Bus route position not established');
     }
 
     private ensureBusStopIsInRoute(busStop: BusStop): void {
@@ -110,14 +113,21 @@ export class Bus implements JSONable {
             if (this.getDistanceToStop(this.getNextBusStop()) <= Bus.PROXIMITY_TO_STOP_AT_STOP) {
                 this.busStopDepartureTimes.push({busStop: this.nextBusStop, departureTime: currentTime});
                 this.nextBusStop = this.getBusStopAfterStop(this.nextBusStop);
+                this.busCapacity.resetAverage();
             }
             this.updateBusStopArrivalTimes();
         }
     }
 
+    public updateCapacity(capacity: Capacity): void {
+        this.busCapacity.addValue(capacity);
+    }
+
     private updateBusStopArrivalTimes() {
         let currentTime = Date.now(); // Date in unix time.
-        this.busStopArrivalTimes = this.busStops.map(s => {return{busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED / 1000))}});
+        this.busStopArrivalTimes = this.busStops.map(s => {
+            return {busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED / 1000))}
+        });
     }
 
     public getPredictedArrival(busStop: BusStop): number {

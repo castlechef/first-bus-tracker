@@ -5,6 +5,7 @@ import {buses} from '../app';
 import {BusRouteName} from '../models/busStops';
 import {Utils} from '../utils/utils';
 import RouteError = Utils.routes.RouteError;
+import {BusCapacity} from '../models/busCapacity';
 
 const router = express.Router();
 
@@ -67,6 +68,30 @@ router.put('/:busId/location', (req, res, next) => {
             next(RouteError.Notfound({busId, location: locationJSON}));
         } else {
             next(RouteError.UnprocessableEntity());
+        }
+    } catch (e) {
+        next(RouteError.ServiceUnavailable());
+    }
+});
+
+router.put('/:busId/capacity', (req, res, next) => {
+    const busId = parseInt(req.params.busId);
+    const capacity = (req.body.data && req.body.data.capacity);
+    let responseData: JsonResponse;
+    try {
+        if (buses.containsBus(busId) && BusCapacity.isValidCapacity(capacity)) {
+            const bus = buses.getBus(busId);
+            bus.updateCapacity(capacity);
+            res.status(200);
+            responseData = Response.factory({
+                busId,
+                capacity
+            });
+            res.json(responseData);
+        } else if (buses.containsBus(busId)) {
+            next(RouteError.UnprocessableEntity());
+        } else {
+            next(RouteError.Notfound());
         }
     } catch (e) {
         next(RouteError.ServiceUnavailable());

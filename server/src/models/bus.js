@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const location_1 = require("./location");
 const utils_1 = require("../utils/utils");
 var convertUnixTimeToNiceTime = utils_1.Utils.time.convertUnixTimeToNiceTime;
+const busCapacity_1 = require("./busCapacity");
 class Bus {
     constructor(id, location, busRouteName, busStops) {
         if (typeof id !== 'number' || !(location instanceof location_1.Location))
@@ -15,6 +16,7 @@ class Bus {
         this.visitedBusStops = [];
         this.busStopDepartureTimes = [];
         this.busStopArrivalTimes = [];
+        this.busCapacity = new busCapacity_1.BusCapacity();
         this.updateLocation(location);
     }
     establishRoutePosition() {
@@ -76,13 +78,19 @@ class Bus {
             if (this.getDistanceToStop(this.getNextBusStop()) <= Bus.PROXIMITY_TO_STOP_AT_STOP) {
                 this.busStopDepartureTimes.push({ busStop: this.nextBusStop, departureTime: currentTime });
                 this.nextBusStop = this.getBusStopAfterStop(this.nextBusStop);
+                this.busCapacity.resetAverage();
             }
             this.updateBusStopArrivalTimes();
         }
     }
+    updateCapacity(capacity) {
+        this.busCapacity.addValue(capacity);
+    }
     updateBusStopArrivalTimes() {
         let currentTime = Date.now(); // Date in unix time.
-        this.busStopArrivalTimes = this.busStops.map(s => { return { busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED / 1000)) }; });
+        this.busStopArrivalTimes = this.busStops.map(s => {
+            return { busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED / 1000)) };
+        });
     }
     getPredictedArrival(busStop) {
         this.enforceBusRoutePositionEstablished();

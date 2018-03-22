@@ -7,6 +7,7 @@ require("mocha");
 const utils_1 = require("../utils/utils");
 const busStops_1 = require("../models/busStops");
 const location_1 = require("../models/location");
+var generateValidLocation = utils_1.Utils.location.generateValidLocation;
 let buses;
 describe('buses routes', () => {
     beforeEach(() => {
@@ -242,6 +243,96 @@ describe('buses routes', () => {
                 return request(app_1.app)
                     .put(`/buses/${bus.id}/location`)
                     .expect(422);
+            });
+        });
+    });
+    describe('/buses/{busId}/capacity [PUT]', () => {
+        it('should respond with 200 response when the capacity is valid and bus id is recognised', () => {
+            const location = generateValidLocation();
+            const bus = app_1.app.locals.buses.createAndInsertBus(location, busStops_1.BusRouteName.U2);
+            const dataToSend = {
+                data: {
+                    capacity: 'FULL'
+                }
+            };
+            const expectedData = {
+                status: 'success',
+                data: {
+                    busId: bus.id,
+                    capacity: 'FULL'
+                }
+            };
+            return request(app_1.app)
+                .put(`/buses/${bus.id}/capacity`)
+                .send(dataToSend)
+                .expect(200)
+                .then(res => {
+                chai_1.expect(res.body).to.deep.equal(expectedData);
+            });
+        });
+        it('should respond with 404 response when the bus id is not recognised', () => {
+            const dataToSend = {
+                data: {
+                    capacity: 'QUIET'
+                }
+            };
+            const expectedData = {
+                status: 'failure',
+                error: {
+                    code: 404,
+                    message: 'Not Found'
+                }
+            };
+            return request(app_1.app)
+                .put(`/buses/20/capacity`)
+                .send(dataToSend)
+                .expect(404)
+                .then(res => {
+                chai_1.expect(res.body).to.deep.equal(expectedData);
+            });
+        });
+        it('should respond with 422 response when the bus id is valid and capacity is invalid format', () => {
+            const location = generateValidLocation();
+            const bus = app_1.app.locals.buses.createAndInsertBus(location, busStops_1.BusRouteName.U2);
+            const dataToSend = {
+                data: {
+                    capacity: 'NOT EMPTY'
+                }
+            };
+            const expectedData = {
+                status: 'failure',
+                error: {
+                    code: 422,
+                    message: 'Unprocessable Entity'
+                }
+            };
+            return request(app_1.app)
+                .put(`/buses/${bus.id}/capacity`)
+                .send(dataToSend)
+                .expect(422)
+                .then(res => {
+                chai_1.expect(res.body).to.deep.equal(expectedData);
+            });
+        });
+        it('should respond with 404 when both bus id and capacity are invalid', () => {
+            const dataToSend = {
+                data: {
+                    capacity: 'VERY QUIET'
+                }
+            };
+            const expectedData = {
+                status: 'failure',
+                error: {
+                    code: 404,
+                    message: 'Not Found'
+                }
+            };
+            return request(app_1.app)
+                .put(`/buses/20/capacity`)
+                .send(dataToSend)
+                .expect(404)
+                .then(res => {
+                chai_1.expect(res.body).to.deep.equal(expectedData);
             });
         });
     });
