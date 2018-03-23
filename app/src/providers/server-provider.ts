@@ -31,7 +31,7 @@ export class ServerProvider {
   }
 
   getStopInfo(number): Observable<StopInfo>{
-    return this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler);  
+    return this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler);
   }
   // catches any errors during the getLocations()
   errorHandler(error: HttpErrorResponse){
