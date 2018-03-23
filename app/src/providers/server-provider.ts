@@ -4,21 +4,35 @@ import { Bus } from '../bus.interface';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
+import {Stop} from '../stops.interface';
+import { BusInfo } from '../busInfo.interface';
+import { StopInfo } from '../stopInfo.interface';
 
 
 @Injectable()
 export class ServerProvider {
   data: any;
   // url for the api where the data is coming from
-  private _url: string = 'http://localhost:8080/buses';
+  private _url: string = 'http://localhost:8080/';
 
   constructor(private http: HttpClient){}
 
   // gets buses data and maps it to the observable Bus
-  getLocations(): Observable<Bus[]>{
-    return this.http.get<Bus[]>(this._url).catch(this.errorHandler);
+  getBusLocations(): Observable<Bus[]>{
+    return this.http.get<Bus[]>(this._url.concat('buses')).catch(this.errorHandler);
   }
 
+  getBusStopLocations(): Observable<Stop[]>{
+    return this.http.get<Stop[]>(this._url.concat('busStops')).catch(this.errorHandler);
+  }
+
+  getBusInfo(number): Observable<BusInfo>{
+    return this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(this.errorHandler);
+  }
+
+  getStopInfo(number): Observable<StopInfo>{
+    return this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler);
+  }
   // catches any errors during the getLocations()
   errorHandler(error: HttpErrorResponse){
     return Observable.throw(error.message || "Server Error");

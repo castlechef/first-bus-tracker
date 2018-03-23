@@ -17,7 +17,9 @@ export class BusPage {
 
   public title = "Bus";
 
-  private exampleBusStops = [
+  nextBusStops: Array<{busStopId: number, busStopName: string, expectedArrival: string}>;
+
+  private exampleBusStops =
     {
       "routeName": "U1X",
       "location": {
@@ -25,27 +27,18 @@ export class BusPage {
         "longitude": -2.336717
       },
       "nextBusStops": [
-        {"busStopId": 1, "busStopName": "Arrival's Square (Stop A)"},
-        {"busStopId": 5, "busStopName": "Youth Hostel"}
+        {"busStopId": 1, "busStopName": "Arrival's Square (Stop A)", "expectedArrival": "09:23"},
+        {"busStopId": 5, "busStopName": "Youth Hostel", "expectedArrival": "10:11"}
       ],
       "capacity": 0
-    },
-    {
-      "routeName": "U2",
-      "location": {
-        "latitude": 51.368438,
-        "longitude": -2.355729
-      },
-      "nextBusStops": [
-        {"busStopId": 2, "busStopName": "Arrival's Square (Stop C)"},
-        {"busStopId": 5, "busStopName": "Youth Hostel"}
-      ],
-      "capacity": 0
-    }
-  ];
+    }; //doaihdoaisdnaso
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController) {
     this.title = navParams.get('routeName');
+    this.nextBusStops = [
+      {busStopId: 1, busStopName: "Arrival's Square (Stop A)", expectedArrival: "09:23"},
+      {busStopId: 5, busStopName: "Youth Hostel", expectedArrival: "10:11"}
+    ]
   }
 
   ionViewDidLoad() {

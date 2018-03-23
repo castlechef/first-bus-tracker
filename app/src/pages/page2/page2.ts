@@ -1,12 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import { ServerProvider } from '../../providers/server-provider';
-import { StopsProvider } from '../../providers/stops-provider';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController } from 'ionic-angular';
 
 @Component({
   selector: 'page-page2',
   templateUrl: 'page2.html',
-  providers: [ServerProvider, StopsProvider]
+  providers: [ServerProvider]
 })
 export class Page2 implements OnInit {
   public buses: any = [];
@@ -22,7 +21,7 @@ export class Page2 implements OnInit {
    * @param {ServerProvider} serverService - for getting buses
    * @param {StopsProvider} stopsService - for getting bus stops
    */
-  constructor(public navCtrl: NavController, public serverService: ServerProvider, public stopsService: StopsProvider){
+  constructor(public navCtrl: NavController, public serverService: ServerProvider){
     //this.loadBuses();
   }
 
@@ -31,7 +30,7 @@ export class Page2 implements OnInit {
      * subscribes to the data for the buses coming from its provider
      * @type {Subscription}
      */
-    this.busSubcription = this.serverService.getLocations()
+    this.busSubcription = this.serverService.getBusLocations()
       .subscribe(data => {
         this.buses = data;
         console.log(this.buses.status);
@@ -44,7 +43,7 @@ export class Page2 implements OnInit {
      * subscribes to the data for the bus stops coming from its provider
      * @type {Subscription}
      */
-    this.stopsSubcription = this.stopsService.getStops()
+    this.stopsSubcription = this.serverService.getBusStopLocations()
       .subscribe(data=> {
         this.stops = data;
         console.log(this.stops.status);
