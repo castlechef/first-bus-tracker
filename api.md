@@ -71,7 +71,7 @@ Allows clients to get the latest list of buses and their locations.
             }
         }
 ```
-
+
 ### Add a Bus [POST]
 
 Allows a new bus to register to the server with its location. The
