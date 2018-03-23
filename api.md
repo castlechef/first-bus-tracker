@@ -88,8 +88,7 @@ Obtains information about a single bus.
 ```json
         {
             "status": "success",
-            "data": [
-                {
+            "data": {
                     "routeName": "U1X",
                     "location": {
                         "latitude": 51.368600,
@@ -108,28 +107,7 @@ Obtains information about a single bus.
                         }
                     ],
                     "capacity": 0
-                },
-                {
-                    "routeName": "U2",
-                    "location": {
-                        "latitude": 51.368438,
-                        "longitude": -2.355729
-                    },
-                    "nextBusStops": [
-                        {
-                            "busStopId": 2, 
-                            "busStopName": "Arrival's Square (Stop C)", 
-                            "expectedArrival": "09:53"
-                        },
-                        {
-                            "busStopId": 5, 
-                            "busStopName": "Youth Hostel", 
-                            "expectedArrival": "10:12"
-                        }
-                    ],
-                    "capacity": 0
                 }
-            ]
         }
 ```
 

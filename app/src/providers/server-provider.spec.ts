@@ -51,7 +51,7 @@ describe('ServerProvider', () => {
         }
       ];
 
-      service.getLocations().subscribe(data => {
+      service.getBusLocations().subscribe(data => {
         expect(data.length).toBe(3);
         expect(data).toEqual(dummyData);
       });
@@ -1178,7 +1178,7 @@ describe('ServerProvider', () => {
         }
       ];
 
-      service.getLocations().subscribe(data => {
+      service.getBusLocations().subscribe(data => {
         expect(data.length).toBe(72);
         expect(data).toEqual(dummyData);
       });
@@ -1200,7 +1200,7 @@ describe('ServerProvider', () => {
         },
       ];
 
-      service.getLocations().subscribe(data => {
+      service.getBusLocations().subscribe(data => {
         expect(data.length).toBe(1);
         expect(data).toEqual(dummyData);
       });
@@ -1226,7 +1226,7 @@ describe('ServerProvider', () => {
         },
       ];
 
-      service.getLocations().subscribe(data => {
+      service.getBusLocations().subscribe(data => {
         expect(data.length).toBe(1);
         expect(data).toEqual(dummyData);
       });
@@ -1254,7 +1254,7 @@ describe('ServerProvider', () => {
         }
       ];
 
-      service.getLocations().subscribe(data => {
+      service.getBusLocations().subscribe(data => {
         expect(data.length).toBe(1);
         expect(data).toEqual(dummyData);
       });

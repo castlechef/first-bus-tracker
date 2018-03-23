@@ -18,13 +18,13 @@ export class BusStopPage {
 
   public title = "BusStop";
 
-  buses: Array<{ busRoute: string, arrivalTime: string, busId: number}>;
+  buses: Array<{busRoute: string, arrivalTime: string, busId: number}>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController) {
     this.title = navParams.get('stopName');
     this.buses = [
       { busRoute: 'U1', arrivalTime: "09:50", busId: 1},
-      { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}
+      { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}//oiihADXINA
     ];
   }
 
