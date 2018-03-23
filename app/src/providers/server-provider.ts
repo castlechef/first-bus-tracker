@@ -6,6 +6,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import {Stop} from '../stops.interface';
 import { BusInfo } from '../busInfo.interface';
+import { StopInfo } from '../stopInfo.interface';
 
 
 @Injectable()
@@ -27,6 +28,10 @@ export class ServerProvider {
 
   getBusInfo(number): Observable<BusInfo>{
     return this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(this.errorHandler);
+  }
+
+  getStopInfo(number): Observable<StopInfo>{
+    return this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler);
   }
   // catches any errors during the getLocations()
   errorHandler(error: HttpErrorResponse){
