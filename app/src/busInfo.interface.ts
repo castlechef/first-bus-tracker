@@ -1,22 +1,35 @@
 export interface BusInfo {
   data: {
-    routeName: string,
-    location: {
-      latitude: number,
-      longitude: number
+  busId: number,
+  location: {
+    latitude: number,
+    longitude: number
+  },
+  routeName: string,
+  capacity: string,
+  departureTimes: [
+    {
+      busStopId: number,
+      busStopName: string,
+      departureTime: string
     },
-    nextBusStops: [
-      {
-        busStopId: number,
-        busStopName: string,
-        expectedArrival: string
-      },
-      {
-        busStopId: number,
-        busStopName: string,
-        expectedArrival: string
-      }
-      ],
-    capacity: number
-  }
+    {
+      busStopId: number,
+      busStopName: string,
+      departureTime: string
+    }
+    ],
+  expectedArrivals: [
+    {
+      busStopId: number,
+      busStopName: string,
+      arrivalTime: string
+    },
+    {
+      busStopId: number,
+      busStopName: string,
+      arrivalTime: string
+    }
+    ]
+}
 }
