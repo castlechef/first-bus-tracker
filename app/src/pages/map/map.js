@@ -10,15 +10,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { BusStopPage } from '../bus-stop/bus-stop';
+import { BusPage } from '../bus/bus';
+import { ServerProvider } from '../../providers/server-provider';
 var MapPage = (function () {
-    function MapPage(navCtrl, navParams, modalctrl) {
+    /**
+     * imports all the necessary parameters
+     * @param {NavController} navCtrl - for navigation
+     * @param {NavParams} navParams - to pass parameters around the navcontroller
+     * @param {ModalController} modalctrl - to handle modals
+     * @param {ServerProvider} serverService - for communicating with the server
+     */
+    function MapPage(navCtrl, navParams, modalctrl, serverService) {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.modalctrl = modalctrl;
+        this.serverService = serverService;
+        //colors for the bus routes
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
         this.busStopMarkers = new Map();
         this.busRouteLines = new Map();
+        this.busMarkers = new Map();
     }
+    MapPage.prototype.ngOnDestroy = function () {
+        this.busSubscription.unsubscribe();
+        this.stopsSubscription.unsubscribe();
+    };
     MapPage.prototype.ionViewDidLoad = function () {
         var _this = this;
         this.loadMap()
@@ -27,8 +43,13 @@ var MapPage = (function () {
                 _this.addUserPositionMarker(latLng);
             _this.addBusStops();
             _this.addBusRoutes();
+            _this.addBuses();
         });
     };
+    /*
+     * Gets the user's position and calls createmap with it. If user's position request is denied creates map with bath spa station as the center
+     * @return - a promise saying that the map was created successfully
+     */
     MapPage.prototype.loadMap = function () {
         var _this = this;
         var geo = navigator.geolocation;
@@ -71,6 +92,10 @@ var MapPage = (function () {
             map: this.map,
             position: latLng,
             title: 'Your Position',
+            icon: {
+                scale: 5,
+                path: google.maps.SymbolPath.CIRCLE
+            }
         });
         navigator.geolocation.watchPosition(function (position) {
             userPosition.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
@@ -84,7 +109,7 @@ var MapPage = (function () {
           'latitude': 51,377954,
           'longitude': -2.357883
         }
-        'routes':[
+        'busRoutePosition':[
          {'name':"U1X", 'position': 1},
          {'name':"U1", 'position': 1}
         ]
@@ -92,1212 +117,32 @@ var MapPage = (function () {
      */
     MapPage.prototype.addBusStops = function () {
         var _this = this;
-        var busStops = [
-            {
-                'busStopId': 0,
-                'busStopName': 'Arrivals Square (Stop C)',
-                'location': {
-                    'latitude': 51.378845,
-                    'longitude': -2.324927
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 1
-                    }
-                ]
-            },
-            {
-                'busStopId': 1,
-                'busStopName': 'The Avenue (Southbound)',
-                'location': {
-                    'latitude': 51.3760679,
-                    'longitude': -2.3243903
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 2
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 2
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 2
-                    }
-                ]
-            },
-            {
-                'busStopId': 2,
-                'busStopName': 'Rainbow Wood Farm',
-                'location': {
-                    'latitude': 51.3725468,
-                    'longitude': -2.3224108
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 3
-                    }
-                ]
-            },
-            {
-                'busStopId': 3,
-                'busStopName': 'Brassknocker Hill',
-                'location': {
-                    'latitude': 51.365948,
-                    'longitude': -2.3197219
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 4
-                    }
-                ]
-            },
-            {
-                'busStopId': 4,
-                'busStopName': 'Flatwoods Road',
-                'location': {
-                    'latitude': 51.3653829,
-                    'longitude': -2.3218583
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 5
-                    }
-                ]
-            },
-            { 'busStopId': 5,
-                'busStopName': 'Ralph Allen School',
-                'location': {
-                    'latitude': 51.3637848,
-                    'longitude': -2.3310113
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 6
-                    }
-                ]
-            },
-            {
-                'busStopId': 6,
-                'busStopName': 'Shaft Road',
-                'location': {
-                    'latitude': 51.3629001,
-                    'longitude': -2.3390767
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 7
-                    }
-                ]
-            },
-            {
-                'busStopId': 7,
-                'busStopName': 'Tyning Road',
-                'location': {
-                    'latitude': 51.362556,
-                    'longitude': -2.3423349
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 8
-                    }
-                ]
-            },
-            {
-                'busStopId': 8,
-                'busStopName': 'Hadley Arms',
-                'location': {
-                    'latitude': 51.3620745,
-                    'longitude': -2.3461718
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 9
-                    }
-                ]
-            },
-            {
-                'busStopId': 9,
-                'busStopName': 'The Firs',
-                'location': {
-                    'latitude': 51.3611789,
-                    'longitude': -2.348787
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 10
-                    }
-                ]
-            },
-            {
-                'busStopId': 10,
-                'busStopName': 'Combe Road',
-                'location': {
-                    'latitude': 51.3604349,
-                    'longitude': -2.3510937
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 11
-                    }
-                ]
-            },
-            {
-                'busStopId': 11,
-                'busStopName': 'Mulberry Park',
-                'location': {
-                    'latitude': 51.3600254,
-                    'longitude': -2.3529625
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 12
-                    }
-                ]
-            },
-            {
-                'busStopId': 12,
-                'busStopName': 'Foxhill House',
-                'location': {
-                    'latitude': 51.3591582,
-                    'longitude': -2.3573459
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 13
-                    }
-                ]
-            },
-            {
-                'busStopId': 13,
-                'busStopName': 'Bradford Road Shops',
-                'location': {
-                    'latitude': 51.3589099,
-                    'longitude': -2.3592979
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 14
-                    }
-                ]
-            },
-            {
-                'busStopId': 14,
-                'busStopName': 'Entry Hill',
-                'location': {
-                    'latitude': 51.358376,
-                    'longitude': -2.3629121
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 15
-                    }
-                ]
-            },
-            {
-                'busStopId': 15,
-                'busStopName': 'Sainsbury\'s',
-                'location': {
-                    'latitude': 51.356926,
-                    'longitude': -2.3716468
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 16
-                    }
-                ]
-            },
-            {
-                'busStopId': 16,
-                'busStopName': 'Fosseway School',
-                'location': {
-                    'latitude': 51.358173,
-                    'longitude': -2.3752047
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 17
-                    }
-                ]
-            },
-            {
-                'busStopId': 17,
-                'busStopName': 'Red Lion',
-                'location': {
-                    'latitude': 51.358837,
-                    'longitude': -2.3764881
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 18
-                    }
-                ]
-            },
-            {
-                'busStopId': 18,
-                'busStopName': 'Noads Corner',
-                'location': {
-                    'latitude': 51.360344,
-                    'longitude': -2.3798181
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 19
-                    }
-                ]
-            },
-            {
-                'busStopId': 19,
-                'busStopName': 'Barrow Road',
-                'location': {
-                    'latitude': 51.3615302,
-                    'longitude': -2.3830448
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 20
-                    }
-                ]
-            },
-            {
-                'busStopId': 20,
-                'busStopName': 'Somerdale View',
-                'location': {
-                    'latitude': 51.3621745,
-                    'longitude': -2.3851631
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 21
-                    }
-                ]
-            },
-            {
-                'busStopId': 21,
-                'busStopName': 'Bath Community Academy',
-                'location': {
-                    'latitude': 51.3644329,
-                    'longitude': -2.39199
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 22
-                    }
-                ]
-            },
-            {
-                'busStopId': 22,
-                'busStopName': 'Padleigh Turn',
-                'location': {
-                    'latitude': 51.3661729,
-                    'longitude': -2.3928671
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 23
-                    }
-                ]
-            },
-            {
-                'busStopId': 23,
-                'busStopName': 'Southdown Road',
-                'location': {
-                    'latitude': 51.3671529,
-                    'longitude': -2.3904759
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 24
-                    }
-                ]
-            },
-            {
-                'busStopId': 24,
-                'busStopName': 'Sladebrook Court',
-                'location': {
-                    'latitude': 51.3682598,
-                    'longitude': -2.3874892
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 25
-                    }
-                ]
-            },
-            {
-                'busStopId': 25,
-                'busStopName': 'Trowbridge House',
-                'location': {
-                    'latitude': 51.370792,
-                    'longitude': -2.3858812
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 26
-                    }
-                ]
-            },
-            {
-                'busStopId': 26,
-                'busStopName': 'Happy Garden',
-                'location': {
-                    'latitude': 51.3724062,
-                    'longitude': -2.3846602
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 27
-                    }
-                ]
-            },
-            {
-                'busStopId': 27,
-                'busStopName': 'Ascension Church',
-                'location': {
-                    'latitude': 51.3744351,
-                    'longitude': -2.3828658
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 28
-                    }
-                ]
-            },
-            {
-                'busStopId': 28,
-                'busStopName': 'Bridge Road',
-                'location': {
-                    'latitude': 51.3758088,
-                    'longitude': -2.3827203
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 29
-                    }
-                ]
-            },
-            {
-                'busStopId': 29,
-                'busStopName': 'Mayfield Road',
-                'location': {
-                    'latitude': 51.3759691,
-                    'longitude': -2.381471
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 30
-                    }
-                ]
-            },
-            {
-                'busStopId': 30,
-                'busStopName': 'Moorland Road',
-                'location': {
-                    'latitude': 51.3774219,
-                    'longitude': -2.3787238
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 31
-                    }
-                ]
-            },
-            {
-                'busStopId': 31,
-                'busStopName': 'Arlington Road',
-                'location': {
-                    'latitude': 51.3781929,
-                    'longitude': -2.3772372
-                },
-                'routes': [
-                    {
-                        'name': 'U2',
-                        'position': 32
-                    }
-                ]
-            },
-            {
-                'busStopId': 32,
-                'busStopName': 'Brougham Hayes',
-                'location': {
-                    'latitude': 51.3810272,
-                    'longitude': -2.3736249
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 17
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 18
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 33
-                    }
-                ]
-            },
-            {
-                'busStopId': 33,
-                'busStopName': 'Pines Way',
-                'location': {
-                    'latitude': 51.3806422,
-                    'longitude': -2.3709923
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 18
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 19
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 34
-                    }
-                ]
-            },
-            {
-                'busStopId': 34,
-                'busStopName': 'Riverside Road',
-                'location': {
-                    'latitude': 51.378719,
-                    'longitude': -2.3675711
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 20
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 35
-                    }
-                ]
-            },
-            {
-                'busStopId': 35,
-                'busStopName': 'Oak Street (Eastbound)',
-                'location': {
-                    'latitude': 51.3784901,
-                    'longitude': -2.3654998
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 21
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 36
-                    }
-                ]
-            },
-            {
-                'busStopId': 36,
-                'busStopName': 'Rossiter Road',
-                'location': {
-                    'latitude': 51.3770055,
-                    'longitude': -2.3578025
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 22
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 37
-                    }
-                ]
-            },
-            {
-                'busStopId': 37,
-                'busStopName': 'Pulteney Court (Northbound)',
-                'location': {
-                    'latitude': 51.3781389,
-                    'longitude': -2.3514739
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 23
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 38
-                    }
-                ]
-            },
-            {
-                'busStopId': 38,
-                'busStopName': 'Pulteney Gardens (Northbound)',
-                'location': {
-                    'latitude': 51.3799901,
-                    'longitude': -2.3513163
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 24
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 39
-                    }
-                ]
-            },
-            {
-                'busStopId': 39,
-                'busStopName': 'St Mary\'s Church',
-                'location': {
-                    'latitude': 51.3839299,
-                    'longitude': -2.3509153
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 24
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 25
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 40
-                    }
-                ]
-            },
-            {
-                'busStopId': 40,
-                'busStopName': 'Sydney Buildings',
-                'location': {
-                    'latitude': 51.3826899,
-                    'longitude': -2.3481607
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 25
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 26
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 41
-                    }
-                ]
-            },
-            {
-                'busStopId': 41,
-                'busStopName': 'Cleveland Walk (Eastbound)',
-                'location': {
-                    'latitude': 51.3809891,
-                    'longitude': -2.3455328
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 26
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 27
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 42
-                    }
-                ]
-            },
-            {
-                'busStopId': 42,
-                'busStopName': 'White Lodge (Eastbound)',
-                'location': {
-                    'latitude': 51.379757,
-                    'longitude': -2.342693
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 27
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 28
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 43
-                    }
-                ]
-            },
-            {
-                'busStopId': 43,
-                'busStopName': 'Youth Hostel (Eastbound)',
-                'location': {
-                    'latitude': 51.3785859,
-                    'longitude': -2.3399967
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 28
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 29
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 44
-                    }
-                ]
-            },
-            {
-                'busStopId': 44,
-                'busStopName': 'Smallcombe House (Eastbound)',
-                'location': {
-                    'latitude': 51.3778652,
-                    'longitude': -2.3375639
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 29
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 30
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 45
-                    }
-                ]
-            },
-            {
-                'busStopId': 45,
-                'busStopName': 'Woodland Place (Eastbound)',
-                'location': {
-                    'latitude': 51.3774341,
-                    'longitude': -2.333839
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 30
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 31
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 46
-                    }
-                ]
-            },
-            {
-                'busStopId': 46,
-                'busStopName': 'North Road (Eastbound)',
-                'location': {
-                    'latitude': 51.3766062,
-                    'longitude': -2.3315202
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 31
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 32
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 47
-                    }
-                ]
-            },
-            {
-                'busStopId': 47,
-                'busStopName': 'Oakley',
-                'location': {
-                    'latitude': 51.3742409,
-                    'longitude': -2.3281842
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 32
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 33
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 48
-                    }
-                ]
-            },
-            {
-                'busStopId': 48,
-                'busStopName': 'The Avenue (Northbound)',
-                'location': {
-                    'latitude': 51.375916,
-                    'longitude': -2.3247048
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 33
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 34
-                    },
-                    {
-                        'name': 'U2',
-                        'position': 49
-                    }
-                ]
-            },
-            {
-                'busStopId': 49,
-                'busStopName': 'Arrivals Square (Stop A)',
-                'location': {
-                    'latitude': 51.379070,
-                    'longitude': -2.325222
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 1
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 1
-                    }
-                ]
-            },
-            {
-                'busStopId': 50,
-                'busStopName': 'Oakley',
-                'location': {
-                    'latitude': 51.3744091,
-                    'longitude': -2.329062
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 3
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 3
-                    }
-                ]
-            },
-            {
-                'busStopId': 51,
-                'busStopName': 'North Road (Westbound)',
-                'location': {
-                    'latitude': 51.3768272,
-                    'longitude': -2.3321251
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 4
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 4
-                    }
-                ]
-            },
-            {
-                'busStopId': 52,
-                'busStopName': 'Woodland Place (Westbound)',
-                'location': {
-                    'latitude': 51.3775061,
-                    'longitude': -2.3344579
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 5
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 5
-                    }
-                ]
-            },
-            {
-                'busStopId': 53,
-                'busStopName': 'Smallcombe House (Westbound)',
-                'location': {
-                    'latitude': 51.3777919,
-                    'longitude': -2.3379649
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 6
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 6
-                    }
-                ]
-            },
-            {
-                'busStopId': 54,
-                'busStopName': 'Youth Hostel (Westbound)',
-                'location': {
-                    'latitude': 51.3786659,
-                    'longitude': -2.3403997
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 7
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 7
-                    }
-                ]
-            },
-            {
-                'busStopId': 55,
-                'busStopName': 'White Lodge (Westbound)',
-                'location': {
-                    'latitude': 51.3799131,
-                    'longitude': -2.3437002
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 8
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 8
-                    }
-                ]
-            },
-            {
-                'busStopId': 56,
-                'busStopName': 'Cleveland Walk (Westbound)',
-                'location': {
-                    'latitude': 51.3809171,
-                    'longitude': -2.3456468
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 9
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 9
-                    }
-                ]
-            },
-            {
-                'busStopId': 57,
-                'busStopName': 'Raby Gardens',
-                'location': {
-                    'latitude': 51.3832779,
-                    'longitude': -2.3502488
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 10
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 10
-                    }
-                ]
-            },
-            {
-                'busStopId': 58,
-                'busStopName': 'Pulteney Gardens (Southbound)',
-                'location': {
-                    'latitude': 51.3795619,
-                    'longitude': -2.3510829
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 11
-                    }
-                ]
-            },
-            {
-                'busStopId': 59,
-                'busStopName': 'Pulteney Court (Southbound)',
-                'location': {
-                    'latitude': 51.3783988,
-                    'longitude': -2.3511017
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 12
-                    }
-                ]
-            },
-            {
-                'busStopId': 60,
-                'busStopName': 'Lyncombe Hill',
-                'location': {
-                    'latitude': 51.376576,
-                    'longitude': -2.3568564
-                },
-                'routes': [
-                    {
-                        'name': 'U1X',
-                        'position': 13
-                    }
-                ]
-            },
-            {
-                'busStopId': 61,
-                'busStopName': 'Oak Street (Westbound)',
-                'location': {
-                    'latitude': 51.3784101,
-                    'longitude': -2.3657721
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 13
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 14
-                    }
-                ]
-            },
-            {
-                'busStopId': 62,
-                'busStopName': 'Cheltenham Street',
-                'location': {
-                    'latitude': 51.3783842,
-                    'longitude': -2.3685877
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 14
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 15
-                    }
-                ]
-            },
-            {
-                'busStopId': 63,
-                'busStopName': 'Hayesfield School',
-                'location': {
-                    'latitude': 51.377144,
-                    'longitude': -2.3709923
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 15
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 16
-                    }
-                ]
-            },
-            {
-                'busStopId': 64,
-                'busStopName': 'Junction Road',
-                'location': {
-                    'latitude': 51.3776212,
-                    'longitude': -2.3738978
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 16
-                    },
-                    {
-                        'name': 'U1X',
-                        'position': 17
-                    }
-                ]
-            },
-            {
-                'busStopId': 65,
-                'busStopName': 'North Parade',
-                'location': {
-                    'latitude': 51.3807489,
-                    'longitude': -2.356322
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 11
-                    }
-                ]
-            },
-            {
-                'busStopId': 66,
-                'busStopName': 'Dorchester Street (Westbound)',
-                'location': {
-                    'latitude': 51.377869,
-                    'longitude': -2.3576939
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 12
-                    }
-                ]
-            },
-            {
-                'busStopId': 67,
-                'busStopName': 'Green Park',
-                'location': {
-                    'latitude': 51.3805472,
-                    'longitude': -2.3662783
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 19
-                    }
-                ]
-            },
-            {
-                'busStopId': 68,
-                'busStopName': 'Corn Street',
-                'location': {
-                    'latitude': 51.3792108,
-                    'longitude': -2.3624307
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 20
-                    }
-                ]
-            },
-            {
-                'busStopId': 69,
-                'busStopName': 'Dorchester Street (Eastbound)',
-                'location': {
-                    'latitude': 51.3780439,
-                    'longitude': -2.359031
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 21
-                    }
-                ]
-            },
-            {
-                'busStopId': 70,
-                'busStopName': 'Guildhall',
-                'location': {
-                    'latitude': 51.3816805,
-                    'longitude': -2.3586655
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 22
-                    }
-                ]
-            },
-            {
-                'busStopId': 71,
-                'busStopName': 'The Pavilion',
-                'location': {
-                    'latitude': 51.3809008,
-                    'longitude': -2.3540957
-                },
-                'routes': [
-                    {
-                        'name': 'U1',
-                        'position': 23
-                    }
-                ]
+        var busStops = [];
+        this.serverService.getBusStopLocations().then(function (data) {
+            busStops = data;
+            busStops = busStops.data;
+            for (var i = 0; i < busStops.length; i++) {
+                _this.addBusStop(busStops[i]);
             }
-        ];
-        var _loop_1 = function (i) {
-            var stopMarker = new google.maps.Marker({
-                map: this_1.map,
-                position: new google.maps.LatLng(busStops[i].location.latitude, busStops[i].location.longitude),
-                title: busStops[i].busStopName
-            });
-            this_1.busStopMarkers.set(busStops[i].busStopId, stopMarker);
-            google.maps.event.addListener(stopMarker, 'click', function () { return _this.openBusStopPage(busStops[i].busStopId, busStops[i].busStopName); });
-        };
-        var this_1 = this;
-        for (var i = 0; i < busStops.length; i++) {
-            _loop_1(i);
-        }
+        });
+    };
+    MapPage.prototype.addBusStop = function (busStop) {
+        var _this = this;
+        var stopMarker = new google.maps.Marker({
+            map: this.map,
+            position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
+            title: busStop.busStopName,
+            icon: {
+                path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                scale: 3
+            }
+        });
+        this.busStopMarkers.set(busStop.busStopId, stopMarker);
+        google.maps.event.addListener(stopMarker, 'click', function () { return _this.openBusStopPage(busStop.busStopId, busStop.busStopName); });
     };
     MapPage.prototype.openBusStopPage = function (busStopId, busStopName) {
         var tryModal = this.modalctrl.create(BusStopPage, { stopID: busStopId, stopName: busStopName });
         tryModal.present();
-        /*this.navCtrl.push(BusStopPage, {
-          stopID: busStopId,
-          stopName: busStopName
-        });*/
     };
     MapPage.prototype.addBusRoutes = function () {
         var exampleBusRouteCoordinates = [
@@ -1970,7 +815,7 @@ var MapPage = (function () {
                     { "latitude": 51.378387, "longitude": -2.3765809 }
                 ]
             }
-        ];
+        ]; //oiafhsaoidhjsadnaosi
         for (var i = 0; i < exampleBusRouteCoordinates.length; i++) {
             var busRoutePath = exampleBusRouteCoordinates[i].positions;
             var googleMapStyle = busRoutePath.map(function (_a) {
@@ -1988,6 +833,35 @@ var MapPage = (function () {
             busRoute.setMap(this.map);
         }
     };
+    MapPage.prototype.addBuses = function () {
+        var _this = this;
+        setInterval(function () {
+            _this.serverService.getBusLocations().then(function (buses) {
+                for (var i = 0; i < buses.length; i++) {
+                    _this.addBus(buses[i]);
+                }
+            });
+        }, 1000);
+    };
+    MapPage.prototype.addBus = function (bus) {
+        var _this = this;
+        if (this.busMarkers.get(bus.busId)) {
+            this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
+        }
+        else {
+            var busMarker = new google.maps.Marker({
+                map: this.map,
+                position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
+                title: bus.routeName
+            });
+            this.busMarkers.set(bus.busId, busMarker);
+            google.maps.event.addListener(busMarker, 'click', function () { return _this.openBusPage(bus.busId, bus.routeName); });
+        }
+    };
+    MapPage.prototype.openBusPage = function (busId, route) {
+        var tryModal = this.modalctrl.create(BusPage, { stopID: busId, routeName: route });
+        tryModal.present();
+    };
     __decorate([
         ViewChild('map'),
         __metadata("design:type", ElementRef)
@@ -1997,8 +871,9 @@ var MapPage = (function () {
         Component({
             selector: 'page-map',
             templateUrl: 'map.html',
+            providers: [ServerProvider]
         }),
-        __metadata("design:paramtypes", [NavController, NavParams, ModalController])
+        __metadata("design:paramtypes", [NavController, NavParams, ModalController, ServerProvider])
     ], MapPage);
     return MapPage;
 }());

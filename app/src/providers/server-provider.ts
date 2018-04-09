@@ -18,12 +18,22 @@ export class ServerProvider {
   constructor(private http: HttpClient){}
 
   // gets buses data and maps it to the observable Bus
-  getBusLocations(): Observable<Bus[]>{
-    return this.http.get<Bus[]>(this._url.concat('buses')).catch(this.errorHandler);
+  getBusLocations() : Promise<Array<Bus>>{
+    return new Promise<Array<Bus>>(resolve => {
+      const subscription = this.http.get<Bus[]>(this._url.concat('buses')).catch(this.errorHandler).subscribe( data => {
+        resolve(data.data);
+        subscription.unsubscribe();
+      });
+    })
   }
 
-  getBusStopLocations(): Observable<Stop[]>{
-    return this.http.get<Stop[]>(this._url.concat('busStops')).catch(this.errorHandler);
+  getBusStopLocations(): Promise<Stop[]>{
+    return new Promise<Stop[]>(resolve => {
+      const subscription = this.http.get<Stop[]>(this._url.concat('busStops')).catch(this.errorHandler).subscribe( data => {
+        resolve(data);
+        subscription.unsubscribe();
+      });
+    })
   }
 
   getBusInfo(number): Observable<BusInfo>{

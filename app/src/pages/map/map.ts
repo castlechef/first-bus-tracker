@@ -32,7 +32,7 @@ export class MapPage {
   private busStopMarkers: Map<number, google.maps.Marker>;
   //maps busroute segements to strings to allow them to be hidden/revealed later
   private busRouteLines: Map<String, google.maps.Polyline>;
-  //maps bus markers to bus ID's to allow them to be manipulated later
+  //collection of bus markers to empty whenever server is called
   private busMarkers: Map<number, google.maps.Marker>;
   //colors for the bus routes
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
@@ -145,15 +145,13 @@ export class MapPage {
   private addBusStops() {
     let busStops: any = [];
 
-    this.stopsSubscription = this.serverService.getBusStopLocations()
-      .subscribe(data=> {
-          busStops = data;
-          busStops  = busStops.data;
-          for (let i = 0; i < busStops.length; i++) {
-            this.addBusStop(busStops[i]);
-          }
-        },
-        error => this.errorMessage = error);
+    this.serverService.getBusStopLocations().then(data => {
+      busStops = data;
+      busStops  = busStops.data;
+      for (let i = 0; i < busStops.length; i++) {
+        this.addBusStop(busStops[i]);
+      }
+    });
   }
 
   private addBusStop(busStop){
@@ -871,30 +869,27 @@ export class MapPage {
   }
 
   private addBuses(){
-    let buses: any = [];
-
-    this.busSubscription = this.serverService.getBusLocations()
-      .subscribe(data => {
-          buses = data;
-          console.log(buses.status);
-          buses = buses.data;
-          console.log(buses);
-          for (let i = 0; i < buses.length; i++) {
-            this.addBus(buses[i]);
-          }
-        },
-        error => this.errorMessage = error);
+    setInterval(()=>{
+      this.serverService.getBusLocations().then((buses)=>{
+        for (let i = 0; i < buses.length; i++) {
+          this.addBus(buses[i]);
+        }
+      });
+    }, 1000);
   }
 
   private addBus(bus){
-    let busMarker = new google.maps.Marker({
-      map: this.map,
-      position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
-      title: bus.routeName
-    });
-
-    this.busMarkers.set(bus.busId, busMarker);
-    google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
+    if(this.busMarkers.get(bus.busId)){
+      this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
+    } else{
+      let busMarker = new google.maps.Marker({
+        map: this.map,
+        position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
+        title: bus.routeName
+      });
+      this.busMarkers.set(bus.busId, busMarker);
+      google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
+    }
   }
 
   private openBusPage(busId, route) {
