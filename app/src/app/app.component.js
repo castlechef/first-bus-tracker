@@ -19,7 +19,7 @@ var MyApp = (function () {
         this.platform = platform;
         this.statusBar = statusBar;
         this.splashScreen = splashScreen;
-        this.rootPage = Page1;
+        this.rootPage = MapPage;
         // used for an example of ngFor and navigation
         this.pages = [
             { title: 'Page One', component: Page1 },

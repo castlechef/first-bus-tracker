@@ -15,11 +15,23 @@ import 'rxjs/add/observable/throw';
 var ServerProvider = (function () {
     function ServerProvider(http) {
         this.http = http;
-        this._url = 'http://localhost:8080/buses';
+        // url for the api where the data is coming from
+        this._url = 'http://localhost:8080/';
     }
-    ServerProvider.prototype.getLocations = function () {
-        return this.http.get(this._url).catch(this.errorHandler);
+    // gets buses data and maps it to the observable Bus
+    ServerProvider.prototype.getBusLocations = function () {
+        return this.http.get(this._url.concat('buses')).catch(this.errorHandler);
     };
+    ServerProvider.prototype.getBusStopLocations = function () {
+        return this.http.get(this._url.concat('busStops')).catch(this.errorHandler);
+    };
+    ServerProvider.prototype.getBusInfo = function (number) {
+        return this.http.get(this._url.concat('buses/' + number)).catch(this.errorHandler);
+    };
+    ServerProvider.prototype.getStopInfo = function (number) {
+        return this.http.get(this._url.concat('busStops/' + number)).catch(this.errorHandler);
+    };
+    // catches any errors during the getLocations()
     ServerProvider.prototype.errorHandler = function (error) {
         return Observable.throw(error.message || "Server Error");
     };
