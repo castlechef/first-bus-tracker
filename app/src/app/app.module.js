@@ -18,6 +18,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { MapPage } from '../pages/map/map';
 import { Geolocation } from '@ionic-native/geolocation';
 import { BusStopPage } from '../pages/bus-stop/bus-stop';
+import { BusPage } from '../pages/bus/bus';
 var AppModule = (function () {
     function AppModule() {
     }
@@ -28,7 +29,8 @@ var AppModule = (function () {
                 Page1,
                 Page2,
                 MapPage,
-                BusStopPage
+                BusStopPage,
+                BusPage
             ],
             imports: [
                 BrowserModule,
@@ -41,7 +43,8 @@ var AppModule = (function () {
                 Page1,
                 Page2,
                 MapPage,
-                BusStopPage
+                BusStopPage,
+                BusPage
             ],
             providers: [
                 StatusBar,

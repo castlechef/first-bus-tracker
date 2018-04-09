@@ -8,7 +8,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Component } from '@angular/core';
-import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angular';
+import { ViewController, IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
+import { BusPage } from '../bus/bus';
 /**
  * Generated class for the BusStopPage page.
  *
@@ -16,12 +17,17 @@ import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angul
  * Ionic pages and navigation.
  */
 var BusStopPage = (function () {
-    function BusStopPage(navCtrl, navParams, viewctrl) {
+    function BusStopPage(navCtrl, navParams, viewctrl, modalctrl) {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.viewctrl = viewctrl;
+        this.modalctrl = modalctrl;
         this.title = "BusStop";
         this.title = navParams.get('stopName');
+        this.buses = [
+            { busRoute: 'U1', arrivalTime: "09:50", busId: 1 },
+            { busRoute: 'U1X', arrivalTime: "09:53", busId: 2 } //oiihADXINA
+        ];
     }
     BusStopPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad BusStopPage');
@@ -29,13 +35,17 @@ var BusStopPage = (function () {
     BusStopPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
     };
+    BusStopPage.prototype.openBus = function (bus) {
+        var tryModal = this.modalctrl.create(BusPage, { busId: bus.busId, routeName: bus.busRoute });
+        tryModal.present();
+    };
     BusStopPage = __decorate([
         IonicPage(),
         Component({
             selector: 'page-bus-stop',
             templateUrl: 'bus-stop.html',
         }),
-        __metadata("design:paramtypes", [NavController, NavParams, ViewController])
+        __metadata("design:paramtypes", [NavController, NavParams, ViewController, ModalController])
     ], BusStopPage);
     return BusStopPage;
 }());
