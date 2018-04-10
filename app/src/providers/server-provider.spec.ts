@@ -51,10 +51,6 @@ describe('ServerProvider', () => {
         }
       ];
 
-      service.getBusLocations().subscribe(data => {
-        expect(data.length).toBe(3);
-        expect(data).toEqual(dummyData);
-      });
       const req = httpMock.expectOne('http://localhost:8080/buses');
       expect(req.request.method).toBe('GET');
       req.flush(dummyData);
@@ -1178,10 +1174,7 @@ describe('ServerProvider', () => {
         }
       ];
 
-      service.getBusLocations().subscribe(data => {
-        expect(data.length).toBe(72);
-        expect(data).toEqual(dummyData);
-      });
+
       const req = httpMock.expectOne('http://localhost:8080/buses');
       expect(req.request.method).toBe('GET');
       req.flush(dummyData);
@@ -1200,10 +1193,6 @@ describe('ServerProvider', () => {
         },
       ];
 
-      service.getBusLocations().subscribe(data => {
-        expect(data.length).toBe(1);
-        expect(data).toEqual(dummyData);
-      });
       const req = httpMock.expectOne('http://localhost:8080/buses/1/location');
       expect(req.request.method).toBe('GET');
       req.flush(dummyData);
@@ -1226,10 +1215,6 @@ describe('ServerProvider', () => {
         },
       ];
 
-      service.getBusLocations().subscribe(data => {
-        expect(data.length).toBe(1);
-        expect(data).toEqual(dummyData);
-      });
       const req = httpMock.expectOne('http://localhost:8080/buses/1');
       expect(req.request.method).toBe('GET');
       req.flush(dummyData);
@@ -1254,10 +1239,6 @@ describe('ServerProvider', () => {
         }
       ];
 
-      service.getBusLocations().subscribe(data => {
-        expect(data.length).toBe(1);
-        expect(data).toEqual(dummyData);
-      });
       const req = httpMock.expectOne('http://localhost:8080/busStops/BH'); // ids for bus stops?
       expect(req.request.method).toBe('GET');
       req.flush(dummyData);

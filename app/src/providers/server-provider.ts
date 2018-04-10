@@ -18,20 +18,40 @@ export class ServerProvider {
   constructor(private http: HttpClient){}
 
   // gets buses data and maps it to the observable Bus
-  getBusLocations(): Observable<Bus[]>{
-    return this.http.get<Bus[]>(this._url.concat('buses')).catch(this.errorHandler);
+  getBusLocations() : Promise<Array<Bus>>{
+    return new Promise<Array<Bus>>(resolve => {
+      const subscription = this.http.get<Bus[]>(this._url.concat('buses')).catch(this.errorHandler).subscribe( data => {
+        resolve(data.data);
+        subscription.unsubscribe();
+      });
+    })
   }
 
-  getBusStopLocations(): Observable<Stop[]>{
-    return this.http.get<Stop[]>(this._url.concat('busStops')).catch(this.errorHandler);
+  getBusStopLocations(): Promise<Stop[]>{
+    return new Promise<Stop[]>(resolve => {
+      const subscription = this.http.get<Stop[]>(this._url.concat('busStops')).catch(this.errorHandler).subscribe( data => {
+        resolve(data);
+        subscription.unsubscribe();
+      });
+    })
   }
 
-  getBusInfo(number): Observable<BusInfo>{
-    return this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(this.errorHandler);
+  getBusInfo(number): Promise<BusInfo>{
+    return new Promise<BusInfo>(resolve => {
+      const subscription = this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(this.errorHandler).subscribe( data => {
+        resolve(data.data);
+        subscription.unsubscribe();
+      });
+    })
   }
 
-  getStopInfo(number): Observable<StopInfo>{
-    return this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler);
+  getStopInfo(number): Promise<StopInfo>{
+    return new Promise<StopInfo>(resolve => {
+      const subscription = this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler).subscribe( data => {
+        resolve(data.data);
+        subscription.unsubscribe();
+      });
+    })
   }
   // catches any errors during the getLocations()
   errorHandler(error: HttpErrorResponse){

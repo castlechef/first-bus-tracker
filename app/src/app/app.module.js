@@ -9,7 +9,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { Page1 } from '../pages/page1/page1';
-import { Page2 } from '../pages/page2/page2';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { ServerProvider } from '../providers/server-provider';
@@ -27,7 +26,6 @@ var AppModule = (function () {
             declarations: [
                 MyApp,
                 Page1,
-                Page2,
                 MapPage,
                 BusStopPage,
                 BusPage
@@ -41,7 +39,6 @@ var AppModule = (function () {
             entryComponents: [
                 MyApp,
                 Page1,
-                Page2,
                 MapPage,
                 BusStopPage,
                 BusPage
