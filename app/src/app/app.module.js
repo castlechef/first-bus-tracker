@@ -9,7 +9,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { Page1 } from '../pages/page1/page1';
-import { Page2 } from '../pages/page2/page2';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { ServerProvider } from '../providers/server-provider';
@@ -18,6 +17,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { MapPage } from '../pages/map/map';
 import { Geolocation } from '@ionic-native/geolocation';
 import { BusStopPage } from '../pages/bus-stop/bus-stop';
+import { BusPage } from '../pages/bus/bus';
 var AppModule = (function () {
     function AppModule() {
     }
@@ -26,9 +26,9 @@ var AppModule = (function () {
             declarations: [
                 MyApp,
                 Page1,
-                Page2,
                 MapPage,
-                BusStopPage
+                BusStopPage,
+                BusPage
             ],
             imports: [
                 BrowserModule,
@@ -39,9 +39,9 @@ var AppModule = (function () {
             entryComponents: [
                 MyApp,
                 Page1,
-                Page2,
                 MapPage,
-                BusStopPage
+                BusStopPage,
+                BusPage
             ],
             providers: [
                 StatusBar,

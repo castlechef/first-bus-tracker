@@ -36,12 +36,22 @@ export class ServerProvider {
     })
   }
 
-  getBusInfo(number): Observable<BusInfo>{
-    return this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(this.errorHandler);
+  getBusInfo(number): Promise<BusInfo>{
+    return new Promise<BusInfo>(resolve => {
+      const subscription = this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(this.errorHandler).subscribe( data => {
+        resolve(data.data);
+        subscription.unsubscribe();
+      });
+    })
   }
 
-  getStopInfo(number): Observable<StopInfo>{
-    return this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler);
+  getStopInfo(number): Promise<StopInfo>{
+    return new Promise<StopInfo>(resolve => {
+      const subscription = this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler).subscribe( data => {
+        resolve(data.data);
+        subscription.unsubscribe();
+      });
+    })
   }
   // catches any errors during the getLocations()
   errorHandler(error: HttpErrorResponse){

@@ -1,5 +1,4 @@
 export interface BusInfo {
-  data: {
   busId: number,
   location: {
     latitude: number,
@@ -31,5 +30,4 @@ export interface BusInfo {
       arrivalTime: string
     }
     ]
-}
 }

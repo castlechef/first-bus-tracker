@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {ViewController, IonicPage, NavController, NavParams, ModalController} from 'ionic-angular';
 import {BusPage} from '../bus/bus';
+import { ServerProvider} from '../../providers/server-provider';
 
 /**
  * Generated class for the BusStopPage page.
@@ -16,16 +17,19 @@ import {BusPage} from '../bus/bus';
 })
 export class BusStopPage {
 
-  public title = "BusStop";
+  public title = "Bus Stop";
 
-  buses: Array<{busRoute: string, arrivalTime: string, busId: number}>;
+  buses: Array<{routeName: string, arrivalTime: string, busId: number}>;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController, public serverService: ServerProvider) {
+    //navParams : stopId stopName
     this.title = navParams.get('stopName');
-    this.buses = [
+    this.getBusStopData(navParams.get('stopId')).then( array =>{
+      this.buses = array;
+    }); /*[
       { busRoute: 'U1', arrivalTime: "09:50", busId: 1},
       { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}//oiihADXINA
-    ];
+    ];*/
   }
 
   ionViewDidLoad() {
@@ -34,6 +38,14 @@ export class BusStopPage {
 
   closeModal(){
     this.viewctrl.dismiss();
+  }
+
+  private getBusStopData(stopId) : Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>{
+    return new Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>(resolve=>{
+      this.serverService.getStopInfo(stopId).then(data=>{
+        resolve(data.arrivals);
+      });
+    });
   }
 
   openBus(bus){
