@@ -30,27 +30,27 @@ export class Page2 implements OnInit {
      * subscribes to the data for the buses coming from its provider
      * @type {Subscription}
      */
-    this.busSubcription = this.serverService.getBusLocations()
+    /*this.busSubcription = this.serverService.getBusLocations()
       .subscribe(data => {
         this.buses = data;
         console.log(this.buses.status);
         this.buses = this.buses.data;
         console.log(this.buses);
       },
-      error => this.errorMessage = error);
+      error => this.errorMessage = error);*/
 
     /**
      * subscribes to the data for the bus stops coming from its provider
      * @type {Subscription}
      */
-    this.stopsSubcription = this.serverService.getBusStopLocations()
+    /*this.stopsSubcription = this.serverService.getBusStopLocations()
       .subscribe(data=> {
         this.stops = data;
         console.log(this.stops.status);
         this.stops  = this.stops.data;
         console.log(this.stops);
       },
-        error => this.stopsErrorMsg = error);
+        error => this.stopsErrorMsg = error);*/
   }
 
   /**

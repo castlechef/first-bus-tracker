@@ -45,10 +45,6 @@ describe('ServerProvider', function () {
                     'routeName': 'U1X'
                 }
             ];
-            service.getBusLocations().subscribe(function (data) {
-                expect(data.length).toBe(3);
-                expect(data).toEqual(dummyData);
-            });
             var req = httpMock.expectOne('http://localhost:8080/buses');
             expect(req.request.method).toBe('GET');
             req.flush(dummyData);
@@ -1170,10 +1166,6 @@ describe('ServerProvider', function () {
                     ]
                 }
             ];
-            service.getBusLocations().subscribe(function (data) {
-                expect(data.length).toBe(72);
-                expect(data).toEqual(dummyData);
-            });
             var req = httpMock.expectOne('http://localhost:8080/buses');
             expect(req.request.method).toBe('GET');
             req.flush(dummyData);
@@ -1190,10 +1182,6 @@ describe('ServerProvider', function () {
                     },
                 },
             ];
-            service.getBusLocations().subscribe(function (data) {
-                expect(data.length).toBe(1);
-                expect(data).toEqual(dummyData);
-            });
             var req = httpMock.expectOne('http://localhost:8080/buses/1/location');
             expect(req.request.method).toBe('GET');
             req.flush(dummyData);
@@ -1214,10 +1202,6 @@ describe('ServerProvider', function () {
                     'capacity': 'full',
                 },
             ];
-            service.getBusLocations().subscribe(function (data) {
-                expect(data.length).toBe(1);
-                expect(data).toEqual(dummyData);
-            });
             var req = httpMock.expectOne('http://localhost:8080/buses/1');
             expect(req.request.method).toBe('GET');
             req.flush(dummyData);
@@ -1240,10 +1224,6 @@ describe('ServerProvider', function () {
                     ]
                 }
             ];
-            service.getBusLocations().subscribe(function (data) {
-                expect(data.length).toBe(1);
-                expect(data).toEqual(dummyData);
-            });
             var req = httpMock.expectOne('http://localhost:8080/busStops/BH'); // ids for bus stops?
             expect(req.request.method).toBe('GET');
             req.flush(dummyData);

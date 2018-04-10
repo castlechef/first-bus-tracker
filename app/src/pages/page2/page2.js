@@ -25,29 +25,30 @@ var Page2 = (function () {
         //this.loadBuses();
     }
     Page2.prototype.ngOnInit = function () {
-        var _this = this;
         /**
          * subscribes to the data for the buses coming from its provider
          * @type {Subscription}
          */
-        this.busSubcription = this.serverService.getBusLocations()
-            .subscribe(function (data) {
-            _this.buses = data;
-            console.log(_this.buses.status);
-            _this.buses = _this.buses.data;
-            console.log(_this.buses);
-        }, function (error) { return _this.errorMessage = error; });
+        /*this.busSubcription = this.serverService.getBusLocations()
+          .subscribe(data => {
+            this.buses = data;
+            console.log(this.buses.status);
+            this.buses = this.buses.data;
+            console.log(this.buses);
+          },
+          error => this.errorMessage = error);*/
         /**
          * subscribes to the data for the bus stops coming from its provider
          * @type {Subscription}
          */
-        this.stopsSubcription = this.serverService.getBusStopLocations()
-            .subscribe(function (data) {
-            _this.stops = data;
-            console.log(_this.stops.status);
-            _this.stops = _this.stops.data;
-            console.log(_this.stops);
-        }, function (error) { return _this.stopsErrorMsg = error; });
+        /*this.stopsSubcription = this.serverService.getBusStopLocations()
+          .subscribe(data=> {
+            this.stops = data;
+            console.log(this.stops.status);
+            this.stops  = this.stops.data;
+            console.log(this.stops);
+          },
+            error => this.stopsErrorMsg = error);*/
     };
     /**
      * when the page is closed so to is the subscriptions to the providers
