@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { Component } from '@angular/core';
 import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angular';
+import { ServerProvider } from '../../providers/server-provider';
 /**
  * Generated class for the BusPage page.
  *
@@ -16,28 +17,17 @@ import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angul
  * Ionic pages and navigation.
  */
 var BusPage = (function () {
-    function BusPage(navCtrl, navParams, viewctrl) {
+    function BusPage(navCtrl, navParams, viewctrl, serverService) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.viewctrl = viewctrl;
+        this.serverService = serverService;
         this.title = "Bus";
-        this.exampleBusStops = {
-            "routeName": "U1X",
-            "location": {
-                "latitude": 51.368600,
-                "longitude": -2.336717
-            },
-            "nextBusStops": [
-                { "busStopId": 1, "busStopName": "Arrival's Square (Stop A)", "expectedArrival": "09:23" },
-                { "busStopId": 5, "busStopName": "Youth Hostel", "expectedArrival": "10:11" }
-            ],
-            "capacity": 0
-        }; //doaihdoaisdnaso
         this.title = navParams.get('routeName');
-        this.nextBusStops = [
-            { busStopId: 1, busStopName: "Arrival's Square (Stop A)", expectedArrival: "09:23" },
-            { busStopId: 5, busStopName: "Youth Hostel", expectedArrival: "10:11" }
-        ];
+        this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
+            _this.nextBusStops = busInfo;
+        });
     }
     BusPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad BusPage');
@@ -45,13 +35,21 @@ var BusPage = (function () {
     BusPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
     };
+    BusPage.prototype.getBusInfo = function (busId) {
+        var _this = this;
+        return new Promise(function (resolve) {
+            _this.serverService.getBusInfo(busId).then(function (data) {
+                resolve(data.expectedArrivals);
+            });
+        });
+    };
     BusPage = __decorate([
         IonicPage(),
         Component({
             selector: 'page-bus',
             templateUrl: 'bus.html',
         }),
-        __metadata("design:paramtypes", [NavController, NavParams, ViewController])
+        __metadata("design:paramtypes", [NavController, NavParams, ViewController, ServerProvider])
     ], BusPage);
     return BusPage;
 }());

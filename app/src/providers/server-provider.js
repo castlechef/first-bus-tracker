@@ -20,16 +20,40 @@ var ServerProvider = (function () {
     }
     // gets buses data and maps it to the observable Bus
     ServerProvider.prototype.getBusLocations = function () {
-        return this.http.get(this._url.concat('buses')).catch(this.errorHandler);
+        var _this = this;
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('buses')).catch(_this.errorHandler).subscribe(function (data) {
+                resolve(data.data);
+                subscription.unsubscribe();
+            });
+        });
     };
     ServerProvider.prototype.getBusStopLocations = function () {
-        return this.http.get(this._url.concat('busStops')).catch(this.errorHandler);
+        var _this = this;
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('busStops')).catch(_this.errorHandler).subscribe(function (data) {
+                resolve(data);
+                subscription.unsubscribe();
+            });
+        });
     };
     ServerProvider.prototype.getBusInfo = function (number) {
-        return this.http.get(this._url.concat('buses/' + number)).catch(this.errorHandler);
+        var _this = this;
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('buses/' + number)).catch(_this.errorHandler).subscribe(function (data) {
+                resolve(data.data);
+                subscription.unsubscribe();
+            });
+        });
     };
     ServerProvider.prototype.getStopInfo = function (number) {
-        return this.http.get(this._url.concat('busStops/' + number)).catch(this.errorHandler);
+        var _this = this;
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(_this.errorHandler).subscribe(function (data) {
+                resolve(data.data);
+                subscription.unsubscribe();
+            });
+        });
     };
     // catches any errors during the getLocations()
     ServerProvider.prototype.errorHandler = function (error) {

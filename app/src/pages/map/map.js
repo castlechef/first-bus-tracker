@@ -109,14 +109,13 @@ var MapPage = (function () {
     MapPage.prototype.addBusStops = function () {
         var _this = this;
         var busStops = [];
-        this.stopsSubscription = this.serverService.getBusStopLocations()
-            .subscribe(function (data) {
+        this.serverService.getBusStopLocations().then(function (data) {
             busStops = data;
             busStops = busStops.data;
             for (var i = 0; i < busStops.length; i++) {
                 _this.addBusStop(busStops[i]);
             }
-        }, function (error) { return _this.errorMessage = error; });
+        });
     };
     //adds a single bus stop to the map with a click event that opens the relevant busstoppage
     MapPage.prototype.addBusStop = function (busStop) {
@@ -141,22 +140,9 @@ var MapPage = (function () {
     //Adds the bus routes from the default routes (Future: Communicate with server to obtain the routes)
     MapPage.prototype.addBusRoutes = function () {
         var exampleBusRouteCoordinates = [
-            /* {
-               'routeName': 'U1X',
-               'positions': [
-                 {latitude: 51.378739, longitude: -2.325066},
-                 {latitude: 51.377843, longitude: -2.325291}
-               ]
-             },
-             {
-               'routeName': 'U1',
-               'positions': [
-                 {latitude: 51.378739, longitude: -2.325066}, //lat lng
-                 {latitude: 51.377843, longitude: -2.325291}
-               ]
-             }*/
             {
-                "routeName": "Section 1",
+                "sectionId": 0,
+                "sectionDescription": "Start: Uni; End: ClavertonDownRd",
                 "positions": [
                     { "latitude": 51.379117, "longitude": -2.325228 },
                     { "latitude": 51.379043, "longitude": -2.325035 },
@@ -189,7 +175,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section 2",
+                "sectionId": 1,
+                "sectionDescription": "Start: ClavertonDownRd; End: BottomofBathwickHill",
                 "positions": [
                     { "latitude": 51.373706, "longitude": -2.326505 },
                     { "latitude": 51.374516, "longitude": -2.329241 },
@@ -248,7 +235,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section 3",
+                "sectionId": 2,
+                "sectionDescription": "Start: BottomofBathwickHill; End: NorthParade",
                 "positions": [
                     { "latitude": 51.384062, "longitude": -2.351423 },
                     { "latitude": 51.383721, "longitude": -2.351401 },
@@ -259,7 +247,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section 4",
+                "sectionId": 3,
+                "sectionDescription": "Start: NorthParade; End:NorthParade",
                 "positions": [
                     { "latitude": 51.380918, "longitude": -2.351283 },
                     { "latitude": 51.380902, "longitude": -2.352265 },
@@ -270,7 +259,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section 5",
+                "sectionId": 4,
+                "sectionDescription": "Start: NorthParade; End: BusStation",
                 "positions": [
                     { "latitude": 51.380821, "longitude": -2.357195 },
                     { "latitude": 51.380510, "longitude": -2.357157 },
@@ -285,48 +275,29 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section 6",
+                "sectionId": 5,
+                "sectionDescription": "Start: BusStation; End: Roundabout",
                 "positions": [
                     { "latitude": 51.378056, "longitude": -2.359759 },
-                    { "latitude": 51.377865, "longitude": -2.360006 },
-                    { "latitude": 51.377811, "longitude": -2.360237 },
-                    { "latitude": 51.377804, "longitude": -2.360333 },
-                    { "latitude": 51.377768, "longitude": -2.360381 },
-                    { "latitude": 51.377727, "longitude": -2.360403 },
-                    { "latitude": 51.377530, "longitude": -2.360473 },
-                    { "latitude": 51.377466, "longitude": -2.360483 },
-                    { "latitude": 51.377419, "longitude": -2.360440 },
-                    { "latitude": 51.377403, "longitude": -2.360398 },
-                    { "latitude": 51.377379, "longitude": -2.360344 },
-                    { "latitude": 51.377356, "longitude": -2.360274 },
-                    { "latitude": 51.377329, "longitude": -2.359995 },
-                    { "latitude": 51.377302, "longitude": -2.359834 },
-                    { "latitude": 51.377275, "longitude": -2.359743 },
-                    { "latitude": 51.377225, "longitude": -2.359673 },
-                    { "latitude": 51.377175, "longitude": -2.359636 },
-                    { "latitude": 51.377125, "longitude": -2.359636 },
-                    { "latitude": 51.377011, "longitude": -2.359904 },
-                    { "latitude": 51.377018, "longitude": -2.360049 },
-                    { "latitude": 51.377018, "longitude": -2.359813 },
-                    { "latitude": 51.377078, "longitude": -2.359673 },
-                    { "latitude": 51.377041, "longitude": -2.359732 },
-                    { "latitude": 51.377162, "longitude": -2.361320 },
-                    { "latitude": 51.377192, "longitude": -2.361411 },
-                    { "latitude": 51.377232, "longitude": -2.361449 },
-                    { "latitude": 51.377289, "longitude": -2.361481 },
-                    { "latitude": 51.377339, "longitude": -2.361470 },
-                    { "latitude": 51.377413, "longitude": -2.361508 },
-                    { "latitude": 51.377470, "longitude": -2.361556 },
-                    { "latitude": 51.377513, "longitude": -2.361621 },
-                    { "latitude": 51.377142, "longitude": -2.361192 },
-                    { "latitude": 51.377111, "longitude": -2.360950 },
-                    { "latitude": 51.377068, "longitude": -2.360424 },
-                    { "latitude": 51.377567, "longitude": -2.361760 }
+                    { "latitude": 51.378056, "longitude": -2.359759 },
+                    { "latitude": 51.377866, "longitude": -2.359826 },
+                    { "latitude": 51.377866, "longitude": -2.359826 },
+                    { "latitude": 51.377839, "longitude": -2.359969 },
+                    { "latitude": 51.377855, "longitude": -2.360267 },
+                    { "latitude": 51.377789, "longitude": -2.360385 },
+                    { "latitude": 51.377738, "longitude": -2.360418 },
+                    { "latitude": 51.377534, "longitude": -2.360472 },
+                    { "latitude": 51.377484, "longitude": -2.360473 },
+                    { "latitude": 51.377456, "longitude": -2.360465 },
+                    { "latitude": 51.377421, "longitude": -2.360426 },
+                    { "latitude": 51.377390, "longitude": -2.360370 }
                 ]
             },
             {
-                "routeName": "Section 7",
+                "sectionId": 6,
+                "sectionDescription": "Start: Roundabout; End: LowerOldfieldPark",
                 "positions": [
+                    { "latitude": 51.377454, "longitude": -2.361383 },
                     { "latitude": 51.377567, "longitude": -2.361760 },
                     { "latitude": 51.377661, "longitude": -2.362109 },
                     { "latitude": 51.377975, "longitude": -2.363369 },
@@ -342,7 +313,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section 8",
+                "sectionId": 7,
+                "sectionDescription": "Start: LowerOldfieldPark; End: BroughamHayes",
                 "positions": [
                     { "latitude": 51.378903, "longitude": -2.368455 },
                     { "latitude": 51.378739, "longitude": -2.368600 },
@@ -389,7 +361,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section J",
+                "sectionId": 8,
+                "sectionDescription": "Start: BroughamHayes; End: PinesWay",
                 "positions": [
                     { "latitude": 51.378397, "longitude": -2.376534 },
                     { "latitude": 51.378501, "longitude": -2.376603 },
@@ -428,7 +401,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section K",
+                "sectionId": 9,
+                "sectionDescription": "Start: PinesWay; End: BusStation",
                 "positions": [
                     { "latitude": 51.380550, "longitude": -2.370858 },
                     { "latitude": 51.380497, "longitude": -2.370713 },
@@ -491,7 +465,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section L",
+                "sectionId": 10,
+                "sectionDescription": "Start: PinesWay; End: LowerOldfieldPark",
                 "positions": [
                     { "latitude": 51.380550, "longitude": -2.370858 },
                     { "latitude": 51.380473, "longitude": -2.370746 },
@@ -515,14 +490,16 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section M",
+                "sectionId": 11,
+                "sectionDescription": "Start: NorthParade; End: NorthParade",
                 "positions": [
                     { "latitude": 51.380821, "longitude": -2.357195 },
                     { "latitude": 51.381461, "longitude": -2.357533 }
                 ]
             },
             {
-                "routeName": "Section N",
+                "sectionId": 12,
+                "sectionDescription": "Start: BathAbbey; End: PultneyBridge",
                 "positions": [
                     { "latitude": 51.381461, "longitude": -2.357533 },
                     { "latitude": 51.381498, "longitude": -2.357624 },
@@ -552,7 +529,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section O",
+                "sectionId": 13,
+                "sectionDescription": "Start: PultneyBridge; End: BathAbbey",
                 "positions": [
                     { "latitude": 51.382860, "longitude": -2.358536 },
                     { "latitude": 51.382857, "longitude": -2.358461 },
@@ -574,7 +552,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section P",
+                "sectionId": 14,
+                "sectionDescription": "Start: PultneyBridge; End: BottomOfBathwickHill",
                 "positions": [
                     { "latitude": 51.382860, "longitude": -2.358536 },
                     { "latitude": 51.383078, "longitude": -2.357790 },
@@ -603,7 +582,8 @@ var MapPage = (function () {
                 ]
             },
             {
-                "routeName": "Section Q",
+                "sectionId": 15,
+                "sectionDescription": "Start: ClavertonDownRd; End: BroughamHayes",
                 "positions": [
                     { "latitude": 51.3736778, "longitude": -2.3265013 },
                     { "latitude": 51.3730013, "longitude": -2.3241953 },
@@ -809,8 +789,55 @@ var MapPage = (function () {
                     { "latitude": 51.3783881, "longitude": -2.3766853 },
                     { "latitude": 51.378387, "longitude": -2.3765809 }
                 ]
+            },
+            {
+                "sectionId": 16,
+                "sectionDescription": "Start: Roundabout; End: NorthParade",
+                "positions": [
+                    { "latitude": 51.377153, "longitude": -2.359604 },
+                    { "latitude": 51.377039, "longitude": -2.359281 },
+                    { "latitude": 51.377033, "longitude": -2.358528 },
+                    { "latitude": 51.376992, "longitude": -2.358096 },
+                    { "latitude": 51.376829, "longitude": -2.357339 },
+                    { "latitude": 51.376772, "longitude": -2.356934 },
+                    { "latitude": 51.376750, "longitude": -2.356624 },
+                    { "latitude": 51.376767, "longitude": -2.356288 },
+                    { "latitude": 51.376960, "longitude": -2.355058 },
+                    { "latitude": 51.376976, "longitude": -2.354080 },
+                    { "latitude": 51.377288, "longitude": -2.352721 },
+                    { "latitude": 51.377524, "longitude": -2.352059 },
+                    { "latitude": 51.378356, "longitude": -2.351228 },
+                    { "latitude": 51.378600, "longitude": -2.351076 },
+                    { "latitude": 51.378940, "longitude": -2.351089 },
+                    { "latitude": 51.379553, "longitude": -2.351225 },
+                    { "latitude": 51.380940, "longitude": -2.351292 }
+                ]
             }
         ]; //oiafhsaoidhjsadnaosi
+        var roundaboutCoords = [
+            { lat: 51.377484, lng: -2.361208 },
+            { lat: 51.377484, lng: -2.361208 },
+            { lat: 51.377314, lng: -2.359773 },
+            { lat: 51.377296, lng: -2.359740 },
+            { lat: 51.377169, lng: -2.359606 },
+            { lat: 51.377153, lng: -2.359604 },
+            { lat: 51.377118, lng: -2.359625 },
+            { lat: 51.377085, lng: -2.359652 },
+            { lat: 51.377043, lng: -2.359702 },
+            { lat: 51.377004, lng: -2.359801 },
+            { lat: 51.377161, lng: -2.361322 },
+            { lat: 51.377194, lng: -2.361415 },
+            { lat: 51.377233, lng: -2.361461 },
+            { lat: 51.377278, lng: -2.361488 },
+            { lat: 51.377328, lng: -2.361506 },
+            { lat: 51.377371, lng: -2.361495 },
+            { lat: 51.377413, lng: -2.361458 },
+            { lat: 51.377434, lng: -2.361423 },
+            { lat: 51.377454, lng: -2.361383 },
+            { lat: 51.377480, lng: -2.361299 },
+            { lat: 51.377483, lng: -2.361218 },
+            { lat: 51.377484, lng: -2.361208 }
+        ];
         for (var i = 0; i < exampleBusRouteCoordinates.length; i++) {
             var busRoutePath = exampleBusRouteCoordinates[i].positions;
             var googleMapStyle = busRoutePath.map(function (_a) {
@@ -824,39 +851,49 @@ var MapPage = (function () {
                 strokeOpacity: 0.8,
                 strokeWeight: 3
             });
-            this.busRouteLines.set(exampleBusRouteCoordinates[i].routeName, busRoute);
+            this.busRouteLines.set(exampleBusRouteCoordinates[i].sectionId, busRoute);
             busRoute.setMap(this.map);
         }
+        var roundabout = new google.maps.Polygon({
+            paths: roundaboutCoords,
+            strokeColor: '#505050',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#505050',
+            fillOpacity: 1
+        });
+        roundabout.setMap(this.map);
     };
     //Gets the buses from the server, adds the to the map - set to update automatically
     MapPage.prototype.addBuses = function () {
         var _this = this;
-        var buses = [];
-        this.busSubscription = this.serverService.getBusLocations()
-            .subscribe(function (data) {
-            buses = data;
-            console.log(buses.status);
-            buses = buses.data;
-            console.log(buses);
-            for (var i = 0; i < buses.length; i++) {
-                _this.addBus(buses[i]);
-            }
-        }, function (error) { return _this.errorMessage = error; });
+        setInterval(function () {
+            _this.serverService.getBusLocations().then(function (buses) {
+                for (var i = 0; i < buses.length; i++) {
+                    _this.addBus(buses[i]);
+                }
+            });
+        }, 1000);
     };
     //Adds a bus marker to the map with a click event
     MapPage.prototype.addBus = function (bus) {
         var _this = this;
-        var busMarker = new google.maps.Marker({
-            map: this.map,
-            position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
-            title: bus.routeName
-        });
-        this.busMarkers.set(bus.busId, busMarker);
-        google.maps.event.addListener(busMarker, 'click', function () { return _this.openBusPage(bus.busId, bus.routeName); });
+        if (this.busMarkers.get(bus.busId)) {
+            this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
+        }
+        else {
+            var busMarker = new google.maps.Marker({
+                map: this.map,
+                position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
+                title: bus.routeName
+            });
+            this.busMarkers.set(bus.busId, busMarker);
+            google.maps.event.addListener(busMarker, 'click', function () { return _this.openBusPage(bus.busId, bus.routeName); });
+        }
     };
     //Opens the bus page with the bus info of the bus given.
     MapPage.prototype.openBusPage = function (busId, route) {
-        var tryModal = this.modalctrl.create(BusPage, { stopID: busId, routeName: route });
+        var tryModal = this.modalctrl.create(BusPage, { busId: busId, routeName: route });
         tryModal.present();
     };
     __decorate([
