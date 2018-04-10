@@ -31,10 +31,12 @@ var MapPage = (function () {
         this.busRouteLines = new Map();
         this.busMarkers = new Map();
     }
+    //Unsubscribe from the server's updates when the page is closed
     MapPage.prototype.ngOnDestroy = function () {
         this.busSubscription.unsubscribe();
         this.stopsSubscription.unsubscribe();
     };
+    //Functions which run when the page is opened
     MapPage.prototype.ionViewDidLoad = function () {
         var _this = this;
         this.loadMap()
@@ -66,6 +68,7 @@ var MapPage = (function () {
             });
         });
     };
+    //Creates the initial map centered around latLng
     MapPage.prototype.createMap = function (latLng) {
         var mapOptions = {
             center: latLng,
@@ -87,6 +90,7 @@ var MapPage = (function () {
         };
         this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
     };
+    //Adds the user's position to the map if available to the app, and sets it to update automatically
     MapPage.prototype.addUserPositionMarker = function (latLng) {
         var userPosition = new google.maps.Marker({
             map: this.map,
@@ -101,6 +105,7 @@ var MapPage = (function () {
             userPosition.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
         });
     };
+    //gets the bus stops from the server and adds them to the map - they are set to update automatically.
     MapPage.prototype.addBusStops = function () {
         var _this = this;
         var busStops = [];
@@ -112,6 +117,7 @@ var MapPage = (function () {
             }
         });
     };
+    //adds a single bus stop to the map with a click event that opens the relevant busstoppage
     MapPage.prototype.addBusStop = function (busStop) {
         var _this = this;
         var stopMarker = new google.maps.Marker({
@@ -126,10 +132,12 @@ var MapPage = (function () {
         this.busStopMarkers.set(busStop.busStopId, stopMarker);
         google.maps.event.addListener(stopMarker, 'click', function () { return _this.openBusStopPage(busStop.busStopId, busStop.busStopName); });
     };
+    //Opens a bus stop page with the details of the bus stop
     MapPage.prototype.openBusStopPage = function (busStopId, busStopName) {
         var tryModal = this.modalctrl.create(BusStopPage, { stopID: busStopId, stopName: busStopName });
         tryModal.present();
     };
+    //Adds the bus routes from the default routes (Future: Communicate with server to obtain the routes)
     MapPage.prototype.addBusRoutes = function () {
         var exampleBusRouteCoordinates = [
             {
@@ -856,6 +864,7 @@ var MapPage = (function () {
         });
         roundabout.setMap(this.map);
     };
+    //Gets the buses from the server, adds the to the map - set to update automatically
     MapPage.prototype.addBuses = function () {
         var _this = this;
         setInterval(function () {
@@ -866,6 +875,7 @@ var MapPage = (function () {
             });
         }, 1000);
     };
+    //Adds a bus marker to the map with a click event
     MapPage.prototype.addBus = function (bus) {
         var _this = this;
         if (this.busMarkers.get(bus.busId)) {
@@ -881,6 +891,7 @@ var MapPage = (function () {
             google.maps.event.addListener(busMarker, 'click', function () { return _this.openBusPage(bus.busId, bus.routeName); });
         }
     };
+    //Opens the bus page with the bus info of the bus given.
     MapPage.prototype.openBusPage = function (busId, route) {
         var tryModal = this.modalctrl.create(BusPage, { busId: busId, routeName: route });
         tryModal.present();

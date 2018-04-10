@@ -7,10 +7,11 @@ import {ServerProvider} from '../../providers/server-provider';
 
 
 /**
- * Generated class for the MapPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
+ * The main page of the app. Communicates with the server and google maps to display a custom google map to the user.
+ * The map displays the user's position, if available to the app, else it centers the map around the default position of the Bath bus station.
+ * It displays all routes by default. (Future allow users to filter bus routes).
+ * It displays all Bus stops attached to all routes currently displayed.
+ * It displays all buses of the displayed routes as they travel along the routes.
  */
 declare var google;
 
@@ -53,11 +54,13 @@ export class MapPage {
     this.busMarkers = new Map<number, google.maps.Marker>();
   }
 
+  //Unsubscribe from the server's updates when the page is closed
   ngOnDestroy() {
     this.busSubscription.unsubscribe();
     this.stopsSubscription.unsubscribe();
   }
 
+  //Functions which run when the page is opened
   ionViewDidLoad() {
     this.loadMap()
       .then((latLng) => {
@@ -88,6 +91,7 @@ export class MapPage {
     });
   }
 
+  //Creates the initial map centered around latLng
   private createMap(latLng: Object) {
     const mapOptions = {
       center: latLng,
@@ -111,6 +115,7 @@ export class MapPage {
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
   }
 
+  //Adds the user's position to the map if available to the app, and sets it to update automatically
   private addUserPositionMarker(latLng) {
     let userPosition = new google.maps.Marker({
       map: this.map,
@@ -127,6 +132,7 @@ export class MapPage {
     });
   }
 
+  //gets the bus stops from the server and adds them to the map - they are set to update automatically.
   private addBusStops() {
     let busStops: any = [];
 
@@ -139,6 +145,7 @@ export class MapPage {
     });
   }
 
+  //adds a single bus stop to the map with a click event that opens the relevant busstoppage
   private addBusStop(busStop) {
     let stopMarker = new google.maps.Marker({
       map: this.map,
@@ -154,11 +161,13 @@ export class MapPage {
     google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
   }
 
+  //Opens a bus stop page with the details of the bus stop
   private openBusStopPage(busStopId, busStopName) {
     let tryModal = this.modalctrl.create(BusStopPage, {stopID: busStopId, stopName: busStopName});
     tryModal.present();
   }
 
+  //Adds the bus routes from the default routes (Future: Communicate with server to obtain the routes)
   private addBusRoutes() {
     let exampleBusRouteCoordinates = [
       {
@@ -890,6 +899,7 @@ export class MapPage {
     roundabout.setMap(this.map);
   }
 
+  //Gets the buses from the server, adds the to the map - set to update automatically
   private addBuses() {
     setInterval(() => {
       this.serverService.getBusLocations().then((buses) => {
@@ -900,6 +910,7 @@ export class MapPage {
     }, 1000);
   }
 
+  //Adds a bus marker to the map with a click event
   private addBus(bus) {
     if (this.busMarkers.get(bus.busId)) {
       this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
@@ -914,6 +925,7 @@ export class MapPage {
     }
   }
 
+  //Opens the bus page with the bus info of the bus given.
   private openBusPage(busId, route) {
     let tryModal = this.modalctrl.create(BusPage, {busId: busId, routeName: route});
     tryModal.present();
