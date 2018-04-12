@@ -8,60 +8,61 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Component } from '@angular/core';
-import { ViewController, IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
-import { BusPage } from '../bus/bus';
+import { IonicPage, ModalController, NavController, NavParams, ViewController } from 'ionic-angular';
 import { ServerProvider } from '../../providers/server-provider';
+import { BusStopPage } from '../bus-stop/bus-stop';
 /**
- * Generated class for the BusStopPage page.
+ * Generated class for the BusStopListPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
-var BusStopPage = (function () {
-    function BusStopPage(navCtrl, navParams, viewctrl, modalctrl, serverService) {
+var BusStopListPage = (function () {
+    function BusStopListPage(navCtrl, navParams, viewctrl, modalctrl, serverService) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.viewctrl = viewctrl;
         this.modalctrl = modalctrl;
         this.serverService = serverService;
-        this.title = "Bus Stop";
+        this.title = "Bus Stops";
         //navParams : stopId stopName
-        this.title = navParams.get('stopName');
-        this.getBusStopData(navParams.get('stopId')).then(function (array) {
-            _this.buses = array;
-        }); /*[
-          { busRoute: 'U1', arrivalTime: "09:50", busId: 1},
-          { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}//oiihADXINA
-        ];*/
+        this.getBusStops().then(function (array) {
+            _this.busStops = array;
+        }, function (rejected) {
+            console.log(rejected);
+            _this.busStops = [];
+        });
     }
-    BusStopPage.prototype.ionViewDidLoad = function () {
+    BusStopListPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad BusStopPage');
     };
-    BusStopPage.prototype.closeModal = function () {
+    BusStopListPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
     };
-    BusStopPage.prototype.getBusStopData = function (stopId) {
+    BusStopListPage.prototype.getBusStops = function () {
         var _this = this;
-        return new Promise(function (resolve) {
-            _this.serverService.getStopInfo(stopId).then(function (data) {
-                resolve(data.arrivals);
+        return new Promise(function (resolve, reject) {
+            _this.serverService.getBusStopLocations().then(function (data) {
+                resolve(data);
+            }, function (rejected) {
+                reject(rejected);
             });
         });
     };
-    BusStopPage.prototype.openBus = function (bus) {
-        var tryModal = this.modalctrl.create(BusPage, { busId: bus.busId, routeName: bus.busRoute });
+    BusStopListPage.prototype.openBusStop = function (busStop) {
+        var tryModal = this.modalctrl.create(BusStopPage, { stopId: busStop.busStopId, stopName: busStop.busStopName });
         tryModal.present();
     };
-    BusStopPage = __decorate([
+    BusStopListPage = __decorate([
         IonicPage(),
         Component({
-            selector: 'page-bus-stop',
-            templateUrl: 'bus-stop.html',
+            selector: 'page-bus-stop-list',
+            templateUrl: 'bus-stop-list.html',
         }),
         __metadata("design:paramtypes", [NavController, NavParams, ViewController, ModalController, ServerProvider])
-    ], BusStopPage);
-    return BusStopPage;
+    ], BusStopListPage);
+    return BusStopListPage;
 }());
-export { BusStopPage };
-//# sourceMappingURL=bus-stop.js.map
+export { BusStopListPage };
+//# sourceMappingURL=bus-stop-list.js.map
