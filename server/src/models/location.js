@@ -55,6 +55,29 @@ class Location {
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
+    bearingTo(otherLocation) {
+        function toRadians(n) { return n * Math.PI / 180; }
+        const { sin, cos, atan2 } = Math;
+        const lat1 = toRadians(this.latitude);
+        const lat2 = toRadians(otherLocation.latitude);
+        const lon1 = toRadians(this.longitude);
+        const lon2 = toRadians(otherLocation.longitude);
+        return (atan2(sin(lon2 - lon1) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)) * (180 / Math.PI) + 360) % 360;
+    }
+    moveInDirectionOf(otherLocation, distance) {
+        function toRadians(n) { return n * Math.PI / 180; }
+        function toDegrees(n) { return n * 180 / Math.PI; }
+        const { sin, cos, atan2, asin, PI } = Math;
+        const bearing = toRadians(this.bearingTo(otherLocation));
+        const lat = toRadians(this.latitude);
+        const lon = toRadians(this.longitude);
+        const earthRadiusInMetres = 6371000;
+        const distFrac = distance / earthRadiusInMetres;
+        const latitudeResult = asin(sin(lat) * cos(distFrac) + cos(lat) * sin(distFrac) * cos(bearing));
+        const a = atan2(sin(bearing) * sin(distFrac) * cos(lat), cos(distFrac) - sin(lat) * sin(latitudeResult));
+        const longitudeResult = (lon + a + 3 * PI) % (2 * PI) - PI;
+        return new Location({ latitude: toDegrees(latitudeResult), longitude: toDegrees(longitudeResult) });
+    }
     static distanceBetweenN(locations) {
         let total = 0;
         for (let i = 0; i < locations.length - 1; i++) {

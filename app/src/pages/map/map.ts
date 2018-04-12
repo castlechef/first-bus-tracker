@@ -913,7 +913,9 @@ export class MapPage {
   //Adds a bus marker to the map with a click event
   private addBus(bus) {
     if (this.busMarkers.get(bus.busId)) {
-      this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
+      const marker = this.busMarkers.get(bus.busId);
+      this.animateMovement(marker, bus.location);
+      //this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
     } else {
       let busMarker = new google.maps.Marker({
         map: this.map,
@@ -922,6 +924,38 @@ export class MapPage {
       });
       this.busMarkers.set(bus.busId, busMarker);
       google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
+    }
+  }
+
+  //Animates the movement of a marker to a new longitude/latitude
+  private async animateMovement(marker: google.maps.Marker, location: {latitude: number, longitude: number}) {
+    function sleep(millis: number): Promise<void> {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(), millis);
+      });
+    }
+    function ease(x: number): number {
+      return ((Math.sin((x-0.5)*Math.PI))+1)/2;
+    }
+
+    const timeToAnimate = 300;
+    const fps = 60;
+    const totalFrames = timeToAnimate * fps / 1000;
+
+    const oldLat = marker.getPosition().lat();
+    const newLat = location.latitude;
+    const oldLon = marker.getPosition().lng();
+    const newLon = location.longitude;
+    const latDif = newLat - oldLat;
+    const lonDif = newLon - oldLon;
+
+    for (let i = 1; i <= totalFrames; i++) {
+      console.log('loop');
+      const proportion = ease(i / totalFrames);
+      const lat = oldLat + (proportion * latDif);
+      const lng = oldLon + (proportion * lonDif);
+      await sleep(1000/fps);
+      marker.setPosition({lat, lng});
     }
   }
 
