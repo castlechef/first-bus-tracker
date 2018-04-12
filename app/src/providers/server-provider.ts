@@ -4,6 +4,7 @@ import { Bus } from '../bus.interface';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/observable/of';
 import {Stop} from '../stops.interface';
 import { BusInfo } from '../busInfo.interface';
 import { StopInfo } from '../stopInfo.interface';
@@ -18,8 +19,8 @@ export class ServerProvider {
 
   // gets buses data and maps it to the observable Bus
   getBusLocations() : Promise<Array<Bus>>{
-    return new Promise<Array<Bus>>(resolve => {
-      const subscription = this.http.get<Bus[]>(this._url.concat('buses')).catch(this.errorHandler).subscribe( data => {
+    return new Promise<Array<Bus>>((resolve, reject) => {
+      const subscription = this.http.get<Bus[]>(this._url.concat('buses')).catch(e => {console.log(e); reject(e); return Observable.of(e);}).subscribe( data => {
         resolve(data.data);
         subscription.unsubscribe();
       });
@@ -28,7 +29,7 @@ export class ServerProvider {
 
   getBusStopLocations(): Promise<Stop[]>{
     return new Promise<Stop[]>((resolve, reject) => {
-      const subscription = this.http.get<Stop[]>(this._url.concat('busStops')).catch(this.errorHandler).subscribe( data => {
+      const subscription = this.http.get<Stop[]>(this._url.concat('busStops')).catch(e => {console.log(e); reject(e); return Observable.of(e);}).subscribe( data => {
         resolve(data);
         subscription.unsubscribe();
       });
@@ -36,8 +37,8 @@ export class ServerProvider {
   }
 
   getBusInfo(number): Promise<BusInfo>{
-    return new Promise<BusInfo>(resolve => {
-      const subscription = this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(this.errorHandler).subscribe( data => {
+    return new Promise<BusInfo>((resolve, reject) => {
+      const subscription = this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(e => {console.log(e); reject(e); return Observable.of(e);}).subscribe( data => {
         resolve(data.data);
         subscription.unsubscribe();
       });
@@ -46,15 +47,10 @@ export class ServerProvider {
 
   getStopInfo(number): Promise<StopInfo>{
     return new Promise<StopInfo>((resolve, reject) => {
-      const subscription = this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler).subscribe( data => {
+      const subscription = this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(e => {console.log(e); reject(e); return Observable.of(e);}).subscribe( data => {
         resolve(data);
         subscription.unsubscribe();
       });
     })
   }
-  // catches any errors during the getLocations()
-  errorHandler(error: HttpErrorResponse){
-    return Observable.throw(error.message + "This is error 1" || "Server Error");
-  }
-
 }

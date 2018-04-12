@@ -143,8 +143,8 @@ export class MapPage {
         this.addBusStop(busStops[i]);
       }
     }, rejected => {
-      console.log(rejected + "error 3");
-      busStops = [];
+      console.log(rejected);
+      this.addBusStops();
     });
   }
 
@@ -910,7 +910,7 @@ export class MapPage {
           this.addBus(buses[i]);
         }
       }, rejected => {
-        console.log(rejected + "Error 2");
+        console.log(rejected);
       });
     }, 1000);
   }
