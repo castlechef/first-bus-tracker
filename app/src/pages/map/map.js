@@ -150,6 +150,9 @@ var MapPage = (function () {
             for (var i = 0; i < busStops.length; i++) {
                 _this.addBusStop(busStops[i]);
             }
+        }, function (rejected) {
+            console.log(rejected + "error 3");
+            busStops = [];
         });
     };
     //adds a single bus stop to the map with a click event that opens the relevant busstoppage
@@ -907,6 +910,8 @@ var MapPage = (function () {
                 for (var i = 0; i < buses.length; i++) {
                     _this.addBus(buses[i]);
                 }
+            }, function (rejected) {
+                console.log(rejected + "Error 2");
             });
         }, 1000);
     };

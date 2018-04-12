@@ -30,7 +30,7 @@ var ServerProvider = (function () {
     };
     ServerProvider.prototype.getBusStopLocations = function () {
         var _this = this;
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             var subscription = _this.http.get(_this._url.concat('busStops')).catch(_this.errorHandler).subscribe(function (data) {
                 resolve(data);
                 subscription.unsubscribe();
@@ -48,16 +48,16 @@ var ServerProvider = (function () {
     };
     ServerProvider.prototype.getStopInfo = function (number) {
         var _this = this;
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(_this.errorHandler).subscribe(function (data) {
-                resolve(data.data);
+                resolve(data);
                 subscription.unsubscribe();
             });
         });
     };
     // catches any errors during the getLocations()
     ServerProvider.prototype.errorHandler = function (error) {
-        return Observable.throw(error.message || "Server Error");
+        return Observable.throw(error.message + "This is error 1" || "Server Error");
     };
     ServerProvider = __decorate([
         Injectable(),

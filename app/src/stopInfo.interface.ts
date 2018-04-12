@@ -1,4 +1,5 @@
 export interface StopInfo {
+  data: {
     busStopId: number,
     busStopName: string,
     location: {
@@ -17,4 +18,5 @@ export interface StopInfo {
         arrivalTime: string
       }
       ]
+  }
 }

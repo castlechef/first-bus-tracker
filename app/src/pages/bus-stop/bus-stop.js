@@ -30,6 +30,9 @@ var BusStopPage = (function () {
         this.title = navParams.get('stopName');
         this.getBusStopData(navParams.get('stopId')).then(function (array) {
             _this.buses = array;
+        }, function (rejected) {
+            _this.buses = [];
+            console.log(rejected);
         }); /*[
           { busRoute: 'U1', arrivalTime: "09:50", busId: 1},
           { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}//oiihADXINA
@@ -43,9 +46,11 @@ var BusStopPage = (function () {
     };
     BusStopPage.prototype.getBusStopData = function (stopId) {
         var _this = this;
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             _this.serverService.getStopInfo(stopId).then(function (data) {
-                resolve(data.arrivals);
+                resolve(data.data.arrivals);
+            }, function (rejected) {
+                reject(rejected);
             });
         });
     };
