@@ -22,7 +22,7 @@ var ServerProvider = (function () {
     ServerProvider.prototype.getBusLocations = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('buses')).catch(function (e) { return Observable.throw(_this.errorHandler(e, reject)); })
+            var subscription = _this.http.get(_this._url.concat('buses')).catch(function (e) { return Observable.throw(reject(e)); })
                 .subscribe(function (data) {
                 resolve(data.data);
                 subscription.unsubscribe();
@@ -32,7 +32,7 @@ var ServerProvider = (function () {
     ServerProvider.prototype.getBusStopLocations = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('busStops')).catch(function (e) { return Observable.throw(_this.errorHandler(e, reject)); })
+            var subscription = _this.http.get(_this._url.concat('busStops')).catch(function (e) { return Observable.throw(reject(e)); })
                 .subscribe(function (data) {
                 resolve(data);
                 subscription.unsubscribe();
@@ -42,7 +42,7 @@ var ServerProvider = (function () {
     ServerProvider.prototype.getBusInfo = function (number) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('buses/' + number)).catch(function (e) { return Observable.throw(_this.errorHandler(e, reject)); })
+            var subscription = _this.http.get(_this._url.concat('buses/' + number)).catch(function (e) { return Observable.throw(reject(e)); })
                 .subscribe(function (data) {
                 resolve(data.data);
                 subscription.unsubscribe();
@@ -52,16 +52,12 @@ var ServerProvider = (function () {
     ServerProvider.prototype.getStopInfo = function (number) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(function (e) { return Observable.throw(_this.errorHandler(e, reject)); })
+            var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(function (e) { return Observable.throw(reject(e)); })
                 .subscribe(function (data) {
                 resolve(data.data);
                 subscription.unsubscribe();
             });
         });
-    };
-    ServerProvider.prototype.errorHandler = function (error, reject) {
-        reject(error);
-        console.log(error);
     };
     ServerProvider = __decorate([
         Injectable(),
