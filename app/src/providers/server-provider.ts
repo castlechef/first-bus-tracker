@@ -8,7 +8,6 @@ import {Stop} from '../stops.interface';
 import { BusInfo } from '../busInfo.interface';
 import { StopInfo } from '../stopInfo.interface';
 
-
 @Injectable()
 export class ServerProvider {
   data: any;
@@ -28,7 +27,7 @@ export class ServerProvider {
   }
 
   getBusStopLocations(): Promise<Stop[]>{
-    return new Promise<Stop[]>(resolve => {
+    return new Promise<Stop[]>((resolve, reject) => {
       const subscription = this.http.get<Stop[]>(this._url.concat('busStops')).catch(this.errorHandler).subscribe( data => {
         resolve(data);
         subscription.unsubscribe();
@@ -46,16 +45,16 @@ export class ServerProvider {
   }
 
   getStopInfo(number): Promise<StopInfo>{
-    return new Promise<StopInfo>(resolve => {
+    return new Promise<StopInfo>((resolve, reject) => {
       const subscription = this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(this.errorHandler).subscribe( data => {
-        resolve(data.data);
+        resolve(data);
         subscription.unsubscribe();
       });
     })
   }
   // catches any errors during the getLocations()
   errorHandler(error: HttpErrorResponse){
-    return Observable.throw(error.message || "Server Error");
+    return Observable.throw(error.message + "This is error 1" || "Server Error");
   }
 
 }

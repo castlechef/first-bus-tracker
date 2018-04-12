@@ -24,6 +24,9 @@ export class BusPage {
     this.title = navParams.get('routeName');
     this.getBusInfo(navParams.get('busId')).then(busInfo =>{
       this.nextBusStops = busInfo;
+    }, rejected => {
+      console.log(rejected);
+      this.nextBusStops = [];
     });
   }
 
@@ -36,9 +39,11 @@ export class BusPage {
   }
 
   private getBusInfo(busId) : Promise<Array<{busStopId: number, busStopName: string, arrivalTime: string}>>{
-    return new Promise<Array<{busStopId: number, busStopName: string, arrivalTime: string}>>(resolve => {
+    return new Promise<Array<{busStopId: number, busStopName: string, arrivalTime: string}>>((resolve, reject) => {
       this.serverService.getBusInfo(busId).then(data=>{
         resolve(data.expectedArrivals);
+      }, rejected =>{
+        reject(rejected);
       });
     });
   }

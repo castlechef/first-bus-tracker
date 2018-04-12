@@ -27,6 +27,9 @@ var BusPage = (function () {
         this.title = navParams.get('routeName');
         this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
             _this.nextBusStops = busInfo;
+        }, function (rejected) {
+            console.log(rejected);
+            _this.nextBusStops = [];
         });
     }
     BusPage.prototype.ionViewDidLoad = function () {
@@ -37,9 +40,11 @@ var BusPage = (function () {
     };
     BusPage.prototype.getBusInfo = function (busId) {
         var _this = this;
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             _this.serverService.getBusInfo(busId).then(function (data) {
                 resolve(data.expectedArrivals);
+            }, function (rejected) {
+                reject(rejected);
             });
         });
     };

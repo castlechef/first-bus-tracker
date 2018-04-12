@@ -142,6 +142,9 @@ export class MapPage {
       for (let i = 0; i < busStops.length; i++) {
         this.addBusStop(busStops[i]);
       }
+    }, rejected => {
+      console.log(rejected + "error 3");
+      busStops = [];
     });
   }
 
@@ -906,6 +909,8 @@ export class MapPage {
         for (let i = 0; i < buses.length; i++) {
           this.addBus(buses[i]);
         }
+      }, rejected => {
+        console.log(rejected + "Error 2");
       });
     }, 1000);
   }
