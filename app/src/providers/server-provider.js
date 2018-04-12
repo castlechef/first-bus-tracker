@@ -21,9 +21,8 @@ var ServerProvider = (function () {
     // gets buses data and maps it to the observable Bus
     ServerProvider.prototype.getBusLocations = function () {
         var _this = this;
-        return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('buses')).catch(function (e) { return Observable.throw(reject(e)); })
-                .subscribe(function (data) {
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('buses')).catch(_this.errorHandler).subscribe(function (data) {
                 resolve(data.data);
                 subscription.unsubscribe();
             });
@@ -31,9 +30,8 @@ var ServerProvider = (function () {
     };
     ServerProvider.prototype.getBusStopLocations = function () {
         var _this = this;
-        return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('busStops')).catch(function (e) { return Observable.throw(reject(e)); })
-                .subscribe(function (data) {
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('busStops')).catch(_this.errorHandler).subscribe(function (data) {
                 resolve(data);
                 subscription.unsubscribe();
             });
@@ -41,9 +39,8 @@ var ServerProvider = (function () {
     };
     ServerProvider.prototype.getBusInfo = function (number) {
         var _this = this;
-        return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('buses/' + number)).catch(function (e) { return Observable.throw(reject(e)); })
-                .subscribe(function (data) {
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('buses/' + number)).catch(_this.errorHandler).subscribe(function (data) {
                 resolve(data.data);
                 subscription.unsubscribe();
             });
@@ -51,13 +48,16 @@ var ServerProvider = (function () {
     };
     ServerProvider.prototype.getStopInfo = function (number) {
         var _this = this;
-        return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(function (e) { return Observable.throw(reject(e)); })
-                .subscribe(function (data) {
+        return new Promise(function (resolve) {
+            var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(_this.errorHandler).subscribe(function (data) {
                 resolve(data.data);
                 subscription.unsubscribe();
             });
         });
+    };
+    // catches any errors during the getLocations()
+    ServerProvider.prototype.errorHandler = function (error) {
+        return Observable.throw(error.message || "Server Error");
     };
     ServerProvider = __decorate([
         Injectable(),

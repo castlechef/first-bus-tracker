@@ -26,9 +26,6 @@ export class BusStopPage {
     this.title = navParams.get('stopName');
     this.getBusStopData(navParams.get('stopId')).then( array =>{
       this.buses = array;
-    }, rejected =>{
-      console.log(rejected);
-      this.buses = [];
     }); /*[
       { busRoute: 'U1', arrivalTime: "09:50", busId: 1},
       { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}//oiihADXINA
@@ -44,11 +41,9 @@ export class BusStopPage {
   }
 
   private getBusStopData(stopId) : Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>{
-    return new Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>((resolve, reject)=>{
+    return new Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>(resolve=>{
       this.serverService.getStopInfo(stopId).then(data=>{
         resolve(data.arrivals);
-      }, rejected =>{
-        reject(rejected);
       });
     });
   }
@@ -57,6 +52,34 @@ export class BusStopPage {
     let tryModal = this.modalctrl.create(BusPage, {busId: bus.busId, routeName: bus.busRoute});
     tryModal.present();
   }
+  /*"busStopId": 1,
+                "busStopName": "Junction Road",
+                "location": {
+                    "latitude": 52.3456546,
+                    "longitude": -1.3465544
+                },
+                "busRoutePosition": [
+                    {
+                        "name": "U1X",
+                        "position": 4
+                    },
+                    {
+                        "name": "U1",
+                        "position": 7
+                    }
+                ],
+                "arrivals": [
+                    {
+                        "busId": 1,
+                        "routeName": "U1",
+                        "arrivalTime": "09:50"
+                    },
+                    {
+                        "busId": 2,
+                        "routeName": "U1X",
+                        "arrivalTime": "09:53"
+                    }
+                ]*/
 }
 
 
