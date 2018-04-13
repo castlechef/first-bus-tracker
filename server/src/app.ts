@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import busesRoute from './routes/buses';
 import busStopsRoute from './routes/busStops';
+import busRoutes from './routes/busRoutes';
 import {Buses} from './models/buses';
 import {BusStops} from './models/busStops';
 import {IBusStop} from './models/busStop';
@@ -20,7 +21,7 @@ const corsOptions: cors.CorsOptions = {
 
 export const app = express();
 
-const data: { busStops: IBusStop[] } = require('../data.json');
+const data: { busStops: IBusStop[] } = require('./data/busStops.json');
 
 export const busStops = new BusStops(data.busStops);
 export const buses = new Buses(busStops);
@@ -34,6 +35,7 @@ app.use(logger('dev'));
 
 app.use('/buses', busesRoute);
 app.use('/busStops', busStopsRoute);
+app.use('/busRoutes', busRoutes);
 app.use('*', (err, req, res, next) => {
     if (err instanceof RouteError) {
         res.status(err.statusCode);

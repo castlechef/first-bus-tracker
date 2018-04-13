@@ -96,11 +96,11 @@ describe('buses', () => {
         });
     });
     describe('getExpectedArrivalsAtStop', () => {
-        const data = require('../../data.json');
+        const data = require('../data/busStops.json');
         const busStops = new busStops_1.BusStops(data.busStops);
         buses = new buses_1.Buses(busStops);
         it('Should return arrival times of 2 buses', () => {
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             const busStops = new busStops_1.BusStops(data.busStops);
             const routeU2 = busStops.getStopsWithRoute(busStops_1.BusRouteName.U2);
             buses = new buses_1.Buses(busStops);

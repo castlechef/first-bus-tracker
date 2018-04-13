@@ -70,7 +70,7 @@ describe('bus', () => {
 
     describe('updateLocation', () => {
         describe('should reject invalid locations', () => {
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             const busStops = new BusStops(data.busStops);
 
             const validId: busId = 0;
@@ -96,7 +96,7 @@ describe('bus', () => {
             let busStops;
 
             beforeEach(() => {
-                const data: { busStops: IBusStop[] } = require('../../data.json');
+                const data: { busStops: IBusStop[] } = require('../data/busStops.json');
                 busStops = new BusStops(data.busStops);
             });
 
@@ -159,7 +159,7 @@ describe('bus', () => {
             const location = new Location({latitude: 51.359261, longitude: -2.357102});
             const expectedStopName = 'Foxhill House';
 
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             const busStops = new BusStops(data.busStops);
 
             const bus = new Bus(0, location, BusRouteName.U2, busStops.getStopsWithRoute(BusRouteName.U2));
@@ -183,7 +183,7 @@ describe('bus', () => {
         let busStops;
 
         beforeEach(() => {
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             busStops = new BusStops(data.busStops);
         });
 
@@ -218,7 +218,7 @@ describe('bus', () => {
         let busStops;
 
         beforeEach(() => {
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             busStops = new BusStops(data.busStops);
         });
 
@@ -305,7 +305,7 @@ describe('bus', () => {
         let busStops;
 
         beforeEach(() => {
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             busStops = new BusStops(data.busStops);
         });
 
@@ -330,7 +330,7 @@ describe('bus', () => {
         let busStops;
 
         beforeEach(() => {
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             busStops = new BusStops(data.busStops);
         });
 
@@ -357,7 +357,7 @@ describe('bus', () => {
         let busStops;
 
         beforeEach(() => {
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             busStops = new BusStops(data.busStops);
         });
 

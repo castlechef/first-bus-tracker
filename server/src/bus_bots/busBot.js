@@ -12,7 +12,7 @@ class BusBot {
         this.milliseconds = milliseconds;
         this.speed = this.milesPerHourToMetersPerSecond(mph);
         this.routeName = routeName;
-        const data = require('../../data.json');
+        const data = require('../data/busStops.json');
         const busStops = new busStops_1.BusStops(data.busStops);
         this.routeStops = busStops.getStopsWithRoute(routeName);
         if (this.routeStops.length < 2)

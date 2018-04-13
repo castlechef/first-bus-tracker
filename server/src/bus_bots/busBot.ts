@@ -22,7 +22,7 @@ export class BusBot {
         this.milliseconds = milliseconds;
         this.speed = this.milesPerHourToMetersPerSecond(mph);
         this.routeName = routeName;
-        const data: { busStops: IBusStop[] } = require('../../data.json');
+        const data: { busStops: IBusStop[] } = require('../data/busStops.json');
         const busStops = new BusStops(data.busStops);
         this.routeStops = busStops.getStopsWithRoute(routeName);
         if (this.routeStops.length < 2) throw new Error('Bus route must have at least 2 stops');

@@ -931,7 +931,7 @@ export class MapPage {
       },
       {
         "sectionId": 18,
-        "sectionDesciption":"Roundabout at bottomOfBathwickHill",
+        "sectionDescription":"Roundabout at bottomOfBathwickHill",
         "positions": [
           {"latitude":51.383982,"longitude":-2.351402},
           {"latitude":51.383982,"longitude":-2.351441},

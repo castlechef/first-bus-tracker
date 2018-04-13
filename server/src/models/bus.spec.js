@@ -54,7 +54,7 @@ describe('bus', () => {
     });
     describe('updateLocation', () => {
         describe('should reject invalid locations', () => {
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             const busStops = new busStops_1.BusStops(data.busStops);
             const validId = 0;
             const bus = new bus_1.Bus(validId, utils_1.Utils.location.generateValidLocation(), busStops_1.BusRouteName.U1, busStops.getStopsWithRoute(busStops_1.BusRouteName.U1));
@@ -73,7 +73,7 @@ describe('bus', () => {
         describe('predicting arrival times', () => {
             let busStops;
             beforeEach(() => {
-                const data = require('../../data.json');
+                const data = require('../data/busStops.json');
                 busStops = new busStops_1.BusStops(data.busStops);
             });
             it('should reduce arrival time of the next stop when moving towards next stop', () => {
@@ -127,7 +127,7 @@ describe('bus', () => {
         it('should return nearest bus stop', () => {
             const location = new location_1.Location({ latitude: 51.359261, longitude: -2.357102 });
             const expectedStopName = 'Foxhill House';
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             const busStops = new busStops_1.BusStops(data.busStops);
             const bus = new bus_1.Bus(0, location, busStops_1.BusRouteName.U2, busStops.getStopsWithRoute(busStops_1.BusRouteName.U2));
             chai_1.expect(bus.getNearestStop().name).to.equal(expectedStopName);
@@ -144,7 +144,7 @@ describe('bus', () => {
     describe('getStopsWithinRange', () => {
         let busStops;
         beforeEach(() => {
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             busStops = new busStops_1.BusStops(data.busStops);
         });
         it('should return stops within a given range (1 stop)', () => {
@@ -168,7 +168,7 @@ describe('bus', () => {
     describe('getNextBusStop', () => {
         let busStops;
         beforeEach(() => {
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             busStops = new busStops_1.BusStops(data.busStops);
         });
         it('should not have next bus stop from single location', () => {
@@ -233,7 +233,7 @@ describe('bus', () => {
     describe('getDistanceToStop', () => {
         let busStops;
         beforeEach(() => {
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             busStops = new busStops_1.BusStops(data.busStops);
         });
         it('should calculate the distance to a given bus stop, 3 stops away', () => {
@@ -254,7 +254,7 @@ describe('bus', () => {
     describe('getBusStopAfterStop', () => {
         let busStops;
         beforeEach(() => {
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             busStops = new busStops_1.BusStops(data.busStops);
         });
         it('should return the third stop, when the bus has passed the first and second', () => {
@@ -273,7 +273,7 @@ describe('bus', () => {
     describe('getNumberOfStopsUntilStop', () => {
         let busStops;
         beforeEach(() => {
-            const data = require('../../data.json');
+            const data = require('../data/busStops.json');
             busStops = new busStops_1.BusStops(data.busStops);
         });
         it('should throw an error when the bus has not established a route', () => {

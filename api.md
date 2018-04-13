@@ -401,7 +401,7 @@ This allows a client to send the capacity of a specific bus.
 # Group Bus Stop
 Group of all bus stop-related resources.
 
-## Bus stops [/busStops/]
+## Bus Stops [/busStops/]
 
 ### Request all Bus Stops [GET]
 Allows clients to get a list of all University bus stops in Bath.
@@ -516,3 +516,68 @@ Allows the client to receive data specific to a bus stop, including location and
         }
 ```
 
+# Group Bus Route
+Group of all bus-route related resources.
+
+## Bus Routes [/busRoutes/]
+
+### Request all Bus Routes [GET]
+Allows clients to view a list of all bus routes and their sections.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+
++ Response 200 (application/json)
+        
+    + Body
+```json
+        {
+            "status": "success",
+            "data": {
+                "busRoutes": [
+                    {
+                        "routeName": "U1",
+                        "sectionIds": [0, 1, 2, 3, 6]
+                    },
+                    {
+                        "routeName": "U2",
+                        "sectionIds": [1, 2, 4, 5, 6]
+                    }
+                ],
+                "sections": [
+                    {
+                        "sectionId": 0,
+                        "sectionDescription":"Start: Northparade; End: Roundabout",
+                        "positions": [
+                            {"latitude":51.380930,"longitude":-2.351281},
+                            {"latitude":51.379767,"longitude":-2.351213}
+                        ]
+                    },
+                    {
+                        "sectionId": 18,
+                        "sectionDescription":"Roundabout at bottomOfBathwickHill",
+                        "positions": [
+                            {"latitude":51.383982,"longitude":-2.351402},
+                            {"latitude":51.383982,"longitude":-2.351441}
+                        ]
+                    }
+                ]
+            }
+        }
+```
+
++ Response 503 (application/json)
+
+    + Body
+```json
+        {
+            "status": "failure",
+            "error": {
+                "code": 503,
+                "message": "Service Unavailable"
+            }
+        }
+```

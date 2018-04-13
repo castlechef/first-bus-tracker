@@ -116,12 +116,12 @@ describe('buses', () => {
     });
 
     describe('getExpectedArrivalsAtStop', () => {
-        const data: { busStops: IBusStop[] } = require('../../data.json');
+        const data: { busStops: IBusStop[] } = require('../data/busStops.json');
         const busStops = new BusStops(data.busStops);
         buses = new Buses(busStops);
 
         it('Should return arrival times of 2 buses', () => {
-            const data: { busStops: IBusStop[] } = require('../../data.json');
+            const data: { busStops: IBusStop[] } = require('../data/busStops.json');
             const busStops = new BusStops(data.busStops);
             const routeU2 = busStops.getStopsWithRoute(BusRouteName.U2);
             buses = new Buses(busStops);
