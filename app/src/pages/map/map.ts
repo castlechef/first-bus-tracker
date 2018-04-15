@@ -5,6 +5,7 @@ import {BusPage} from '../bus/bus';
 import {ServerProvider} from '../../providers/server-provider';
 import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus-route';
 import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover';
+import {} from 'googlemaps';
 
 
 /**
@@ -129,8 +130,9 @@ export class MapPage {
       position: latLng,
       title: 'Your Position',
       icon: {
-        scale: 5,
-        path: google.maps.SymbolPath.CIRCLE
+        url: '../assets/icon/userIcon.png',
+        anchor: new google.maps.Point(16,16),
+        scaledSize: new google.maps.Size(32,32)
       }
     });
 
@@ -163,8 +165,8 @@ export class MapPage {
       position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
       title: busStop.busStopName,
       icon: {
-        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-        scale: 3
+        url: '../assets/icon/busStop.png',
+        scaledSize: new google.maps.Size(42,42)
       }
     });
 
@@ -289,7 +291,11 @@ export class MapPage {
       let busMarker = new google.maps.Marker({
         map: this.map,
         position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
-        title: bus.routeName
+        title: bus.routeName,
+        icon: {
+          url: '../assets/icon/bus.png',
+          anchor: new google.maps.Point(32,50)
+        }
       });
       this.busMarkers.set(bus.busId, busMarker);
       google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
