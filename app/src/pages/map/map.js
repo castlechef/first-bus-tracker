@@ -148,6 +148,7 @@ var MapPage = (function () {
         var busStops = [];
         this.serverService.getBusStopLocations().then(function (data) {
             busStops = data;
+            busStops = busStops.data;
             for (var i = 0; i < busStops.length; i++) {
                 _this.addBusStop(busStops[i]);
             }

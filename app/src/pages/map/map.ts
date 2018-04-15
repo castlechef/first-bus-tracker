@@ -141,6 +141,7 @@ export class MapPage {
 
     this.serverService.getBusStopLocations().then(data => {
       busStops = data;
+      busStops = busStops.data;
       for (let i = 0; i < busStops.length; i++) {
         this.addBusStop(busStops[i]);
       }
