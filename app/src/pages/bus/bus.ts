@@ -67,6 +67,6 @@ export class BusPage {
   }
 
   private inputCapacity(number){
-    this.serverService.setCapacity(busId, capacities[number]);
+    this.serverService.setCapacity(this.busId, this.capacities[number]);
   }
 }

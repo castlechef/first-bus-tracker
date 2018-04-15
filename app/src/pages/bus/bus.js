@@ -65,7 +65,7 @@ var BusPage = (function () {
         });
     };
     BusPage.prototype.inputCapacity = function (number) {
-        this.serverService.setCapacity(busId, capacities[number]);
+        this.serverService.setCapacity(this.busId, this.capacities[number]);
     };
     BusPage = __decorate([
         IonicPage(),

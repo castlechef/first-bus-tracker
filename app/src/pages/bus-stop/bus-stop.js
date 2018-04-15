@@ -28,21 +28,30 @@ var BusStopPage = (function () {
         this.title = "Bus Stop";
         //navParams : stopId stopName
         this.title = navParams.get('stopName');
+        this.stopId = navParams.get('stopId');
         this.getBusStopData(navParams.get('stopId')).then(function (array) {
             _this.buses = array;
         }, function (rejected) {
             _this.buses = [];
             console.log(rejected);
-        }); /*[
-          { busRoute: 'U1', arrivalTime: "09:50", busId: 1},
-          { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}//oiihADXINA
-        ];*/
+        });
+        this.infoUpdater();
     }
     BusStopPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad' + this.navParams.get('stopId'));
     };
     BusStopPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
+    };
+    BusStopPage.prototype.infoUpdater = function () {
+        var _this = this;
+        setInterval(function () {
+            _this.getBusStopData(_this.stopId).then(function (stopInfo) {
+                _this.buses = stopInfo;
+            }, function (rejected) {
+                console.log(rejected);
+            });
+        }, 1000);
     };
     BusStopPage.prototype.getBusStopData = function (stopId) {
         var _this = this;
