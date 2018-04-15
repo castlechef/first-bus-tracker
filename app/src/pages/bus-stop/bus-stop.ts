@@ -18,21 +18,21 @@ import { ServerProvider} from '../../providers/server-provider';
 export class BusStopPage {
 
   public title = "Bus Stop";
+  private stopId;
 
   buses: Array<{routeName: string, arrivalTime: string, busId: number}>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController, public serverService: ServerProvider) {
     //navParams : stopId stopName
     this.title = navParams.get('stopName');
+    this.stopId = navParams.get('stopId');
     this.getBusStopData(navParams.get('stopId')).then( array =>{
       this.buses = array;
     }, rejected => {
       this.buses = [];
       console.log(rejected);
-    }); /*[
-      { busRoute: 'U1', arrivalTime: "09:50", busId: 1},
-      { busRoute: 'U1X', arrivalTime: "09:53", busId: 2}//oiihADXINA
-    ];*/
+    });
+    this.infoUpdater();
   }
 
   ionViewDidLoad() {
@@ -41,6 +41,16 @@ export class BusStopPage {
 
   closeModal(){
     this.viewctrl.dismiss();
+  }
+
+  private infoUpdater() {
+    setInterval(() => {
+      this.getBusStopData(this.stopId).then(stopInfo => {
+        this.buses = stopInfo;
+      }, rejected => {
+        console.log(rejected);
+      });
+    }, 1000)
   }
 
   private getBusStopData(stopId) : Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>{
