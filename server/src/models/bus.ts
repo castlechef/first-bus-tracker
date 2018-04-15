@@ -218,9 +218,7 @@ export class Bus implements JSONable {
             .reverse();
 
         const arrivalTimes = this.busStopArrivalTimes
-            .sort(({busStop: busStop1, arrivalTime: t1}, {busStop: busStop2, arrivalTime: t2}) => {
-                return t1 - t2;
-            })
+            .sort(({busStop: busStop1, arrivalTime: t1}, {busStop: busStop2, arrivalTime: t2}) => t1 > t2 ? 1 : -1)
             .filter(({busStop, arrivalTime}, index) => {
                 return index < Bus.NUMBER_OF_ARRIVAL_TIMES_TO_SEND
             })
