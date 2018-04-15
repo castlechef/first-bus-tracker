@@ -130,8 +130,9 @@ export class MapPage {
       position: latLng,
       title: 'Your Position',
       icon: {
-        scale: 5,
-        path: google.maps.SymbolPath.CIRCLE
+        url: '../assets/icon/userIcon.png',
+        anchor: new google.maps.Point(16,16),
+        scaledSize: new google.maps.Size(32,32)
       }
     });
 
@@ -292,7 +293,8 @@ export class MapPage {
         position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
         title: bus.routeName,
         icon: {
-          url: '../assets/icon/bus.png'
+          url: '../assets/icon/bus.png',
+          anchor: new google.maps.Point(32,50)
         }
       });
       this.busMarkers.set(bus.busId, busMarker);
