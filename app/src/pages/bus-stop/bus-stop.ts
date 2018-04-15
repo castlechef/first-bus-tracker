@@ -36,7 +36,7 @@ export class BusStopPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad BusStopPage');
+    console.log('ionViewDidLoad' + this.navParams.get('stopId'));
   }
 
   closeModal(){

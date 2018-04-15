@@ -33,7 +33,7 @@ var BusPage = (function () {
         });
     }
     BusPage.prototype.ionViewDidLoad = function () {
-        console.log('ionViewDidLoad BusPage');
+        console.log('ionViewDidLoad ' + this.nextBusStops);
     };
     BusPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
@@ -42,7 +42,8 @@ var BusPage = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this.serverService.getBusInfo(busId).then(function (data) {
-                resolve(data.expectedArrivals);
+                var gotten = data.arrivalTimes;
+                resolve(gotten);
             }, function (rejected) {
                 reject(rejected);
             });
