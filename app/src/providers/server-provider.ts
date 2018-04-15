@@ -68,4 +68,9 @@ export class ServerProvider {
       });
     })
   }
+
+  setCapacity(busId, capacity: string){
+    const url = '${this._url}buses/${busId}/capacity';
+    this.http.put<string>(url, capacity);
+  }
 }
