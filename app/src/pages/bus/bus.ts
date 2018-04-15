@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angular';
 import {ServerProvider} from '../../providers/server-provider';
-
+import { BusInfo } from '../../busInfo.interface';
 /**
  * Generated class for the BusPage page.
  *
@@ -17,17 +17,23 @@ import {ServerProvider} from '../../providers/server-provider';
 export class BusPage {
 
   public title = "Bus";
-
+  public busId;
   nextBusStops: Array<{busStopId: number, busStopsName: string, arrivalTime: string}>;
+
+  public capacity: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public serverService: ServerProvider) {
     this.title = navParams.get('routeName');
+    this.busId = navParams.get('busId');
     this.getBusInfo(navParams.get('busId')).then(busInfo =>{
-      this.nextBusStops = busInfo;
+      this.nextBusStops = busInfo.arrivalTimes;
+      this.capacity = busInfo.capacity;
     }, rejected => {
       console.log(rejected);
+      this.capacity = "UNKNOWN";
       this.nextBusStops = [];
     });
+    this.infoUpdater();
   }
 
   ionViewDidLoad() {
@@ -38,15 +44,24 @@ export class BusPage {
     this.viewctrl.dismiss();
   }
 
-  private getBusInfo(busId) : Promise<Array<{busStopId: number, busStopsName: string, arrivalTime: string}>>{
-    return new Promise<Array<{busStopId: number, busStopsName: string, arrivalTime: string}>>((resolve, reject) => {
+  private infoUpdater(){
+    setInterval(()=>{
+      this.getBusInfo(this.busId).then(busInfo =>{
+        this.nextBusStops = busInfo.arrivalTimes;
+        this.capacity = busInfo.capacity;
+      }, rejected => {
+        console.log(rejected);
+      });
+    }, 1000)
+  }
+
+  private getBusInfo(busId) : Promise<BusInfo>{
+    return new Promise<BusInfo>((resolve, reject) => {
       this.serverService.getBusInfo(busId).then(data=>{
-        let gotten = data.arrivalTimes;
-        resolve(gotten);
+        resolve(data);
       }, rejected =>{
         reject(rejected);
       });
     });
   }
-
 }

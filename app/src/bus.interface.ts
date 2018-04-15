@@ -1,8 +1,8 @@
 export interface Bus {
-      id: number,
-      locations: {
-        latitude: number,
-        longitude: number
-      },
-      routeName: string
+  id: number,
+  locations: {
+    latitude: number,
+    longitude: number
+  },
+  routeName: string
 }

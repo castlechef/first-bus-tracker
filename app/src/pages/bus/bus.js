@@ -25,12 +25,16 @@ var BusPage = (function () {
         this.serverService = serverService;
         this.title = "Bus";
         this.title = navParams.get('routeName');
+        this.busId = navParams.get('busId');
         this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
-            _this.nextBusStops = busInfo;
+            _this.nextBusStops = busInfo.arrivalTimes;
+            _this.capacity = busInfo.capacity;
         }, function (rejected) {
             console.log(rejected);
+            _this.capacity = "UNKNOWN";
             _this.nextBusStops = [];
         });
+        this.infoUpdater();
     }
     BusPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad ' + this.nextBusStops);
@@ -38,12 +42,22 @@ var BusPage = (function () {
     BusPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
     };
+    BusPage.prototype.infoUpdater = function () {
+        var _this = this;
+        setInterval(function () {
+            _this.getBusInfo(_this.busId).then(function (busInfo) {
+                _this.nextBusStops = busInfo.arrivalTimes;
+                _this.capacity = busInfo.capacity;
+            }, function (rejected) {
+                console.log(rejected);
+            });
+        }, 1000);
+    };
     BusPage.prototype.getBusInfo = function (busId) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this.serverService.getBusInfo(busId).then(function (data) {
-                var gotten = data.arrivalTimes;
-                resolve(gotten);
+                resolve(data);
             }, function (rejected) {
                 reject(rejected);
             });
