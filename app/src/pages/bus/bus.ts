@@ -18,7 +18,7 @@ export class BusPage {
 
   public title = "Bus";
 
-  nextBusStops: Array<{busStopId: number, busStopName: string, arrivalTime: string}>;
+  nextBusStops: Array<{busStopId: number, busStopsName: string, arrivalTime: string}>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public serverService: ServerProvider) {
     this.title = navParams.get('routeName');
@@ -31,17 +31,18 @@ export class BusPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad BusPage');
+    console.log('ionViewDidLoad ' + this.nextBusStops);
   }
 
   closeModal(){
     this.viewctrl.dismiss();
   }
 
-  private getBusInfo(busId) : Promise<Array<{busStopId: number, busStopName: string, arrivalTime: string}>>{
-    return new Promise<Array<{busStopId: number, busStopName: string, arrivalTime: string}>>((resolve, reject) => {
+  private getBusInfo(busId) : Promise<Array<{busStopId: number, busStopsName: string, arrivalTime: string}>>{
+    return new Promise<Array<{busStopId: number, busStopsName: string, arrivalTime: string}>>((resolve, reject) => {
       this.serverService.getBusInfo(busId).then(data=>{
-        resolve(data.expectedArrivals);
+        let gotten = data.arrivalTimes;
+        resolve(gotten);
       }, rejected =>{
         reject(rejected);
       });

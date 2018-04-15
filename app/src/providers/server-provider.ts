@@ -39,7 +39,7 @@ export class ServerProvider {
   getBusInfo(number): Promise<BusInfo>{
     return new Promise<BusInfo>((resolve, reject) => {
       const subscription = this.http.get<BusInfo>(this._url.concat('buses/' + number)).catch(e => {console.log(e); reject(e); return Observable.of(e);}).subscribe( data => {
-        resolve(data.data);
+        resolve(data);
         subscription.unsubscribe();
       });
     })
