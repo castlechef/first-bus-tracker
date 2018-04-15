@@ -23,7 +23,11 @@ var ServerProvider = (function () {
     ServerProvider.prototype.getBusLocations = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('buses')).catch(function (e) { console.log(e); reject(e); return Observable.of(e); }).subscribe(function (data) {
+            var subscription = _this.http.get(_this._url.concat('buses')).catch(function (e) {
+                console.log(e);
+                reject(e);
+                return Observable.of(e);
+            }).subscribe(function (data) {
                 resolve(data.data);
                 subscription.unsubscribe();
             });
@@ -32,7 +36,11 @@ var ServerProvider = (function () {
     ServerProvider.prototype.getBusStopLocations = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('busStops')).catch(function (e) { console.log(e); reject(e); return Observable.of(e); }).subscribe(function (data) {
+            var subscription = _this.http.get(_this._url.concat('busStops')).catch(function (e) {
+                console.log(e);
+                reject(e);
+                return Observable.of(e);
+            }).subscribe(function (data) {
                 resolve(data);
                 subscription.unsubscribe();
             });
@@ -41,16 +49,25 @@ var ServerProvider = (function () {
     ServerProvider.prototype.getBusInfo = function (number) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('buses/' + number)).catch(function (e) { console.log(e); reject(e); return Observable.of(e); }).subscribe(function (data) {
-                resolve(data);
-                subscription.unsubscribe();
+            var subscription = _this.http
+                .get(_this._url.concat('buses/' + number))
+                .toPromise()
+                .then(function (body) {
+                resolve(body.data);
+            })
+                .catch(function (e) {
+                reject(e);
             });
         });
     };
     ServerProvider.prototype.getStopInfo = function (number) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(function (e) { console.log(e); reject(e); return Observable.of(e); }).subscribe(function (data) {
+            var subscription = _this.http.get(_this._url.concat('busStops/' + number)).catch(function (e) {
+                console.log(e);
+                reject(e);
+                return Observable.of(e);
+            }).subscribe(function (data) {
                 resolve(data);
                 subscription.unsubscribe();
             });

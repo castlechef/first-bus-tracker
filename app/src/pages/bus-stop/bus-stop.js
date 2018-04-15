@@ -39,7 +39,6 @@ var BusStopPage = (function () {
         ];*/
     }
     BusStopPage.prototype.ionViewDidLoad = function () {
-        console.log('ionViewDidLoad BusStopPage');
         console.log('ionViewDidLoad' + this.navParams.get('stopId'));
     };
     BusStopPage.prototype.closeModal = function () {

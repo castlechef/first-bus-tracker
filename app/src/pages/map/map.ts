@@ -16,6 +16,8 @@ import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus
  */
 declare var google;
 
+
+
 @IonicPage()
 @Component({
   selector: 'page-map',
