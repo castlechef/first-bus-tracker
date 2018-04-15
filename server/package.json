@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node ./src/server",
-    "start-dummy-bus": "node ./src/bus_bots/busBot --bus-route=U2 --mph=40",
+    "start-dummy-bus": "node ./src/bus_bots/busBot --bus-route=U2 --mph=40 --interval=1000",
     "test": "mocha --require ts-node/register  'src/**/*.spec.ts'"
   },
   "author": "",

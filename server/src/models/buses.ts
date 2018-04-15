@@ -66,9 +66,13 @@ export class Buses implements JSONable {
     }
 
     public getExpectedArrivalsAtStop(busStop: BusStop): BusArrival[] {
-        return this.buses
+        let a = this.buses
             .filter(b => b.hasStopPredictionReadyForStop(busStop))
-            .map(b => {return {bus: b, arrivalTime: b.getPredictedArrival(busStop)}});
+            .map(b => {return {bus: b, arrivalTime: b.getPredictedArrival(busStop)}})
+            .sort((b1, b2) => b1.arrivalTime > b2.arrivalTime ? 1 : -1);
+        a.forEach(({arrivalTime}) => console.log('arrival time: ' + arrivalTime));
+
+        return a;
     }
 
 

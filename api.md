@@ -479,7 +479,8 @@ Allows clients to get a list of all University bus stops in Bath.
     + busStopId (number) - a unique identifier for a specific bus stop.
 
 ### Request a specific bus stop [GET]
-Allows the client to receive data specific to a bus stop, including location and arrival times for nearby buses.
+Allows the client to receive data specific to a bus stop, including location
+and arrival times for nearby buses, sorted in ascending order of arrival time.
 
 + Request (application/json)
 
