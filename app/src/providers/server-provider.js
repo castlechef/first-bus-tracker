@@ -70,6 +70,10 @@ var ServerProvider = (function () {
             });
         });
     };
+    ServerProvider.prototype.setCapacity = function (busId, capacity) {
+        var url = '${this._url}buses/${busId}/capacity';
+        this.http.put(url, capacity);
+    };
     ServerProvider = __decorate([
         Injectable(),
         __metadata("design:paramtypes", [HttpClient])

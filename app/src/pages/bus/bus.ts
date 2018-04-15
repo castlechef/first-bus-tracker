@@ -18,14 +18,15 @@ export class BusPage {
 
   public title = "Bus";
   public busId;
-  nextBusStops: Array<{busStopId: number, busStopsName: string, arrivalTime: string}>;
+  private capacities = ["UNKNOWN", "EMPTY", "QUIET", "BUSY", "FULL"];
+  nextBusStops: Array<{ busStopId: number, busStopsName: string, arrivalTime: string }>;
 
   public capacity: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public serverService: ServerProvider) {
     this.title = navParams.get('routeName');
     this.busId = navParams.get('busId');
-    this.getBusInfo(navParams.get('busId')).then(busInfo =>{
+    this.getBusInfo(navParams.get('busId')).then(busInfo => {
       this.nextBusStops = busInfo.arrivalTimes;
       this.capacity = busInfo.capacity;
     }, rejected => {
@@ -40,13 +41,13 @@ export class BusPage {
     console.log('ionViewDidLoad ' + this.nextBusStops);
   }
 
-  closeModal(){
+  closeModal() {
     this.viewctrl.dismiss();
   }
 
-  private infoUpdater(){
-    setInterval(()=>{
-      this.getBusInfo(this.busId).then(busInfo =>{
+  private infoUpdater() {
+    setInterval(() => {
+      this.getBusInfo(this.busId).then(busInfo => {
         this.nextBusStops = busInfo.arrivalTimes;
         this.capacity = busInfo.capacity;
       }, rejected => {
@@ -55,13 +56,17 @@ export class BusPage {
     }, 1000)
   }
 
-  private getBusInfo(busId) : Promise<BusInfo>{
+  private getBusInfo(busId): Promise<BusInfo> {
     return new Promise<BusInfo>((resolve, reject) => {
-      this.serverService.getBusInfo(busId).then(data=>{
+      this.serverService.getBusInfo(busId).then(data => {
         resolve(data);
-      }, rejected =>{
+      }, rejected => {
         reject(rejected);
       });
     });
+  }
+
+  private inputCapacity(number){
+    this.serverService.setCapacity(busId, capacities[number]);
   }
 }

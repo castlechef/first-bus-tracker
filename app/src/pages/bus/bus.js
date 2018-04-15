@@ -24,6 +24,7 @@ var BusPage = (function () {
         this.viewctrl = viewctrl;
         this.serverService = serverService;
         this.title = "Bus";
+        this.capacities = ["UNKNOWN", "EMPTY", "QUIET", "BUSY", "FULL"];
         this.title = navParams.get('routeName');
         this.busId = navParams.get('busId');
         this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
@@ -62,6 +63,9 @@ var BusPage = (function () {
                 reject(rejected);
             });
         });
+    };
+    BusPage.prototype.inputCapacity = function (number) {
+        this.serverService.setCapacity(busId, capacities[number]);
     };
     BusPage = __decorate([
         IonicPage(),
