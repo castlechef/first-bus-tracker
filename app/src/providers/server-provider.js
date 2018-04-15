@@ -42,7 +42,7 @@ var ServerProvider = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var subscription = _this.http.get(_this._url.concat('buses/' + number)).catch(function (e) { console.log(e); reject(e); return Observable.of(e); }).subscribe(function (data) {
-                resolve(data.data);
+                resolve(data);
                 subscription.unsubscribe();
             });
         });
