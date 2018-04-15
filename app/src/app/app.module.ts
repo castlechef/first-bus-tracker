@@ -15,6 +15,7 @@ import { MapPage } from '../pages/map/map';
 import { Geolocation } from '@ionic-native/geolocation';
 import {BusStopPage} from '../pages/bus-stop/bus-stop';
 import {BusPage} from '../pages/bus/bus';
+import { BusRouteProvider } from '../providers/bus-route/bus-route';
 
 @NgModule({
   declarations: [
@@ -45,8 +46,8 @@ import {BusPage} from '../pages/bus/bus';
     HttpClientModule,
     ServerProvider,
     Geolocation,
-    { provide: ErrorHandler, useClass: IonicErrorHandler }
-
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
+    BusRouteProvider
   ]
 })
 export class AppModule { }

@@ -540,11 +540,13 @@ Allows clients to view a list of all bus routes and their sections.
                 "busRoutes": [
                     {
                         "routeName": "U1",
-                        "sectionIds": [0, 1, 2, 3, 6]
+                        "sectionsUsed": [0, 1, 2, 3, 6],
+                        "order": [0, 1, 2, 3, -6, -2, -1]
                     },
                     {
                         "routeName": "U2",
-                        "sectionIds": [1, 2, 4, 5, 6]
+                        "sectionsUsed": [1, 2, 4, 5, 6],
+                        "order": [0, 1, 2, 4, -6, -2, -1]
                     }
                 ],
                 "sections": [

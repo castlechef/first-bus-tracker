@@ -18,6 +18,7 @@ import { MapPage } from '../pages/map/map';
 import { Geolocation } from '@ionic-native/geolocation';
 import { BusStopPage } from '../pages/bus-stop/bus-stop';
 import { BusPage } from '../pages/bus/bus';
+import { BusRouteProvider } from '../providers/bus-route/bus-route';
 var AppModule = (function () {
     function AppModule() {
     }
@@ -51,7 +52,8 @@ var AppModule = (function () {
                 HttpClientModule,
                 ServerProvider,
                 Geolocation,
-                { provide: ErrorHandler, useClass: IonicErrorHandler }
+                { provide: ErrorHandler, useClass: IonicErrorHandler },
+                BusRouteProvider
             ]
         })
     ], AppModule);
