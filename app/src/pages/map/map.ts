@@ -167,7 +167,7 @@ export class MapPage {
 
   //Opens a bus stop page with the details of the bus stop
   private openBusStopPage(busStopId, busStopName) {
-    let tryModal = this.modalctrl.create(BusStopPage, {stopID: busStopId, stopName: busStopName});
+    let tryModal = this.modalctrl.create(BusStopPage, {stopId: busStopId, stopName: busStopName});
     tryModal.present();
   }
 

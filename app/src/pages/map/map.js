@@ -174,7 +174,7 @@ var MapPage = (function () {
     };
     //Opens a bus stop page with the details of the bus stop
     MapPage.prototype.openBusStopPage = function (busStopId, busStopName) {
-        var tryModal = this.modalctrl.create(BusStopPage, { stopID: busStopId, stopName: busStopName });
+        var tryModal = this.modalctrl.create(BusStopPage, { stopId: busStopId, stopName: busStopName });
         tryModal.present();
     };
     //Adds the bus routes from the default routes (Future: Communicate with server to obtain the routes)
