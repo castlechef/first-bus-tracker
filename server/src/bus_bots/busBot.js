@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const busStops_1 = require("../models/busStops");
 const utils_1 = require("../utils/utils");
+const location_1 = require("../models/location");
 const rp = require("request-promise");
 var randomBetweenNumbers = utils_1.Utils.Numeric.randomBetweenNumbers;
 class BusBot {
@@ -14,10 +15,31 @@ class BusBot {
         this.routeName = routeName;
         const data = require('../data/busStops.json');
         const busStops = new busStops_1.BusStops(data.busStops);
-        this.routeStops = busStops.getStopsWithRoute(routeName);
-        if (this.routeStops.length < 2)
-            throw new Error('Bus route must have at least 2 stops');
-        this.nextBusStopIndex = Math.floor(randomBetweenNumbers(0, this.routeStops.length));
+        //this.routeStops = busStops.getStopsWithRoute(routeName);
+        this.waypoints = this.getPointsOfRoute();
+        //if (this.routeStops.length < 2) throw new Error('Bus route must have at least 2 stops');
+        this.waypointIndex = Math.floor(randomBetweenNumbers(0, this.waypoints.length));
+        console.log('Total route length: ' + location_1.Location.distanceBetweenN(this.waypoints));
+    }
+    getPointsOfRoute() {
+        const { busRoutes, sections } = require('../data/busRoutes.json');
+        if (!busRoutes.some(busRoute => busRoute.busRouteName === this.routeName))
+            throw new Error('Route not found');
+        const busRoute = busRoutes.find(r => r.busRouteName === this.routeName);
+        function getPositionsFromSectionId(id) {
+            //console.log('getting positions from section id ' + id);
+            if (id < 0)
+                return getPositionsFromSectionId(-id).reverse();
+            const section = sections.find(section => section.sectionId === id);
+            //console.log(section);
+            return section.positions.map(l => new location_1.Location(l));
+        }
+        let positionList = [];
+        busRoute.order.forEach(id => {
+            let points = getPositionsFromSectionId(id);
+            points.forEach(point => positionList.push(point));
+        });
+        return positionList;
     }
     async startFollowing() {
         const nextLocation = this.getNextLocation();
@@ -36,8 +58,8 @@ class BusBot {
         try {
             const data = await rp(options);
             this.busId = data.data.busId;
-            console.log('Post successful!');
-            console.log(data.data);
+            //console.log('Post successful!');
+            //console.log(data.data);
         }
         catch (e) {
             console.log('Error!!', e.message);
@@ -73,8 +95,8 @@ class BusBot {
         };
         try {
             const data = await rp(options);
-            console.log('Put successful!');
-            console.log(data.data);
+            //console.log('Put successful!');
+            //console.log(data.data);
         }
         catch (e) {
             console.log('Error!!', e.message);
@@ -83,22 +105,22 @@ class BusBot {
     }
     move() {
         let distanceToMove = (this.speed * this.milliseconds) / 1000; //this.distancePerMove;
-        console.log('distanceToMove', distanceToMove);
-        console.log(this.speed, this.milliseconds);
-        let distanceToNextStop = this.peakNextLocation().distanceFrom(this.currentLocation);
-        while (distanceToMove > distanceToNextStop) {
-            distanceToMove -= distanceToNextStop;
+        //console.log('distanceToMove',distanceToMove);
+        //console.log(this.speed,this.milliseconds);
+        let distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
+        while (distanceToMove > distanceToNextPosition) {
+            distanceToMove -= distanceToNextPosition;
             this.currentLocation = this.getNextLocation();
-            distanceToNextStop = this.peakNextLocation().distanceFrom(this.currentLocation);
+            distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
         }
         this.currentLocation = this.currentLocation.moveInDirectionOf(this.peakNextLocation(), distanceToMove);
     }
     peakNextLocation() {
-        return this.routeStops[this.nextBusStopIndex].location;
+        return this.waypoints[this.waypointIndex];
     }
     getNextLocation() {
         const location = this.peakNextLocation();
-        this.nextBusStopIndex = (this.nextBusStopIndex + 1) % this.routeStops.length;
+        this.waypointIndex = (this.waypointIndex + 1) % this.waypoints.length;
         return location;
     }
     stopFollowing() {
@@ -124,7 +146,7 @@ function dashedToCamelCase(dashed) {
 function dashedToSpaced(dashed) {
     return dashed.split('-').join(' ');
 }
-const { busRoute, interval = 1000, mph = '25' } = getOptionsFromArray(process.argv.slice(2));
+const { busRoute, interval = 100, mph = '25' } = getOptionsFromArray(process.argv.slice(2));
 console.log('mph', mph);
 const b = new BusBot(busRoute, parseInt(mph), interval);
 b.startFollowing().then(() => {

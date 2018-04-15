@@ -8,14 +8,15 @@ import Timer = NodeJS.Timer;
 
 export class BusBot {
     private routeName: BusRouteName;
-    private routeStops: BusStop[];
-    private nextBusStopIndex: number;
+    //private routeStops: BusStop[];
+    private waypointIndex: number;
     private interval: Timer;
     private busId: number;
     private distancePerMove = 30; //metres
     private currentLocation: Location;
     private speed: number;
     private milliseconds: number;
+    private waypoints: Location[];
 
     constructor(routeName: BusRouteName, mph: number | string, milliseconds: number) {
         if (typeof milliseconds === 'string') milliseconds = parseInt(milliseconds);
@@ -24,9 +25,31 @@ export class BusBot {
         this.routeName = routeName;
         const data: { busStops: IBusStop[] } = require('../data/busStops.json');
         const busStops = new BusStops(data.busStops);
-        this.routeStops = busStops.getStopsWithRoute(routeName);
-        if (this.routeStops.length < 2) throw new Error('Bus route must have at least 2 stops');
-        this.nextBusStopIndex = Math.floor(randomBetweenNumbers(0, this.routeStops.length));
+        //this.routeStops = busStops.getStopsWithRoute(routeName);
+        this.waypoints = this.getPointsOfRoute();
+        //if (this.routeStops.length < 2) throw new Error('Bus route must have at least 2 stops');
+        this.waypointIndex = Math.floor(randomBetweenNumbers(0, this.waypoints.length));
+        console.log('Total route length: ' + Location.distanceBetweenN(this.waypoints));
+    }
+
+    private getPointsOfRoute(): Location[] {
+        const {busRoutes, sections} = require('../data/busRoutes.json');
+        if (!busRoutes.some(busRoute => busRoute.busRouteName === this.routeName)) throw new Error('Route not found');
+        const busRoute = busRoutes.find(r => r.busRouteName === this.routeName);
+        function getPositionsFromSectionId(id: number): Location[] {
+            //console.log('getting positions from section id ' + id);
+            if (id < 0) return getPositionsFromSectionId(-id).reverse();
+            const section = sections.find(section => section.sectionId === id);
+            //console.log(section);
+            return section.positions.map(l => new Location(l));
+        }
+
+        let positionList = [];
+        busRoute.order.forEach(id => {
+            let points = getPositionsFromSectionId(id);
+            points.forEach(point => positionList.push(point));
+        });
+        return positionList;
     }
 
     public async startFollowing(): Promise<void> {
@@ -46,8 +69,8 @@ export class BusBot {
         try {
             const data = await rp(options);
             this.busId = data.data.busId;
-            console.log('Post successful!');
-            console.log(data.data);
+            //console.log('Post successful!');
+            //console.log(data.data);
         } catch (e) {
             console.log('Error!!', e.message);
             throw new Error('Cannot start following :(');
@@ -84,8 +107,8 @@ export class BusBot {
         };
         try {
             const data = await rp(options);
-            console.log('Put successful!');
-            console.log(data.data);
+            //console.log('Put successful!');
+            //console.log(data.data);
         } catch (e) {
             console.log('Error!!', e.message);
             throw new Error('Cannot PUT :(');
@@ -95,24 +118,24 @@ export class BusBot {
 
     private move(): void {
         let distanceToMove: number = (this.speed * this.milliseconds) / 1000;//this.distancePerMove;
-        console.log('distanceToMove',distanceToMove);
-        console.log(this.speed,this.milliseconds);
-        let distanceToNextStop: number = this.peakNextLocation().distanceFrom(this.currentLocation);
-        while (distanceToMove > distanceToNextStop) {
-            distanceToMove -= distanceToNextStop;
+        //console.log('distanceToMove',distanceToMove);
+        //console.log(this.speed,this.milliseconds);
+        let distanceToNextPosition: number = this.peakNextLocation().distanceFrom(this.currentLocation);
+        while (distanceToMove > distanceToNextPosition) {
+            distanceToMove -= distanceToNextPosition;
             this.currentLocation = this.getNextLocation();
-            distanceToNextStop = this.peakNextLocation().distanceFrom(this.currentLocation);
+            distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
         }
         this.currentLocation = this.currentLocation.moveInDirectionOf(this.peakNextLocation(), distanceToMove);
     }
 
     private peakNextLocation(): Location {
-        return this.routeStops[this.nextBusStopIndex].location;
+        return this.waypoints[this.waypointIndex];
     }
 
     private getNextLocation(): Location {
         const location: Location = this.peakNextLocation();
-        this.nextBusStopIndex = (this.nextBusStopIndex + 1) % this.routeStops.length;
+        this.waypointIndex = (this.waypointIndex + 1) % this.waypoints.length;
         return location;
     }
 
@@ -144,7 +167,7 @@ function dashedToSpaced(dashed: string): string {
     return dashed.split('-').join(' ');
 }
 
-const {busRoute, interval = 1000, mph = '25'} = getOptionsFromArray(process.argv.slice(2));
+const {busRoute, interval = 100, mph = '25'} = getOptionsFromArray(process.argv.slice(2));
 console.log('mph', mph);
 
 const b = new BusBot(busRoute, parseInt(mph), interval);
