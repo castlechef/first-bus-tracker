@@ -48,7 +48,7 @@ var BusStopPage = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this.serverService.getStopInfo(stopId).then(function (data) {
-                resolve(data.data.arrivals);
+                resolve(data.arrivals);
             }, function (rejected) {
                 reject(rejected);
             });

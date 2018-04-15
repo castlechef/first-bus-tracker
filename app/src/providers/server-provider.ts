@@ -1,7 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Bus} from '../bus.interface';
-import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
@@ -21,33 +20,31 @@ export class ServerProvider {
   // gets buses data and maps it to the observable Bus
   getBusLocations(): Promise<Array<Bus>> {
     return new Promise<Array<Bus>>((resolve, reject) => {
-      const subscription = this.http.get<Bus[]>(this._url.concat('buses')).catch(e => {
-        console.log(e);
+      this.http
+        .get<any>(this._url.concat('buses'))
+        .toPromise().then(body => {
+        resolve(body.data);
+      }).catch(e => {
         reject(e);
-        return Observable.of(e);
-      }).subscribe(data => {
-        resolve(data.data);
-        subscription.unsubscribe();
       });
     })
   }
 
   getBusStopLocations(): Promise<Stop[]> {
     return new Promise<Stop[]>((resolve, reject) => {
-      const subscription = this.http.get<Stop[]>(this._url.concat('busStops')).catch(e => {
-        console.log(e);
+      this.http
+        .get<any>(this._url.concat('busStops'))
+        .toPromise().then(body => {
+        resolve(body.data);
+      }).catch(e => {
         reject(e);
-        return Observable.of(e);
-      }).subscribe(data => {
-        resolve(data);
-        subscription.unsubscribe();
       });
     })
   }
 
   getBusInfo(number): Promise<BusInfo> {
     return new Promise<BusInfo>((resolve, reject) => {
-      const subscription = this.http
+      this.http
         .get<any>(this._url.concat('buses/' + number))
         .toPromise()
         .then(body => {
@@ -61,13 +58,13 @@ export class ServerProvider {
 
   getStopInfo(number): Promise<StopInfo> {
     return new Promise<StopInfo>((resolve, reject) => {
-      const subscription = this.http.get<StopInfo>(this._url.concat('busStops/' + number)).catch(e => {
-        console.log(e);
+      this.http
+        .get<any>(this._url.concat('busStops/' + number))
+        .toPromise()
+        .then(body => {
+          resolve(body.data);
+        }).catch(e => {
         reject(e);
-        return Observable.of(e);
-      }).subscribe(data => {
-        resolve(data);
-        subscription.unsubscribe();
       });
     })
   }

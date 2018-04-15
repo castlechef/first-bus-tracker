@@ -46,7 +46,7 @@ export class BusStopPage {
   private getBusStopData(stopId) : Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>{
     return new Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>((resolve, reject)=>{
       this.serverService.getStopInfo(stopId).then(data=>{
-        resolve(data.data.arrivals);
+        resolve(data.arrivals);
       }, rejected => {
         reject(rejected);
       });
