@@ -348,7 +348,13 @@ export class MapPage {
 
   public async updateBusRouteBeingUsed() {
     if (!this.routeStates) {
-      const busRoutes = await this.busRouteProvider.getBusRoutes();
+      let busRoutes;
+      try {
+        busRoutes = await this.busRouteProvider.getBusRoutes();
+      } catch(err) {
+        console.log('Can\'t get busRoutes', err);
+        return
+      }
       const busRouteNames = busRoutes.map(({busRouteName}) => busRouteName);
       this.routeStates = busRouteNames.map(busRouteName => ({busRouteName, active: true}));
     }
