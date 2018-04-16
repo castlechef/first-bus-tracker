@@ -382,21 +382,31 @@ var MapPage = (function () {
     };
     MapPage.prototype.updateBusRouteBeingUsed = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var busRoutes, busRouteNames;
+            var busRoutes, err_1, busRouteNames;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!!this.routeStates) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                        if (!!this.routeStates) return [3 /*break*/, 5];
+                        busRoutes = void 0;
+                        _a.label = 1;
                     case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                    case 2:
                         busRoutes = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_1 = _a.sent();
+                        console.log('Can\'t get busRoutes', err_1);
+                        return [2 /*return*/];
+                    case 4:
                         busRouteNames = busRoutes.map(function (_a) {
                             var busRouteName = _a.busRouteName;
                             return busRouteName;
                         });
                         this.routeStates = busRouteNames.map(function (busRouteName) { return ({ busRouteName: busRouteName, active: true }); });
-                        _a.label = 2;
-                    case 2:
+                        _a.label = 5;
+                    case 5:
                         this.addBusStops();
                         this.addBusRoutes();
                         this.addBuses();
@@ -414,21 +424,31 @@ var MapPage = (function () {
     };
     MapPage.prototype.presentOptionsPopover = function (event) {
         return __awaiter(this, void 0, void 0, function () {
-            var busRoutes, busRouteNames, popover;
+            var busRoutes, err_2, busRouteNames, popover;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!!this.routeStates) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                        if (!!this.routeStates) return [3 /*break*/, 5];
+                        busRoutes = void 0;
+                        _a.label = 1;
                     case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                    case 2:
                         busRoutes = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_2 = _a.sent();
+                        console.log("Can't get bus routes", err_2);
+                        return [2 /*return*/];
+                    case 4:
                         busRouteNames = busRoutes.map(function (_a) {
                             var busRouteName = _a.busRouteName;
                             return busRouteName;
                         });
                         this.routeStates = busRouteNames.map(function (busRouteName) { return ({ busRouteName: busRouteName, active: true }); });
-                        _a.label = 2;
-                    case 2:
+                        _a.label = 5;
+                    case 5:
                         popover = this.popoverCtrl.create(MapOptionsPopoverPage, {
                             mapPage: this
                         });

@@ -377,7 +377,13 @@ export class MapPage {
 
   private async presentOptionsPopover(event: UIEvent) {
     if (!this.routeStates) {
-      const busRoutes = await this.busRouteProvider.getBusRoutes();
+      let busRoutes;
+      try{
+        busRoutes = await this.busRouteProvider.getBusRoutes();
+      } catch (err) {
+        console.log("Can't get bus routes", err);
+        return
+      }
       const busRouteNames = busRoutes.map(({busRouteName}) => busRouteName);
       this.routeStates = busRouteNames.map(busRouteName => ({busRouteName, active: true}));
     }

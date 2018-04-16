@@ -29,7 +29,8 @@ var BusRouteProvider = (function () {
                 resolve(_this.busRoutes);
             })
                 .catch(function (err) {
-                reject();
+                console.log("Error in getBusRoutes", err);
+                reject(err);
             });
         });
     };
@@ -41,7 +42,8 @@ var BusRouteProvider = (function () {
                 resolve(_this.sections);
             })
                 .catch(function (err) {
-                reject();
+                console.log("Error in getSections", err);
+                reject(err);
             });
         });
     };
@@ -68,7 +70,8 @@ var BusRouteProvider = (function () {
                     reject();
                 }
             }).catch(function (error) {
-                reject();
+                console.log("error in updateDataFromServer", error);
+                reject(error);
             });
         });
     };
