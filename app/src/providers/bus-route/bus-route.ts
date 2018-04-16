@@ -27,7 +27,8 @@ export class BusRouteProvider {
           resolve(this.busRoutes);
         })
         .catch(err => {
-          reject();
+          console.log("Error in getBusRoutes", err);
+          reject(err);
         });
     });
   }
@@ -39,7 +40,8 @@ export class BusRouteProvider {
           resolve(this.sections);
         })
         .catch(err => {
-          reject();
+          console.log("Error in getSections", err);
+          reject(err);
         });
     });
   }
@@ -65,7 +67,8 @@ export class BusRouteProvider {
           reject();
         }
       }).catch(error => {
-        reject();
+        console.log("error in updateDataFromServer", error);
+        reject(error);
       });
     });
   }
