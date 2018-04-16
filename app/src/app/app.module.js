@@ -19,6 +19,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { BusStopPage } from '../pages/bus-stop/bus-stop';
 import { BusPage } from '../pages/bus/bus';
 import { BusRouteProvider } from '../providers/bus-route/bus-route';
+import { MapOptionsPopoverPage } from '../pages/map-options-popover/map-options-popover';
 var AppModule = (function () {
     function AppModule() {
     }
@@ -29,12 +30,13 @@ var AppModule = (function () {
                 Page1,
                 MapPage,
                 BusStopPage,
-                BusPage
+                BusPage,
+                MapOptionsPopoverPage
             ],
             imports: [
                 BrowserModule,
                 IonicModule.forRoot(MyApp, {}, { links: [] }),
-                HttpClientModule,
+                HttpClientModule
             ],
             bootstrap: [IonicApp],
             entryComponents: [
@@ -42,7 +44,8 @@ var AppModule = (function () {
                 Page1,
                 MapPage,
                 BusStopPage,
-                BusPage
+                BusPage,
+                MapOptionsPopoverPage
             ],
             providers: [
                 StatusBar,
