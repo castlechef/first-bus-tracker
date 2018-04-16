@@ -69,8 +69,14 @@ export class ServerProvider {
     })
   }
 
-  setCapacity(busId, capacity: string){
-    const url = '${this._url}buses/${busId}/capacity';
-    this.http.put<string>(url, capacity);
+  setCapacity(busId, capacity){
+    console.log("attempting to set capacity:", capacity, "bus id:", busId);
+    const url = this._url.concat('buses/',busId ,'/capacity');
+    console.log(url);
+    this.http.put<any>(url, capacity).toPromise().then(body=>{
+      console.log(body);
+    }, error=>{
+      console.log("This didn't work:" , error);
+    });
   }
 }

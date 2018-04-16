@@ -71,8 +71,14 @@ var ServerProvider = (function () {
         });
     };
     ServerProvider.prototype.setCapacity = function (busId, capacity) {
-        var url = '${this._url}buses/${busId}/capacity';
-        this.http.put(url, capacity);
+        console.log("attempting to set capacity:", capacity, "bus id:", busId);
+        var url = this._url.concat('buses/', busId, '/capacity');
+        console.log(url);
+        this.http.put(url, capacity).toPromise().then(function (body) {
+            console.log(body);
+        }, function (error) {
+            console.log("This didn't work:", error);
+        });
     };
     ServerProvider = __decorate([
         Injectable(),

@@ -24,7 +24,28 @@ var BusPage = (function () {
         this.viewctrl = viewctrl;
         this.serverService = serverService;
         this.title = "Bus";
-        this.capacities = ["UNKNOWN", "EMPTY", "QUIET", "BUSY", "FULL"];
+        this.capacities = [{
+                "data": {
+                    "capacity": "UNKNOWN"
+                }
+            }, {
+                "data": {
+                    "capacity": "EMPTY"
+                }
+            }, {
+                "data": {
+                    "capacity": "QUIET"
+                }
+            }, {
+                "data": {
+                    "capacity": "BUSY"
+                }
+            }, {
+                "data": {
+                    "capacity": "FULL"
+                }
+            }];
+        this.capacityInput = true;
         this.title = navParams.get('routeName');
         this.busId = navParams.get('busId');
         this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
@@ -65,7 +86,11 @@ var BusPage = (function () {
         });
     };
     BusPage.prototype.inputCapacity = function (number) {
+        this.capacity = this.capacities[number].data.capacity;
         this.serverService.setCapacity(this.busId, this.capacities[number]);
+    };
+    BusPage.prototype.closeCapacity = function () {
+        this.capacityInput = false;
     };
     BusPage = __decorate([
         IonicPage(),

@@ -29,5 +29,20 @@
       {{stop.arrivalTime}}
     </button>
   </ion-list>
-  <div class="capacity" style="display: None">"Capacity"</div>
+  <div *ngIf="capacityInput" class="capacity" style="display: block">
+    <ion-item>
+      <ion-range [debounce]="1000" min="1" max="4" snaps="true" color="custPink" [(ngModel)]="sliderValue" (ionChange)="inputCapacity(sliderValue)">
+        <ion-label range-left>Empty</ion-label>
+        <ion-label range-right>Full</ion-label>
+        <ion-buttons range-right>
+          <button ion-button color="light" (click)="closeCapacity()">
+            OK
+          </button>
+          <button ion-button color="light" (click)="closeCapacity()">
+            Dismiss
+          </button>
+        </ion-buttons>
+      </ion-range>
+    </ion-item>
+  </div>
 </ion-content>

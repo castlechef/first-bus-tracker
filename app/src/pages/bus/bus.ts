@@ -18,8 +18,29 @@ export class BusPage {
 
   public title = "Bus";
   public busId;
-  private capacities = ["UNKNOWN", "EMPTY", "QUIET", "BUSY", "FULL"];
+  private capacities = [ {
+    "data": {
+      "capacity": "UNKNOWN"
+    }
+  },  {
+    "data": {
+      "capacity": "EMPTY"
+    }
+  },  {
+    "data": {
+      "capacity": "QUIET"
+    }
+  },  {
+    "data": {
+      "capacity": "BUSY"
+    }
+  },  {
+    "data": {
+      "capacity": "FULL"
+    }
+  }];
   nextBusStops: Array<{ busStopId: number, busStopsName: string, arrivalTime: string }>;
+  public capacityInput = true;
 
   public capacity: string;
 
@@ -67,6 +88,11 @@ export class BusPage {
   }
 
   private inputCapacity(number){
+    this.capacity = this.capacities[number].data.capacity;
     this.serverService.setCapacity(this.busId, this.capacities[number]);
+  }
+
+  private closeCapacity(){
+    this.capacityInput = false;
   }
 }
