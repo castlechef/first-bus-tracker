@@ -19,8 +19,9 @@
 
 <ion-content>
   <ion-list>
-    <button ion-item *ngFor="let busStop of busStops" (click)="openBusStop(busStop)">
+    <ion-item (press)="presentConfirm(busStop)" *ngFor="let busStop of busStops" (click)="openBusStop(busStop)">
       {{ busStop.busStopName }}
-    </button>
+      <ion-icon *ngIf="busStop.isFav" color="gold" name="star"></ion-icon>
+    </ion-item>
   </ion-list>
 </ion-content>

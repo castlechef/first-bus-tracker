@@ -49,6 +49,7 @@ import { BusPage } from '../bus/bus';
 import { ServerProvider } from '../../providers/server-provider';
 import { BusRouteProvider } from '../../providers/bus-route/bus-route';
 import { MapOptionsPopoverPage } from '../map-options-popover/map-options-popover';
+import { SettingsProvider } from '../../providers/settings/settings';
 var MapPage = (function () {
     /**
      * imports all the necessary parameters
@@ -57,13 +58,14 @@ var MapPage = (function () {
      * @param {ModalController} modalctrl - to handle modals
      * @param {ServerProvider} serverService - for communicating with the server
      */
-    function MapPage(navCtrl, navParams, modalctrl, serverService, busRouteProvider, popoverCtrl) {
+    function MapPage(navCtrl, navParams, modalctrl, serverService, busRouteProvider, popoverCtrl, settings) {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.modalctrl = modalctrl;
         this.serverService = serverService;
         this.busRouteProvider = busRouteProvider;
         this.popoverCtrl = popoverCtrl;
+        this.settings = settings;
         //colors for the bus routes
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
         this.busIntervals = new Map();
@@ -507,7 +509,8 @@ var MapPage = (function () {
             ModalController,
             ServerProvider,
             BusRouteProvider,
-            PopoverController])
+            PopoverController,
+            SettingsProvider])
     ], MapPage);
     return MapPage;
 }());
