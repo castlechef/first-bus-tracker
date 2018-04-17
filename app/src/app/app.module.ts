@@ -11,35 +11,36 @@ import { ServerProvider} from '../providers/server-provider';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { MapPage } from '../pages/map/map';
 import { Geolocation } from '@ionic-native/geolocation';
-import {BusStopPage} from '../pages/bus-stop/bus-stop';
-import {BusPage} from '../pages/bus/bus';
 import { BusRouteProvider } from '../providers/bus-route/bus-route';
-import {MapOptionsPopoverPage} from '../pages/map-options-popover/map-options-popover';
+import {Page2} from '../pages/page2/page2';
+import {MapPageModule} from '../pages/map/map.module';
+import {BusPageModule} from '../pages/bus/bus.module';
+import {BusStopPageModule} from '../pages/bus-stop/bus-stop.module';
+import {BusStopListPageModule} from '../pages/bus-stop-list/bus-stop-list.module';
+import {MapOptionsPopoverPageModule} from '../pages/map-options-popover/map-options-popover.module';
 
 @NgModule({
   declarations: [
     MyApp,
     Page1,
-    MapPage,
-    BusStopPage,
-    BusPage,
-    MapOptionsPopoverPage
+    Page2
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp, {}, { links: [] }),
+    MapPageModule,
+    BusPageModule,
+    BusStopPageModule,
+    BusStopListPageModule,
+    MapOptionsPopoverPageModule,
     HttpClientModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
     Page1,
-    MapPage,
-    BusStopPage,
-    BusPage,
-    MapOptionsPopoverPage
+    Page2
   ],
   providers: [
     StatusBar,

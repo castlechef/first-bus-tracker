@@ -11,9 +11,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 /*
   Generated class for the BusRouteProvider provider.
-
-  See https://angular.io/guide/dependency-injection for more info on providers
-  and Angular DI.
 */
 var BusRouteProvider = (function () {
     function BusRouteProvider(http) {
@@ -29,6 +26,7 @@ var BusRouteProvider = (function () {
                 resolve(_this.busRoutes);
             })
                 .catch(function (err) {
+                console.log('trying to get bus routes, but no data? server not connected?');
                 reject();
             });
         });
@@ -41,6 +39,7 @@ var BusRouteProvider = (function () {
                 resolve(_this.sections);
             })
                 .catch(function (err) {
+                console.log('trying to get bus route sections, but no data? server not connected?');
                 reject();
             });
         });
@@ -72,13 +71,13 @@ var BusRouteProvider = (function () {
             });
         });
     };
-    BusRouteProvider.URL = 'http://localhost:8080/busRoutes';
+    BusRouteProvider.URL = "http://10.0.0.4:" + 8080 + "/busRoutes";
     BusRouteProvider = BusRouteProvider_1 = __decorate([
         Injectable(),
-        __metadata("design:paramtypes", [HttpClient])
+        __metadata("design:paramtypes", [typeof (_a = typeof HttpClient !== "undefined" && HttpClient) === "function" && _a || Object])
     ], BusRouteProvider);
     return BusRouteProvider;
-    var BusRouteProvider_1;
+    var BusRouteProvider_1, _a;
 }());
 export { BusRouteProvider };
 //# sourceMappingURL=bus-route.js.map

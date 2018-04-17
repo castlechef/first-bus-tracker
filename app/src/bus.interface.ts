@@ -1,6 +1,6 @@
 export interface Bus {
-  id: number,
-  locations: {
+  busId: number,
+  location: {
     latitude: number,
     longitude: number
   },

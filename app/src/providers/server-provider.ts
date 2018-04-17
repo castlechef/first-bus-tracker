@@ -10,24 +10,34 @@ import {StopInfo} from '../stopInfo.interface';
 
 @Injectable()
 export class ServerProvider {
-  data: any;
   // url for the api where the data is coming from
-  private _url: string = 'http://localhost:8080/';
+  //private _url: string = 'http://localhost:8080/';
+  private _url: string = `http://10.0.0.4:${8080}/`;
+  private buses: Bus[];
 
   constructor(private http: HttpClient) {
+    this.buses = [];
+    this.startBusFetchingBuses();
   }
 
-  // gets buses data and maps it to the observable Bus
-  getBusLocations(): Promise<Array<Bus>> {
-    return new Promise<Array<Bus>>((resolve, reject) => {
+  private startBusFetchingBuses() {
+    setInterval(() => {
       this.http
         .get<any>(this._url.concat('buses'))
-        .toPromise().then(body => {
-        resolve(body.data);
-      }).catch(e => {
-        reject(e);
-      });
-    })
+        .toPromise()
+        .then(body => {
+          this.buses = body.data;
+        })
+        .catch(e => {
+          console.log('Error fetching buses data', e.message);
+        })
+    }, 1000);
+  }
+
+
+  // gets buses data and maps it to the observable Bus
+  getBusLocations(): Bus[] {
+    return this.buses;
   }
 
   getBusStopLocations(): Promise<Stop[]> {

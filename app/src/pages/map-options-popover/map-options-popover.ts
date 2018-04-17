@@ -16,21 +16,20 @@ import {MapPage} from '../map/map';
 })
 export class MapOptionsPopoverPage {
 
+  private showList: boolean;
   private map: MapPage;
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
     this.map = navParams.data.mapPage;
-    console.log(this.map);
+    this.showList = !!(this.map.routeStates);
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad MapOptionsPopoverPage');
   }
 
   updateState(routeState) {
-    console.log('updating state',routeState);
     routeState.active = !routeState.active;
-    this.map.updateBusRouteBeingUsed();
+    this.map.updateMapElementsVisibility();
   }
 
 }

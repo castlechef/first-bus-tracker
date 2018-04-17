@@ -16,20 +16,28 @@ var ServerProvider = (function () {
     function ServerProvider(http) {
         this.http = http;
         // url for the api where the data is coming from
-        this._url = 'http://localhost:8080/';
+        //private _url: string = 'http://localhost:8080/';
+        this._url = "http://10.0.0.4:" + 8080 + "/";
+        this.buses = [];
+        this.startBusFetchingBuses();
     }
-    // gets buses data and maps it to the observable Bus
-    ServerProvider.prototype.getBusLocations = function () {
+    ServerProvider.prototype.startBusFetchingBuses = function () {
         var _this = this;
-        return new Promise(function (resolve, reject) {
+        setInterval(function () {
             _this.http
                 .get(_this._url.concat('buses'))
-                .toPromise().then(function (body) {
-                resolve(body.data);
-            }).catch(function (e) {
-                reject(e);
+                .toPromise()
+                .then(function (body) {
+                _this.buses = body.data;
+            })
+                .catch(function (e) {
+                console.log('Error fetching buses data', e.message);
             });
-        });
+        }, 1000);
+    };
+    // gets buses data and maps it to the observable Bus
+    ServerProvider.prototype.getBusLocations = function () {
+        return this.buses;
     };
     ServerProvider.prototype.getBusStopLocations = function () {
         var _this = this;
@@ -76,9 +84,10 @@ var ServerProvider = (function () {
     };
     ServerProvider = __decorate([
         Injectable(),
-        __metadata("design:paramtypes", [HttpClient])
+        __metadata("design:paramtypes", [typeof (_a = typeof HttpClient !== "undefined" && HttpClient) === "function" && _a || Object])
     ], ServerProvider);
     return ServerProvider;
+    var _a;
 }());
 export { ServerProvider };
 //# sourceMappingURL=server-provider.js.map

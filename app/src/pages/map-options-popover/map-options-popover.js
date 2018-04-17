@@ -20,15 +20,13 @@ var MapOptionsPopoverPage = (function () {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.map = navParams.data.mapPage;
-        console.log(this.map);
+        this.showList = !!(this.map.routeStates);
     }
     MapOptionsPopoverPage.prototype.ionViewDidLoad = function () {
-        console.log('ionViewDidLoad MapOptionsPopoverPage');
     };
     MapOptionsPopoverPage.prototype.updateState = function (routeState) {
-        console.log('updating state', routeState);
         routeState.active = !routeState.active;
-        this.map.updateBusRouteBeingUsed();
+        this.map.updateMapElementsVisibility();
     };
     MapOptionsPopoverPage = __decorate([
         IonicPage(),
