@@ -11,9 +11,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 /*
   Generated class for the BusRouteProvider provider.
-
-  See https://angular.io/guide/dependency-injection for more info on providers
-  and Angular DI.
 */
 var BusRouteProvider = (function () {
     function BusRouteProvider(http) {
@@ -75,7 +72,7 @@ var BusRouteProvider = (function () {
             });
         });
     };
-    BusRouteProvider.URL = 'http://localhost:8080/busRoutes';
+    BusRouteProvider.URL = "http://10.0.0.4:" + 8080 + "/busRoutes";
     BusRouteProvider = BusRouteProvider_1 = __decorate([
         Injectable(),
         __metadata("design:paramtypes", [HttpClient])

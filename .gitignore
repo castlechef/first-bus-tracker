@@ -78,3 +78,7 @@ typings/
 .next
 
 /app/www/
+
+platforms/
+plugins/
+resources/

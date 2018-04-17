@@ -5,8 +5,13 @@
   Ionic pages and navigation.
 -->
 <ion-content>
-  <ion-item *ngFor="let state of map.routeStates">
-    <ion-label>{{state.busRouteName}}</ion-label>
-    <ion-checkbox item-right checked="{{state.active}}" (ionChange)="updateState(state)"></ion-checkbox>
-  </ion-item>
+  <div *ngIf="showList">
+    <ion-item *ngFor="let state of map.routeStates">
+      <ion-label>{{state.busRouteName}}</ion-label>
+      <ion-checkbox item-right checked="{{state.active}}" (ionChange)="updateState(state)"></ion-checkbox>
+    </ion-item>
+  </div>
+  <div *ngIf="!showList">
+    Not being shown.
+  </div>
 </ion-content>

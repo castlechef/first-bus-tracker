@@ -66,6 +66,7 @@ var MapPage = (function () {
         this.popoverCtrl = popoverCtrl;
         //colors for the bus routes
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
+        this.busIntervals = new Map();
         this.busStopMarkers = new Map();
         this.busRouteSectionLines = new Map();
         this.busMarkers = new Map();
@@ -82,7 +83,8 @@ var MapPage = (function () {
             .then(function (latLng) {
             if (latLng != null)
                 _this.addUserPositionMarker(latLng);
-            _this.updateBusRouteBeingUsed();
+            //this.updateBusRouteBeingUsed();
+            _this.setupMapElements();
         });
     };
     /*
@@ -134,7 +136,7 @@ var MapPage = (function () {
             position: latLng,
             title: 'Your Position',
             icon: {
-                url: '../assets/icon/userIcon.png',
+                url: './assets/icon/userIcon.png',
                 anchor: new google.maps.Point(16, 16),
                 scaledSize: new google.maps.Size(32, 32)
             }
@@ -143,68 +145,99 @@ var MapPage = (function () {
             userPosition.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
         });
     };
-    //gets the bus stops from the server and adds them to the map - they are set to update automatically.
-    MapPage.prototype.addBusStops = function () {
-        var _this = this;
-        var busStops = [];
-        this.serverService.getBusStopLocations().then(function (data) {
-            busStops = data;
-            for (var i = 0; i < busStops.length; i++) {
-                _this.addBusStop(busStops[i]);
-            }
-        }, function (rejected) {
-            console.log(rejected);
-            setInterval(function () {
-                _this.addBusStops();
-            }, 1000);
-        });
-    };
-    //adds a single bus stop to the map with a click event that opens the relevant busstoppage
-    MapPage.prototype.addBusStop = function (busStop) {
-        var _this = this;
-        var stopMarker = new google.maps.Marker({
-            map: this.map,
-            position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
-            title: busStop.busStopName,
-            icon: {
-                url: '../assets/icon/busStop.png',
-                scaledSize: new google.maps.Size(42, 42)
-            }
-        });
-        this.busStopMarkers.set(busStop.busStopId, stopMarker);
-        google.maps.event.addListener(stopMarker, 'click', function () { return _this.openBusStopPage(busStop.busStopId, busStop.busStopName); });
-    };
-    //Opens a bus stop page with the details of the bus stop
-    MapPage.prototype.openBusStopPage = function (busStopId, busStopName) {
-        var tryModal = this.modalctrl.create(BusStopPage, { stopId: busStopId, stopName: busStopName });
-        tryModal.present();
-    };
-    //Adds the bus routes from the default routes (Future: Communicate with server to obtain the routes)
-    MapPage.prototype.addBusRoutes = function () {
+    MapPage.prototype.presentOptionsPopover = function (event) {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            function getSectionFromId(id) {
-                return sections.find(function (s) { return s.sectionId === id; });
-            }
-            function getAllUsedSections() {
-                var allSections = [];
-                routes
-                    .filter(function (_a) {
-                    var busRouteName = _a.busRouteName;
-                    return routesToShow.indexOf(busRouteName) !== -1;
-                })
-                    .forEach(function (_a) {
-                    var sectionsUsed = _a.sectionsUsed;
-                    return sectionsUsed.forEach(function (s) { return allSections.push(s); });
-                });
-                // Convert to a set then back to an array to remove duplicates
-                return Array.from(new Set(allSections));
-            }
-            var routesToShow, roundaboutCoords, routes, sections, e_1, roundabout;
+            var busRoutes, err_1, busRouteNames, popover;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        routesToShow = this.getRoutesToShow();
+                        if (!!this.routeStates) return [3 /*break*/, 5];
+                        busRoutes = void 0;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                    case 2:
+                        busRoutes = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_1 = _a.sent();
+                        console.log("Can't get bus routes", err_1);
+                        return [2 /*return*/];
+                    case 4:
+                        busRouteNames = busRoutes.map(function (_a) {
+                            var busRouteName = _a.busRouteName;
+                            return busRouteName;
+                        });
+                        this.routeStates = busRouteNames.map(function (busRouteName) { return ({ busRouteName: busRouteName, active: true }); });
+                        _a.label = 5;
+                    case 5:
+                        popover = this.popoverCtrl.create(MapOptionsPopoverPage, {
+                            mapPage: this
+                        });
+                        popover.present({
+                            ev: event
+                        });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MapPage.prototype.setupMapElements = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var busRoutes, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                    case 1:
+                        busRoutes = _a.sent();
+                        this.routeStates = busRoutes.map(function (_a) {
+                            var busRouteName = _a.busRouteName;
+                            return ({ busRouteName: busRouteName, active: true });
+                        });
+                        this.setupMapRoutes();
+                        this.setupMapBuses();
+                        this.setupMapBusStops();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_1 = _a.sent();
+                        setTimeout(function () {
+                            _this.setupMapElements();
+                            return;
+                        }, 1000);
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MapPage.prototype.setupMapRoutes = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var sections, roundaboutCoords, roundabout;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.busRouteProvider.getSections()];
+                    case 1:
+                        sections = _a.sent();
+                        console.log('setting up map routes');
+                        sections.forEach(function (section) {
+                            var points = section.positions.map(function (_a) {
+                                var lat = _a.latitude, lng = _a.longitude;
+                                return ({ lat: lat, lng: lng });
+                            });
+                            var busRoute = new google.maps.Polyline({
+                                path: points,
+                                geodesic: true,
+                                strokeColor: '#FF0000',
+                                strokeOpacity: 0.2,
+                                strokeWeight: 6
+                            });
+                            _this.busRouteSectionLines.set(section.sectionId, busRoute);
+                        });
                         roundaboutCoords = [
                             { lat: 51.377484, lng: -2.361208 },
                             { lat: 51.377484, lng: -2.361208 },
@@ -231,46 +264,6 @@ var MapPage = (function () {
                             { lat: 51.377483, lng: -2.361218 },
                             { lat: 51.377484, lng: -2.361208 }
                         ];
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 4, , 5]);
-                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
-                    case 2:
-                        routes = _a.sent();
-                        return [4 /*yield*/, this.busRouteProvider.getSections()];
-                    case 3:
-                        sections = _a.sent();
-                        return [3 /*break*/, 5];
-                    case 4:
-                        e_1 = _a.sent();
-                        console.log('Cannot get routes data.');
-                        return [2 /*return*/];
-                    case 5:
-                        //routes.forEach(({busRouteName, sectionsUsed}) => {
-                        //  sectionsUsed.forEach(sectionId => {
-                        this.busRouteSectionLines.forEach(function (polyline) {
-                            polyline.setMap(null);
-                        });
-                        getAllUsedSections().forEach(function (sectionId) {
-                            if (_this.busRouteSectionLines.has(sectionId)) {
-                                _this.busRouteSectionLines.get(sectionId).setMap(_this.map);
-                                return;
-                            }
-                            var section = getSectionFromId(sectionId);
-                            var googleMapStyle = section.positions.map(function (_a) {
-                                var lat = _a.latitude, lng = _a.longitude;
-                                return ({ lat: lat, lng: lng });
-                            });
-                            var busRoute = new google.maps.Polyline({
-                                path: googleMapStyle,
-                                geodesic: true,
-                                strokeColor: '#FF0000',
-                                strokeOpacity: 0.2,
-                                strokeWeight: 6,
-                                map: _this.map
-                            });
-                            _this.busRouteSectionLines.set(sectionId, busRoute);
-                        });
                         roundabout = new google.maps.Polygon({
                             paths: roundaboutCoords,
                             strokeColor: '#505050',
@@ -280,45 +273,171 @@ var MapPage = (function () {
                             fillOpacity: 0
                         });
                         roundabout.setMap(this.map);
+                        this.updateBusRoutesVisibility();
                         return [2 /*return*/];
                 }
             });
         });
     };
-    //Gets the buses from the server, adds the to the map - set to update automatically
-    MapPage.prototype.addBuses = function () {
+    MapPage.prototype.setupMapBuses = function () {
         var _this = this;
         setInterval(function () {
-            _this.serverService.getBusLocations().then(function (buses) {
-                for (var i = 0; i < buses.length; i++) {
-                    _this.addBus(buses[i]);
-                }
-            }, function (rejected) {
-                console.log(rejected);
-            });
+            _this.buses = _this.serverService.getBusLocations();
+            _this.addBusesToMap();
         }, 1000);
     };
-    //Adds a bus marker to the map with a click event
-    MapPage.prototype.addBus = function (bus) {
+    MapPage.prototype.setupMapBusStops = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this;
+                        return [4 /*yield*/, this.serverService.getBusStopLocations()];
+                    case 1:
+                        _a.busStops = _b.sent();
+                        this.busStops.forEach(function (busStop) {
+                            var stopMarker = new google.maps.Marker({
+                                position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
+                                title: busStop.busStopName,
+                                icon: {
+                                    url: './assets/icon/busStop.png',
+                                    scaledSize: new google.maps.Size(42, 42)
+                                }
+                            });
+                            _this.busStopMarkers.set(busStop.busStopId, stopMarker);
+                            google.maps.event.addListener(stopMarker, 'click', function () { return _this.openBusStopPage(busStop.busStopId, busStop.busStopName); });
+                        });
+                        this.updateBusStopsVisibility();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MapPage.prototype.updateMapElementsVisibility = function () {
+        this.updateBusRoutesVisibility();
+        this.updateBusesVisibility();
+        this.updateBusStopsVisibility();
+    };
+    MapPage.prototype.updateBusRoutesVisibility = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var sectionsUsed;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getSectionsUsed()];
+                    case 1:
+                        sectionsUsed = _a.sent();
+                        this.busRouteSectionLines.forEach(function (polyline, sectionId) {
+                            if (sectionsUsed.indexOf(sectionId) !== -1) {
+                                polyline.setMap(_this.map);
+                            }
+                            else {
+                                polyline.setMap(null);
+                            }
+                        });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MapPage.prototype.updateBusesVisibility = function () {
         var _this = this;
-        if (this.busMarkers.get(bus.busId)) {
-            var marker = this.busMarkers.get(bus.busId);
-            this.animateMovement(marker, bus.location);
-            //this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
+        this.buses.forEach(function (bus) {
+            if (_this.busMarkers.has(bus.busId)) {
+                var busMarker = _this.busMarkers.get(bus.busId);
+                if (_this.getRoutesToShow().some(function (route) { return bus.routeName === route; })) {
+                    if (busMarker.getMap() !== _this.map) {
+                        busMarker.setMap(_this.map);
+                    }
+                }
+                else {
+                    if (busMarker.getMap() !== null) {
+                        busMarker.setMap(null);
+                    }
+                }
+            }
+            else {
+                console.log('we have a bus, but no marker for it?!');
+            }
+        });
+    };
+    MapPage.prototype.updateBusStopsVisibility = function () {
+        var _this = this;
+        var shouldShowStop = function (id) {
+            return _this.busStops
+                .find(function (_a) {
+                var busStopId = _a.busStopId;
+                return id === busStopId;
+            })
+                .routes.some(function (route) { return _this.getRoutesToShow().indexOf(route.name) !== -1; });
+        };
+        this.busStopMarkers.forEach(function (stopMarker, id) {
+            if (shouldShowStop(id)) {
+                if (stopMarker.getMap() !== _this.map)
+                    stopMarker.setMap(_this.map);
+            }
+            else {
+                if (stopMarker.getMap() !== null)
+                    stopMarker.setMap(null);
+            }
+        });
+    };
+    MapPage.prototype.getRoutesToShow = function () {
+        return this.routeStates
+            .filter(function (_a) {
+            var active = _a.active;
+            return active;
+        })
+            .map(function (_a) {
+            var busRouteName = _a.busRouteName;
+            return busRouteName;
+        });
+    };
+    MapPage.prototype.getSectionsUsed = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var busRoutes, sectionsToUse;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                    case 1:
+                        busRoutes = _a.sent();
+                        sectionsToUse = new Set();
+                        busRoutes.forEach(function (busRoute) {
+                            if (_this.getRoutesToShow().indexOf(busRoute.busRouteName) !== -1) {
+                                busRoute.sectionsUsed.forEach(function (id) { return sectionsToUse.add(id); });
+                            }
+                        });
+                        return [2 /*return*/, Array.from(sectionsToUse)];
+                }
+            });
+        });
+    };
+    MapPage.prototype.addBusesToMap = function () {
+        var _this = this;
+        this.buses.forEach(function (bus) { return _this.addBusToMap(bus); });
+    };
+    MapPage.prototype.addBusToMap = function (bus) {
+        var _this = this;
+        if (this.busMarkers.has(bus.busId)) {
+            var busMarker = this.busMarkers.get(bus.busId);
+            this.animateMovement(busMarker, bus.location);
         }
         else {
             var busMarker = new google.maps.Marker({
-                map: this.map,
                 position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
                 title: bus.routeName,
                 icon: {
-                    url: '../assets/icon/bus.png',
+                    url: './assets/icon/bus.png',
                     anchor: new google.maps.Point(32, 50)
                 }
             });
             this.busMarkers.set(bus.busId, busMarker);
             google.maps.event.addListener(busMarker, 'click', function () { return _this.openBusPage(bus.busId, bus.routeName); });
         }
+        this.updateBusesVisibility();
     };
     //Animates the movement of a marker to a new longitude/latitude
     MapPage.prototype.animateMovement = function (marker, location) {
@@ -335,8 +454,8 @@ var MapPage = (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        timeToAnimate = 90;
-                        fps = 60;
+                        timeToAnimate = 100;
+                        fps = 24;
                         totalFrames = timeToAnimate * fps / 1000;
                         oldLat = marker.getPosition().lat();
                         newLat = location.latitude;
@@ -369,97 +488,10 @@ var MapPage = (function () {
         var tryModal = this.modalctrl.create(BusPage, { busId: busId, routeName: route });
         tryModal.present();
     };
-    MapPage.prototype.getRoutesToShow = function () {
-        return this.routeStates
-            .filter(function (_a) {
-            var active = _a.active;
-            return active;
-        })
-            .map(function (_a) {
-            var busRouteName = _a.busRouteName;
-            return busRouteName;
-        });
-    };
-    MapPage.prototype.updateBusRouteBeingUsed = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var busRoutes, err_1, busRouteNames;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!!this.routeStates) return [3 /*break*/, 5];
-                        busRoutes = void 0;
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
-                    case 2:
-                        busRoutes = _a.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
-                        err_1 = _a.sent();
-                        console.log('Can\'t get busRoutes', err_1);
-                        return [2 /*return*/];
-                    case 4:
-                        busRouteNames = busRoutes.map(function (_a) {
-                            var busRouteName = _a.busRouteName;
-                            return busRouteName;
-                        });
-                        this.routeStates = busRouteNames.map(function (busRouteName) { return ({ busRouteName: busRouteName, active: true }); });
-                        _a.label = 5;
-                    case 5:
-                        this.addBusStops();
-                        this.addBusRoutes();
-                        this.addBuses();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    MapPage.prototype.updateBusRoutesShown = function () {
-        console.log('updating things shown');
-        this.busRouteSectionLines.forEach(function (polyline) {
-            polyline.setMap(null);
-        });
-        this.addBusRoutes();
-    };
-    MapPage.prototype.presentOptionsPopover = function (event) {
-        return __awaiter(this, void 0, void 0, function () {
-            var busRoutes, err_2, busRouteNames, popover;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!!this.routeStates) return [3 /*break*/, 5];
-                        busRoutes = void 0;
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
-                    case 2:
-                        busRoutes = _a.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
-                        err_2 = _a.sent();
-                        console.log("Can't get bus routes", err_2);
-                        return [2 /*return*/];
-                    case 4:
-                        busRouteNames = busRoutes.map(function (_a) {
-                            var busRouteName = _a.busRouteName;
-                            return busRouteName;
-                        });
-                        this.routeStates = busRouteNames.map(function (busRouteName) { return ({ busRouteName: busRouteName, active: true }); });
-                        _a.label = 5;
-                    case 5:
-                        popover = this.popoverCtrl.create(MapOptionsPopoverPage, {
-                            mapPage: this
-                        });
-                        console.log(this.routeStates);
-                        popover.present({
-                            ev: event
-                        });
-                        return [2 /*return*/];
-                }
-            });
-        });
+    //Opens a bus stop page with the details of the bus stop
+    MapPage.prototype.openBusStopPage = function (busStopId, busStopName) {
+        var tryModal = this.modalctrl.create(BusStopPage, { stopId: busStopId, stopName: busStopName });
+        tryModal.present();
     };
     __decorate([
         ViewChild('map'),

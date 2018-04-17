@@ -5,14 +5,8 @@ export interface Stop {
     latitude: number,
     longitude: number
   },
-  busRoutePosition: [
-    {
-      name: string,
-      position: number
-    },
-    {
-      name: string,
-      position: number
-    }
-    ]
+  routes: {
+    name: string,
+    position: number
+  }[];
 }

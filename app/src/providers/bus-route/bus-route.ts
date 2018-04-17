@@ -3,14 +3,11 @@ import {Injectable} from '@angular/core';
 
 /*
   Generated class for the BusRouteProvider provider.
-
-  See https://angular.io/guide/dependency-injection for more info on providers
-  and Angular DI.
 */
 @Injectable()
 export class BusRouteProvider {
 
-  private static readonly URL = 'http://localhost:8080/busRoutes';
+  private static readonly URL = `http://10.0.0.4:${8080}/busRoutes`;
 
   private sections: Section[];
   private busRoutes: BusRoute[];

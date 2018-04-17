@@ -6,6 +6,8 @@ import {ServerProvider} from '../../providers/server-provider';
 import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus-route';
 import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover';
 import {} from 'googlemaps';
+import {Stop} from '../../stops.interface';
+import {Bus} from '../../bus.interface';
 
 
 /**
@@ -30,14 +32,17 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
-  private routeStates: { busRouteName: string, active: boolean }[];
+  private busIntervals: Map<number, any>;
+  private buses: Bus[];
+  private busStops: Stop[];
+  public routeStates: { busRouteName: string, active: boolean }[];
 
   //in case server fails stuff gets put into the errorMessage - isn't used for anything currently
   public errorMessage;
   //maps bus stop IDs to their markers to allow markers to be manipulated later
   private busStopMarkers: Map<number, google.maps.Marker>;
   //maps busroute segements to strings to allow them to be hidden/revealed later
-  private busRouteSectionLines: Map<string, google.maps.Polyline>;
+  private busRouteSectionLines: Map<number, google.maps.Polyline>;
   //collection of bus markers to empty whenever server is called
   private busMarkers: Map<number, google.maps.Marker>;
   //colors for the bus routes
@@ -59,8 +64,9 @@ export class MapPage {
               public serverService: ServerProvider,
               private busRouteProvider: BusRouteProvider,
               private popoverCtrl: PopoverController) {
+    this.busIntervals = new Map<number, any>();
     this.busStopMarkers = new Map<number, google.maps.Marker>();
-    this.busRouteSectionLines = new Map<string, google.maps.Polyline>();
+    this.busRouteSectionLines = new Map<number, google.maps.Polyline>();
     this.busMarkers = new Map<number, google.maps.Marker>();
   }
 
@@ -75,7 +81,8 @@ export class MapPage {
     this.loadMap()
       .then((latLng) => {
         if (latLng != null) this.addUserPositionMarker(latLng);
-        this.updateBusRouteBeingUsed();
+        //this.updateBusRouteBeingUsed();
+        this.setupMapElements();
       });
   }
 
@@ -130,7 +137,7 @@ export class MapPage {
       position: latLng,
       title: 'Your Position',
       icon: {
-        url: '../assets/icon/userIcon.png',
+        url: './assets/icon/userIcon.png',
         anchor: new google.maps.Point(16,16),
         scaledSize: new google.maps.Size(32,32)
       }
@@ -141,48 +148,59 @@ export class MapPage {
     });
   }
 
-  //gets the bus stops from the server and adds them to the map - they are set to update automatically.
-  private addBusStops() {
-    let busStops: any = [];
-
-    this.serverService.getBusStopLocations().then(data => {
-      busStops = data;
-      for (let i = 0; i < busStops.length; i++) {
-        this.addBusStop(busStops[i]);
+  private async presentOptionsPopover(event: UIEvent) {
+    if (!this.routeStates) {
+      let busRoutes;
+      try{
+        busRoutes = await this.busRouteProvider.getBusRoutes();
+      } catch (err) {
+        console.log("Can't get bus routes", err);
+        return
       }
-    }, rejected => {
-      console.log(rejected);
-      setInterval(() => {
-        this.addBusStops();
-      }, 1000);
+      const busRouteNames = busRoutes.map(({busRouteName}) => busRouteName);
+      this.routeStates = busRouteNames.map(busRouteName => ({busRouteName, active: true}));
+    }
+    const popover = this.popoverCtrl.create(MapOptionsPopoverPage, {
+      mapPage: this
+    });
+    popover.present({
+      ev: event
     });
   }
 
-  //adds a single bus stop to the map with a click event that opens the relevant busstoppage
-  private addBusStop(busStop) {
-    let stopMarker = new google.maps.Marker({
-      map: this.map,
-      position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
-      title: busStop.busStopName,
-      icon: {
-        url: '../assets/icon/busStop.png',
-        scaledSize: new google.maps.Size(42,42)
-      }
+  private async setupMapElements() {
+    try {
+      const busRoutes = await this.busRouteProvider.getBusRoutes();
+      this.routeStates = busRoutes.map(({busRouteName}) => ({busRouteName, active: true}));
+
+      this.setupMapRoutes();
+      this.setupMapBuses();
+      this.setupMapBusStops();
+
+    } catch(e) {
+      setTimeout(() => {
+        this.setupMapElements();
+        return;
+      }, 1000)
+    }
+  }
+
+  private async setupMapRoutes() {
+    const sections: Section[] = await this.busRouteProvider.getSections();
+    console.log('setting up map routes');
+
+    sections.forEach(section => {
+      const points = section.positions.map(({latitude: lat, longitude: lng}) => ({lat, lng}));
+      const busRoute = new google.maps.Polyline({
+        path: points,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.2,
+        strokeWeight: 6
+      });
+      this.busRouteSectionLines.set(section.sectionId, busRoute);
     });
 
-    this.busStopMarkers.set(busStop.busStopId, stopMarker);
-    google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
-  }
-
-  //Opens a bus stop page with the details of the bus stop
-  private openBusStopPage(busStopId, busStopName) {
-    let tryModal = this.modalctrl.create(BusStopPage, {stopId: busStopId, stopName: busStopName});
-    tryModal.present();
-  }
-
-  //Adds the bus routes from the default routes (Future: Communicate with server to obtain the routes)
-  private async addBusRoutes(): Promise<void> {
-    const routesToShow = this.getRoutesToShow();
     const roundaboutCoords = [
       {lat: 51.377484, lng: -2.361208},
       {lat: 51.377484, lng: -2.361208},
@@ -209,54 +227,6 @@ export class MapPage {
       {lat: 51.377483, lng: -2.361218},
       {lat: 51.377484, lng: -2.361208}
     ];
-    let routes: BusRoute[];
-    let sections: Section[];
-    try {
-      routes = await this.busRouteProvider.getBusRoutes();
-      sections = await this.busRouteProvider.getSections();
-    } catch (e) {
-      console.log('Cannot get routes data.');
-      return;
-    }
-
-    function getSectionFromId(id: number) {
-      return sections.find(s => s.sectionId === id);
-    }
-
-    function getAllUsedSections() {
-      let allSections = [];
-      routes
-        .filter(({busRouteName}) => routesToShow.indexOf(busRouteName) !== -1)
-        .forEach(({sectionsUsed}) => sectionsUsed.forEach(s => allSections.push(s)));
-
-      // Convert to a set then back to an array to remove duplicates
-      return Array.from(new Set(allSections));
-    }
-
-    //routes.forEach(({busRouteName, sectionsUsed}) => {
-    //  sectionsUsed.forEach(sectionId => {
-    this.busRouteSectionLines.forEach(polyline => {
-      polyline.setMap(null);
-    });
-    getAllUsedSections().forEach(sectionId => {
-      if (this.busRouteSectionLines.has(sectionId)) {
-        this.busRouteSectionLines.get(sectionId).setMap(this.map);
-        return;
-      }
-      const section = getSectionFromId(sectionId);
-      const googleMapStyle = section.positions.map(({latitude: lat, longitude: lng}) => ({lat, lng}));
-      const busRoute = new google.maps.Polyline({
-        path: googleMapStyle,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.2,
-        strokeWeight: 6,
-        map: this.map
-      });
-      this.busRouteSectionLines.set(sectionId, busRoute);
-    });
-    //});
-
     const roundabout = new google.maps.Polygon({
       paths: roundaboutCoords,
       strokeColor: '#505050',
@@ -266,40 +236,125 @@ export class MapPage {
       fillOpacity: 0
     });
     roundabout.setMap(this.map);
+    this.updateBusRoutesVisibility();
+
   }
 
-  //Gets the buses from the server, adds the to the map - set to update automatically
-  private addBuses() {
+  private setupMapBuses() {
     setInterval(() => {
-      this.serverService.getBusLocations().then((buses) => {
-        for (let i = 0; i < buses.length; i++) {
-          this.addBus(buses[i]);
-        }
-      }, rejected => {
-        console.log(rejected);
-      });
-    }, 1000);
+      this.buses = this.serverService.getBusLocations();
+      this.addBusesToMap();
+    }, 1000)
   }
 
-  //Adds a bus marker to the map with a click event
-  private addBus(bus) {
-    if (this.busMarkers.get(bus.busId)) {
-      const marker = this.busMarkers.get(bus.busId);
-      this.animateMovement(marker, bus.location);
-      //this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
+  private async setupMapBusStops() {
+    this.busStops = await this.serverService.getBusStopLocations();
+    this.busStops.forEach(busStop => {
+      const stopMarker = new google.maps.Marker({
+        position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
+        title: busStop.busStopName,
+        icon: {
+          url: './assets/icon/busStop.png',
+          scaledSize: new google.maps.Size(42,42)
+        }
+      });
+      this.busStopMarkers.set(busStop.busStopId,stopMarker);
+      google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
+    });
+    this.updateBusStopsVisibility();
+  }
+
+  public updateMapElementsVisibility() {
+    this.updateBusRoutesVisibility();
+    this.updateBusesVisibility();
+    this.updateBusStopsVisibility();
+  }
+
+  private async updateBusRoutesVisibility() {
+    const sectionsUsed = await this.getSectionsUsed();
+
+    this.busRouteSectionLines.forEach((polyline, sectionId) => {
+      if (sectionsUsed.indexOf(sectionId) !== -1) {
+        polyline.setMap(this.map);
+      } else {
+        polyline.setMap(null);
+      }
+    });
+  }
+
+  private updateBusesVisibility() {
+    this.buses.forEach(bus => {
+      if (this.busMarkers.has(bus.busId)) {
+        const busMarker = this.busMarkers.get(bus.busId);
+        if (this.getRoutesToShow().some(route => bus.routeName === route)) {
+          if (busMarker.getMap() !== this.map) {
+            busMarker.setMap(this.map);
+          }
+        } else {
+          if (busMarker.getMap() !== null) {
+            busMarker.setMap(null);
+          }
+        }
+      } else {
+        console.log('we have a bus, but no marker for it?!')
+      }
+    });
+  }
+
+  private updateBusStopsVisibility() {
+    const shouldShowStop = (id): boolean => {
+      return this.busStops
+        .find(({busStopId}) => id === busStopId)
+        .routes.some(route => this.getRoutesToShow().indexOf(route.name) !== -1);
+    };
+
+    this.busStopMarkers.forEach((stopMarker, id) => {
+      if (shouldShowStop(id)) {
+        if (stopMarker.getMap() !== this.map) stopMarker.setMap(this.map);
+      } else {
+        if (stopMarker.getMap() !== null) stopMarker.setMap(null);
+      }
+    });
+  }
+
+  private getRoutesToShow(): string[] {
+    return this.routeStates
+      .filter(({active}) => active)
+      .map(({busRouteName}) => busRouteName);
+  }
+
+  private async getSectionsUsed(): Promise<number[]> {
+    const busRoutes: BusRoute[] = await this.busRouteProvider.getBusRoutes();
+    let sectionsToUse: Set<number> = new Set<number>();
+    busRoutes.forEach(busRoute => {
+      if (this.getRoutesToShow().indexOf(busRoute.busRouteName) !== -1) {
+        busRoute.sectionsUsed.forEach(id => sectionsToUse.add(id));
+      }
+    });
+    return Array.from(sectionsToUse);
+  }
+
+  private addBusesToMap() {
+    this.buses.forEach(bus => this.addBusToMap(bus));
+  }
+
+  private addBusToMap(bus: Bus) {
+    if (this.busMarkers.has(bus.busId)) {
+      const busMarker = this.busMarkers.get(bus.busId);
+      this.animateMovement(busMarker, bus.location);
     } else {
       let busMarker = new google.maps.Marker({
-        map: this.map,
         position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
         title: bus.routeName,
         icon: {
-          url: '../assets/icon/bus.png',
+          url: './assets/icon/bus.png',
           anchor: new google.maps.Point(32,50)
         }
       });
       this.busMarkers.set(bus.busId, busMarker);
       google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
     }
+    this.updateBusesVisibility();
   }
 
   //Animates the movement of a marker to a new longitude/latitude
@@ -314,8 +369,8 @@ export class MapPage {
       return ((Math.sin((x - 0.5) * Math.PI)) + 1) / 2;
     }
 
-    const timeToAnimate = 90;
-    const fps = 60;
+    const timeToAnimate = 100;
+    const fps = 24;
     const totalFrames = timeToAnimate * fps / 1000;
 
     const oldLat = marker.getPosition().lat();
@@ -334,65 +389,17 @@ export class MapPage {
     }
   }
 
+
   //Opens the bus page with the bus info of the bus given.
   private openBusPage(busId, route) {
     let tryModal = this.modalctrl.create(BusPage, {busId: busId, routeName: route});
     tryModal.present();
   }
 
-  private getRoutesToShow(): string[] {
-    return this.routeStates
-      .filter(({active}) => active)
-      .map(({busRouteName}) => busRouteName);
+  //Opens a bus stop page with the details of the bus stop
+  private openBusStopPage(busStopId, busStopName) {
+    let tryModal = this.modalctrl.create(BusStopPage, {stopId: busStopId, stopName: busStopName});
+    tryModal.present();
   }
 
-  public async updateBusRouteBeingUsed() {
-    if (!this.routeStates) {
-      let busRoutes;
-      try {
-        busRoutes = await this.busRouteProvider.getBusRoutes();
-      } catch(err) {
-        console.log('Can\'t get busRoutes', err);
-        return
-      }
-      const busRouteNames = busRoutes.map(({busRouteName}) => busRouteName);
-      this.routeStates = busRouteNames.map(busRouteName => ({busRouteName, active: true}));
-    }
-    this.addBusStops();
-    this.addBusRoutes();
-    this.addBuses();
-    // updates buses shown
-    // updates routes shown
-    //this.updateBusRoutesShown();
-    // updates bus stops shown
-  }
-
-  private updateBusRoutesShown() {
-    console.log('updating things shown');
-    this.busRouteSectionLines.forEach(polyline => {
-      polyline.setMap(null);
-    });
-    this.addBusRoutes();
-  }
-
-  private async presentOptionsPopover(event: UIEvent) {
-    if (!this.routeStates) {
-      let busRoutes;
-      try{
-        busRoutes = await this.busRouteProvider.getBusRoutes();
-      } catch (err) {
-        console.log("Can't get bus routes", err);
-        return
-      }
-      const busRouteNames = busRoutes.map(({busRouteName}) => busRouteName);
-      this.routeStates = busRouteNames.map(busRouteName => ({busRouteName, active: true}));
-    }
-    const popover = this.popoverCtrl.create(MapOptionsPopoverPage, {
-      mapPage: this
-    });
-    console.log(this.routeStates);
-    popover.present({
-      ev: event
-    });
-  }
 }
