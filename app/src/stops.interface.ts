@@ -8,5 +8,6 @@ export interface Stop {
   routes: {
     name: string,
     position: number
-  }[];
+  }[],
+  isFav?: boolean
 }
