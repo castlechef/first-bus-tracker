@@ -73,8 +73,23 @@ var ServerProvider = (function () {
                 .toPromise()
                 .then(function (body) {
                 resolve(body.data);
-            }).catch(function (e) {
-                reject(e);
+            })
+                .catch(function (e) {
+                reject(e.message);
+            });
+        });
+    };
+    ServerProvider.prototype.getStops = function () {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.http
+                .get(_this._url.concat('busStops/'))
+                .toPromise()
+                .then(function (body) {
+                resolve(body.data);
+            })
+                .catch(function (e) {
+                reject(e.message);
             });
         });
     };

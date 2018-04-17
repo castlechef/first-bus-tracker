@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {IonicPage, ModalController, NavController, NavParams, ViewController} from 'ionic-angular';
 import {ServerProvider} from '../../providers/server-provider';
 import {BusStopPage} from '../bus-stop/bus-stop';
@@ -18,30 +18,35 @@ import {Stop} from '../../stops.interface';
 })
 export class BusStopListPage {
 
-  public title = "Bus Stops";
+  public title = 'Bus Stops';
 
   busStops: Stop[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController, public serverService: ServerProvider) {
     //navParams : stopId stopName
     this.busStops = [];
-    this.serverService.getStopInfo('').then( array =>{
-      this.busStops = array;
-    }, err =>{
-      console.log('error getting bus stops', err.message);
-      this.busStops = [];
-    });
+    this.serverService.getStops()
+      .then(array => {
+        this.busStops = array.sort((s1, s2) => s1.busStopName > s2.busStopName ? 1 : -1);
+      }, err => {
+        console.log('error getting bus stops', err.message);
+        this.busStops = [];
+      });
+  }
+
+  ionViewWillEnter() {
+    this.viewctrl.showBackButton(false);
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad BusStopPage');
   }
 
-  closeModal(){
+  closeModal() {
     this.viewctrl.dismiss();
   }
 
-  openBusStop(busStop){
+  openBusStop(busStop) {
     let tryModal = this.modalctrl.create(BusStopPage, {stopId: busStop.busStopId, stopName: busStop.busStopName});
     tryModal.present();
   }

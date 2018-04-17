@@ -25,16 +25,20 @@ var BusStopListPage = (function () {
         this.viewctrl = viewctrl;
         this.modalctrl = modalctrl;
         this.serverService = serverService;
-        this.title = "Bus Stops";
+        this.title = 'Bus Stops';
         //navParams : stopId stopName
         this.busStops = [];
-        this.serverService.getStopInfo('').then(function (array) {
-            _this.busStops = array;
+        this.serverService.getStops()
+            .then(function (array) {
+            _this.busStops = array.sort(function (s1, s2) { return s1.busStopName > s2.busStopName ? 1 : -1; });
         }, function (err) {
             console.log('error getting bus stops', err.message);
             _this.busStops = [];
         });
     }
+    BusStopListPage.prototype.ionViewWillEnter = function () {
+        this.viewctrl.showBackButton(false);
+    };
     BusStopListPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad BusStopPage');
     };

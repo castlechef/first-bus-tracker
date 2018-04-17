@@ -73,10 +73,25 @@ export class ServerProvider {
         .toPromise()
         .then(body => {
           resolve(body.data);
-        }).catch(e => {
-        reject(e);
-      });
+        })
+        .catch(e => {
+          reject(e.message);
+        });
     })
+  }
+
+  getStops(): Promise<Stop[]> {
+    return new Promise<Stop[]>((resolve, reject) => {
+      this.http
+        .get<any>(this._url.concat('busStops/'))
+        .toPromise()
+        .then(body => {
+          resolve(body.data);
+        })
+        .catch(e => {
+          reject(e.message);
+        });
+    });
   }
 
   setCapacity(busId, capacity){
