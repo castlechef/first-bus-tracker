@@ -137,7 +137,7 @@ export class MapPage {
       position: latLng,
       title: 'Your Position',
       icon: {
-        url: '../assets/icon/userIcon.png',
+        url: './assets/icon/userIcon.png',
         anchor: new google.maps.Point(16,16),
         scaledSize: new google.maps.Size(32,32)
       }
@@ -254,7 +254,7 @@ export class MapPage {
         position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
         title: busStop.busStopName,
         icon: {
-          url: '../assets/icon/busStop.png',
+          url: './assets/icon/busStop.png',
           scaledSize: new google.maps.Size(42,42)
         }
       });
@@ -347,7 +347,7 @@ export class MapPage {
         position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
         title: bus.routeName,
         icon: {
-          url: '../assets/icon/bus.png',
+          url: './assets/icon/bus.png',
           anchor: new google.maps.Point(32,50)
         }
       });
