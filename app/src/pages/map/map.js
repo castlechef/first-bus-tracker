@@ -136,8 +136,9 @@ var MapPage = (function () {
             position: latLng,
             title: 'Your Position',
             icon: {
-                scale: 5,
-                path: google.maps.SymbolPath.CIRCLE
+                url: '../assets/icon/userIcon.png',
+                anchor: new google.maps.Point(16, 16),
+                scaledSize: new google.maps.Size(32, 32)
             }
         });
         navigator.geolocation.watchPosition(function (position) {
@@ -168,8 +169,8 @@ var MapPage = (function () {
             position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
             title: busStop.busStopName,
             icon: {
-                path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-                scale: 3
+                url: '../assets/icon/busStop.png',
+                scaledSize: new google.maps.Size(42, 42)
             }
         });
         //this.busStopMarkers.set(busStop.busStopId, stopMarker);
@@ -311,7 +312,11 @@ var MapPage = (function () {
             var busMarker = new google.maps.Marker({
                 map: this.map,
                 position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
-                title: bus.routeName
+                title: bus.routeName,
+                icon: {
+                    url: '../assets/icon/bus.png',
+                    anchor: new google.maps.Point(32, 50)
+                }
             });
             this.busMarkers.set(bus.busId, busMarker);
             google.maps.event.addListener(busMarker, 'click', function () { return _this.openBusPage(bus.busId, bus.routeName); });
@@ -379,21 +384,31 @@ var MapPage = (function () {
     };
     MapPage.prototype.updateBusRouteBeingUsed = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var busRoutes, busRouteNames;
+            var busRoutes, err_1, busRouteNames;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!!this.routeStates) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                        if (!!this.routeStates) return [3 /*break*/, 5];
+                        busRoutes = void 0;
+                        _a.label = 1;
                     case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                    case 2:
                         busRoutes = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_1 = _a.sent();
+                        console.log('Can\'t get busRoutes', err_1);
+                        return [2 /*return*/];
+                    case 4:
                         busRouteNames = busRoutes.map(function (_a) {
                             var busRouteName = _a.busRouteName;
                             return busRouteName;
                         });
                         this.routeStates = busRouteNames.map(function (busRouteName) { return ({ busRouteName: busRouteName, active: true }); });
-                        _a.label = 2;
-                    case 2:
+                        _a.label = 5;
+                    case 5:
                         this.addBusStops();
                         this.addBusRoutes();
                         this.addBuses();
@@ -411,7 +426,7 @@ var MapPage = (function () {
     };
     MapPage.prototype.presentOptionsPopover = function (event) {
         return __awaiter(this, void 0, void 0, function () {
-            var busRoutes, err_1, busRouteNames, popover;
+            var busRoutes, err_2, busRouteNames, popover;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -425,8 +440,8 @@ var MapPage = (function () {
                         busRoutes = _a.sent();
                         return [3 /*break*/, 4];
                     case 3:
-                        err_1 = _a.sent();
-                        console.log("Can't get bus routes", err_1);
+                        err_2 = _a.sent();
+                        console.log("Can't get bus routes", err_2);
                         return [2 /*return*/];
                     case 4:
                         busRouteNames = busRoutes.map(function (_a) {

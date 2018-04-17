@@ -64,7 +64,8 @@ export class BusRouteProvider {
           reject();
         }
       }).catch(error => {
-        reject();
+        console.log("error in updateDataFromServer", error);
+        reject(error);
       });
     });
   }

@@ -67,7 +67,8 @@ var BusRouteProvider = (function () {
                     reject();
                 }
             }).catch(function (error) {
-                reject();
+                console.log("error in updateDataFromServer", error);
+                reject(error);
             });
         });
     };
