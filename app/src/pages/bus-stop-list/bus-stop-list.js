@@ -27,10 +27,11 @@ var BusStopListPage = (function () {
         this.serverService = serverService;
         this.title = "Bus Stops";
         //navParams : stopId stopName
-        this.getBusStops().then(function (array) {
+        this.busStops = [];
+        this.serverService.getStopInfo('').then(function (array) {
             _this.busStops = array;
-        }, function (rejected) {
-            console.log(rejected);
+        }, function (err) {
+            console.log('error getting bus stops', err.message);
             _this.busStops = [];
         });
     }
@@ -39,16 +40,6 @@ var BusStopListPage = (function () {
     };
     BusStopListPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
-    };
-    BusStopListPage.prototype.getBusStops = function () {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this.serverService.getBusStopLocations().then(function (data) {
-                resolve(data);
-            }, function (rejected) {
-                reject(rejected);
-            });
-        });
     };
     BusStopListPage.prototype.openBusStop = function (busStop) {
         var tryModal = this.modalctrl.create(BusStopPage, { stopId: busStop.busStopId, stopName: busStop.busStopName });

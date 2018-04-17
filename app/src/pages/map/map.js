@@ -73,8 +73,6 @@ var MapPage = (function () {
     }
     //Unsubscribe from the server's updates when the page is closed
     MapPage.prototype.ngOnDestroy = function () {
-        this.busSubscription.unsubscribe();
-        this.stopsSubscription.unsubscribe();
     };
     //Functions which run when the page is opened
     MapPage.prototype.ionViewDidLoad = function () {

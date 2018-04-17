@@ -72,7 +72,7 @@ var BusRouteProvider = (function () {
             });
         });
     };
-    BusRouteProvider.URL = "http://10.0.0.4:" + 8080 + "/busRoutes";
+    BusRouteProvider.URL = "http://localhost:" + 8080 + "/busRoutes";
     BusRouteProvider = BusRouteProvider_1 = __decorate([
         Injectable(),
         __metadata("design:paramtypes", [HttpClient])

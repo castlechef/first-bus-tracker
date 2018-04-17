@@ -12,7 +12,7 @@ import {StopInfo} from '../stopInfo.interface';
 export class ServerProvider {
   // url for the api where the data is coming from
   //private _url: string = 'http://localhost:8080/';
-  private _url: string = `http://10.0.0.4:${8080}/`;
+  private _url: string = `http://localhost:${8080}/`;
   private buses: Bus[];
 
   constructor(private http: HttpClient) {

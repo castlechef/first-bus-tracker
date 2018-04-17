@@ -20,14 +20,15 @@ export class BusStopListPage {
 
   public title = "Bus Stops";
 
-  busStops: Array<Stop>;
+  busStops: Stop[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController, public serverService: ServerProvider) {
     //navParams : stopId stopName
-    this.getBusStops().then( array =>{
+    this.busStops = [];
+    this.serverService.getStopInfo('').then( array =>{
       this.busStops = array;
-    }, rejected =>{
-      console.log(rejected);
+    }, err =>{
+      console.log('error getting bus stops', err.message);
       this.busStops = [];
     });
   }
@@ -38,16 +39,6 @@ export class BusStopListPage {
 
   closeModal(){
     this.viewctrl.dismiss();
-  }
-
-  private getBusStops() : Promise<Array<Stop>>{
-    return new Promise<Array<Stop>>((resolve, reject)=>{
-      this.serverService.getBusStopLocations().then(data=>{
-        resolve(data);
-      }, rejected =>{
-        reject(rejected);
-      });
-    });
   }
 
   openBusStop(busStop){

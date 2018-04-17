@@ -17,7 +17,7 @@ var ServerProvider = (function () {
         this.http = http;
         // url for the api where the data is coming from
         //private _url: string = 'http://localhost:8080/';
-        this._url = "http://10.0.0.4:" + 8080 + "/";
+        this._url = "http://localhost:" + 8080 + "/";
         this.buses = [];
         this.startBusFetchingBuses();
     }
