@@ -35,7 +35,6 @@ export class MapPage {
   private busIntervals: Map<number, any>;
   private buses: Bus[];
   private busStops: Stop[];
-  private interval;
   public routeStates: { busRouteName: string, active: boolean }[];
 
   //in case server fails stuff gets put into the errorMessage - isn't used for anything currently
@@ -149,240 +148,6 @@ export class MapPage {
     });
   }
 
-  //gets the bus stops from the server and adds them to the map - they are set to update automatically.
-  private addBusStops() {
-    let busStops: any = [];
-
-    this.serverService.getBusStopLocations().then(data => {
-      busStops = data;
-      for (let i = 0; i < busStops.length; i++) {
-        this.addBusStop(busStops[i]);
-      }
-    }, rejected => {
-      console.log(rejected);
-      setInterval(() => {
-        this.addBusStops();
-      }, 1000);
-    });
-  }
-
-  //adds a single bus stop to the map with a click event that opens the relevant busstoppage
-  private addBusStop(busStop) {
-    let stopMarker = new google.maps.Marker({
-      map: this.map,
-      position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
-      title: busStop.busStopName,
-      icon: {
-        url: '../assets/icon/busStop.png',
-        scaledSize: new google.maps.Size(42,42)
-      }
-    });
-
-    //this.busStopMarkers.set(busStop.busStopId, stopMarker);
-    google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
-  }
-
-  //Opens a bus stop page with the details of the bus stop
-  private openBusStopPage(busStopId, busStopName) {
-    let tryModal = this.modalctrl.create(BusStopPage, {stopId: busStopId, stopName: busStopName});
-    tryModal.present();
-  }
-
-  //Adds the bus routes from the default routes (Future: Communicate with server to obtain the routes)
-  private async addBusRoutes(): Promise<void> {
-    const routesToShow = this.getRoutesToShow();
-    const roundaboutCoords = [
-      {lat: 51.377484, lng: -2.361208},
-      {lat: 51.377484, lng: -2.361208},
-      {lat: 51.377385, lng: -2.360370},
-      {lat: 51.377337, lng: -2.359838},
-      {lat: 51.377314, lng: -2.359773},
-      {lat: 51.377296, lng: -2.359740},
-      {lat: 51.377169, lng: -2.359606},
-      {lat: 51.377153, lng: -2.359604},
-      {lat: 51.377118, lng: -2.359625},
-      {lat: 51.377085, lng: -2.359652},
-      {lat: 51.377043, lng: -2.359702},
-      {lat: 51.377004, lng: -2.359801},
-      {lat: 51.377161, lng: -2.361322},
-      {lat: 51.377194, lng: -2.361415},
-      {lat: 51.377233, lng: -2.361461},
-      {lat: 51.377278, lng: -2.361488},
-      {lat: 51.377328, lng: -2.361506},
-      {lat: 51.377371, lng: -2.361495},
-      {lat: 51.377413, lng: -2.361458},
-      {lat: 51.377434, lng: -2.361423},
-      {lat: 51.377454, lng: -2.361383},
-      {lat: 51.377480, lng: -2.361299},
-      {lat: 51.377483, lng: -2.361218},
-      {lat: 51.377484, lng: -2.361208}
-    ];
-    let routes: BusRoute[];
-    let sections: Section[];
-    try {
-      routes = await this.busRouteProvider.getBusRoutes();
-      sections = await this.busRouteProvider.getSections();
-    } catch (e) {
-      console.log('Cannot get routes data.');
-      return;
-    }
-
-    function getSectionFromId(id: number) {
-      return sections.find(s => s.sectionId === id);
-    }
-
-    function getAllUsedSections() {
-      let allSections = [];
-      routes
-        .filter(({busRouteName}) => routesToShow.indexOf(busRouteName) !== -1)
-        .forEach(({sectionsUsed}) => sectionsUsed.forEach(s => allSections.push(s)));
-
-      // Convert to a set then back to an array to remove duplicates
-      return Array.from(new Set(allSections));
-    }
-
-    //routes.forEach(({busRouteName, sectionsUsed}) => {
-    //  sectionsUsed.forEach(sectionId => {
-    this.busRouteSectionLines.forEach(polyline => {
-      polyline.setMap(null);
-    });
-    getAllUsedSections().forEach(sectionId => {
-      if (this.busRouteSectionLines.has(sectionId)) {
-        this.busRouteSectionLines.get(sectionId).setMap(this.map);
-        return;
-      }
-      const section = getSectionFromId(sectionId);
-      const googleMapStyle = section.positions.map(({latitude: lat, longitude: lng}) => ({lat, lng}));
-      const busRoute = new google.maps.Polyline({
-        path: googleMapStyle,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.2,
-        strokeWeight: 6,
-        map: this.map
-      });
-      this.busRouteSectionLines.set(sectionId, busRoute);
-    });
-    //});
-
-    const roundabout = new google.maps.Polygon({
-      paths: roundaboutCoords,
-      strokeColor: '#505050',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#505050',
-      fillOpacity: 0
-    });
-    roundabout.setMap(this.map);
-  }
-
-  //Gets the buses from the server, adds the to the map - set to update automatically
-  private addBuses() {
-    setInterval(() => {
-      this.serverService.getBusLocations()/*.then((buses) => {
-        for (let i = 0; i < buses.length; i++) {
-          this.addBus(buses[i]);
-        }
-      }, rejected => {
-        console.log(rejected);
-      });*/
-    }, 1000);
-  }
-
-  //Adds a bus marker to the map with a click event
-  private addBus(bus) {
-    if (this.busMarkers.get(bus.busId)) {
-      const marker = this.busMarkers.get(bus.busId);
-      this.animateMovement(marker, bus.location);
-      //this.busMarkers.get(bus.busId).setPosition(new google.maps.LatLng(bus.location.latitude, bus.location.longitude));
-    } else {
-      let busMarker = new google.maps.Marker({
-        map: this.map,
-        position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
-        title: bus.routeName,
-        icon: {
-          url: '../assets/icon/bus.png',
-          anchor: new google.maps.Point(32,50)
-        }
-      });
-      this.busMarkers.set(bus.busId, busMarker);
-      google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
-    }
-  }
-
-  //Animates the movement of a marker to a new longitude/latitude
-  private async animateMovement(marker: google.maps.Marker, location: { latitude: number, longitude: number }) {
-    function sleep(millis: number): Promise<void> {
-      return new Promise(resolve => {
-        setTimeout(() => resolve(), millis);
-      });
-    }
-
-    function ease(x: number): number {
-      return ((Math.sin((x - 0.5) * Math.PI)) + 1) / 2;
-    }
-
-    const timeToAnimate = 100;
-    const fps = 24;
-    const totalFrames = timeToAnimate * fps / 1000;
-
-    const oldLat = marker.getPosition().lat();
-    const newLat = location.latitude;
-    const oldLon = marker.getPosition().lng();
-    const newLon = location.longitude;
-    const latDif = newLat - oldLat;
-    const lonDif = newLon - oldLon;
-
-    for (let i = 1; i <= totalFrames; i++) {
-      const proportion = ease(i / totalFrames);
-      const lat = oldLat + (proportion * latDif);
-      const lng = oldLon + (proportion * lonDif);
-      await sleep(1000 / fps);
-      marker.setPosition({lat, lng});
-    }
-  }
-
-  //Opens the bus page with the bus info of the bus given.
-  private openBusPage(busId, route) {
-    let tryModal = this.modalctrl.create(BusPage, {busId: busId, routeName: route});
-    tryModal.present();
-  }
-
-  private getRoutesToShow(): string[] {
-    return this.routeStates
-      .filter(({active}) => active)
-      .map(({busRouteName}) => busRouteName);
-  }
-
-  public async updateBusRouteBeingUsed() {
-    if (!this.routeStates) {
-      let busRoutes;
-      try {
-        busRoutes = await this.busRouteProvider.getBusRoutes();
-      } catch(err) {
-        console.log('Can\'t get busRoutes', err);
-        return
-      }
-      const busRouteNames = busRoutes.map(({busRouteName}) => busRouteName);
-      this.routeStates = busRouteNames.map(busRouteName => ({busRouteName, active: true}));
-    }
-    this.addBusStops();
-    this.addBusRoutes();
-    this.addBuses();
-    // updates buses shown
-    // updates routes shown
-    //this.updateBusRoutesShown();
-    // updates bus stops shown
-  }
-
-  private updateBusRoutesShown() {
-    console.log('updating things shown');
-    this.busRouteSectionLines.forEach(polyline => {
-      polyline.setMap(null);
-    });
-    this.addBusRoutes();
-  }
-
   private async presentOptionsPopover(event: UIEvent) {
     if (!this.routeStates) {
       let busRoutes;
@@ -403,12 +168,6 @@ export class MapPage {
     });
   }
 
-
-
-
-
-
-
   private async setupMapElements() {
     try {
       const busRoutes = await this.busRouteProvider.getBusRoutes();
@@ -426,15 +185,7 @@ export class MapPage {
     }
   }
 
-  public updateMapElementsVisibility() {
-    this.updateBusRoutesVisibility();
-    this.updateBusesVisibility();
-    this.updateBusStopsVisibility();
-  }
-
   private async setupMapRoutes() {
-    const routesToShow = this.getRoutesToShow();
-    const routes = await this.busRouteProvider.getBusRoutes();
     const sections: Section[] = await this.busRouteProvider.getSections();
     console.log('setting up map routes');
 
@@ -489,15 +240,34 @@ export class MapPage {
 
   }
 
-  private async getSectionsUsed(): Promise<number[]> {
-    const busRoutes: BusRoute[] = await this.busRouteProvider.getBusRoutes();
-    let sectionsToUse: Set<number> = new Set<number>();
-    busRoutes.forEach(busRoute => {
-      if (this.getRoutesToShow().indexOf(busRoute.busRouteName) !== -1) {
-        busRoute.sectionsUsed.forEach(id => sectionsToUse.add(id));
-      }
+  private setupMapBuses() {
+    setInterval(() => {
+      this.buses = this.serverService.getBusLocations();
+      this.addBusesToMap();
+    }, 1000)
+  }
+
+  private async setupMapBusStops() {
+    this.busStops = await this.serverService.getBusStopLocations();
+    this.busStops.forEach(busStop => {
+      const stopMarker = new google.maps.Marker({
+        position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
+        title: busStop.busStopName,
+        icon: {
+          url: '../assets/icon/busStop.png',
+          scaledSize: new google.maps.Size(42,42)
+        }
+      });
+      this.busStopMarkers.set(busStop.busStopId,stopMarker);
+      google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
     });
-    return Array.from(sectionsToUse);
+    this.updateBusStopsVisibility();
+  }
+
+  public updateMapElementsVisibility() {
+    this.updateBusRoutesVisibility();
+    this.updateBusesVisibility();
+    this.updateBusStopsVisibility();
   }
 
   private async updateBusRoutesVisibility() {
@@ -512,34 +282,7 @@ export class MapPage {
     });
   }
 
-  private setupMapBuses() {
-    setInterval(() => {
-      this.buses = this.serverService.getBusLocations();
-      this.addBusesToMap();
-    }, 1000)
-  }
-
-  private addBusesToMap() {
-    this.buses.forEach(bus => this.addBusToMap(bus));
-  }
-
-  private addBusToMap(bus: Bus) {
-    if (this.busMarkers.has(bus.busId)) {
-      const busMarker = this.busMarkers.get(bus.busId);
-      this.animateMovement(busMarker, bus.location);
-    } else {
-      let busMarker = new google.maps.Marker({
-        position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
-        title: bus.routeName
-      });
-      this.busMarkers.set(bus.busId, busMarker);
-      google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
-    }
-    this.updateBusesVisibility();
-  }
-
   private updateBusesVisibility() {
-    // uses this.routeStates to hide/show buses
     this.buses.forEach(bus => {
       if (this.busMarkers.has(bus.busId)) {
         const busMarker = this.busMarkers.get(bus.busId);
@@ -558,27 +301,7 @@ export class MapPage {
     });
   }
 
-  private async setupMapBusStops() {
-    this.busStops = await this.serverService.getBusStopLocations();
-    this.busStops.forEach(busStop => {
-      const stopMarker = new google.maps.Marker({
-        position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
-        title: busStop.busStopName,
-        icon: {
-          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-          scale: 3
-        }
-      });
-      //stopMarker.setMap(this.map);
-      this.busStopMarkers.set(busStop.busStopId,stopMarker);
-      google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
-    });
-    this.updateBusStopsVisibility();
-  }
-
   private updateBusStopsVisibility() {
-    // uses this.routeStates to hide/show bus stops
-
     const shouldShowStop = (id): boolean => {
       return this.busStops
         .find(({busStopId}) => id === busStopId)
@@ -586,7 +309,6 @@ export class MapPage {
     };
 
     this.busStopMarkers.forEach((stopMarker, id) => {
-      const stop = this.busStops.find(({busStopId}) => id === busStopId);
       if (shouldShowStop(id)) {
         if (stopMarker.getMap() !== this.map) stopMarker.setMap(this.map);
       } else {
@@ -595,13 +317,89 @@ export class MapPage {
     });
   }
 
+  private getRoutesToShow(): string[] {
+    return this.routeStates
+      .filter(({active}) => active)
+      .map(({busRouteName}) => busRouteName);
+  }
+
+  private async getSectionsUsed(): Promise<number[]> {
+    const busRoutes: BusRoute[] = await this.busRouteProvider.getBusRoutes();
+    let sectionsToUse: Set<number> = new Set<number>();
+    busRoutes.forEach(busRoute => {
+      if (this.getRoutesToShow().indexOf(busRoute.busRouteName) !== -1) {
+        busRoute.sectionsUsed.forEach(id => sectionsToUse.add(id));
+      }
+    });
+    return Array.from(sectionsToUse);
+  }
+
+  private addBusesToMap() {
+    this.buses.forEach(bus => this.addBusToMap(bus));
+  }
+
+  private addBusToMap(bus: Bus) {
+    if (this.busMarkers.has(bus.busId)) {
+      const busMarker = this.busMarkers.get(bus.busId);
+      this.animateMovement(busMarker, bus.location);
+    } else {
+      let busMarker = new google.maps.Marker({
+        position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
+        title: bus.routeName,
+        icon: {
+          url: '../assets/icon/bus.png',
+          anchor: new google.maps.Point(32,50)
+        }
+      });
+      this.busMarkers.set(bus.busId, busMarker);
+      google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
+    }
+    this.updateBusesVisibility();
+  }
+
+  //Animates the movement of a marker to a new longitude/latitude
+  private async animateMovement(marker: google.maps.Marker, location: { latitude: number, longitude: number }) {
+    function sleep(millis: number): Promise<void> {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(), millis);
+      });
+    }
+
+    function ease(x: number): number {
+      return ((Math.sin((x - 0.5) * Math.PI)) + 1) / 2;
+    }
+
+    const timeToAnimate = 100;
+    const fps = 24;
+    const totalFrames = timeToAnimate * fps / 1000;
+
+    const oldLat = marker.getPosition().lat();
+    const newLat = location.latitude;
+    const oldLon = marker.getPosition().lng();
+    const newLon = location.longitude;
+    const latDif = newLat - oldLat;
+    const lonDif = newLon - oldLon;
+
+    for (let i = 1; i <= totalFrames; i++) {
+      const proportion = ease(i / totalFrames);
+      const lat = oldLat + (proportion * latDif);
+      const lng = oldLon + (proportion * lonDif);
+      await sleep(1000 / fps);
+      marker.setPosition({lat, lng});
+    }
+  }
 
 
+  //Opens the bus page with the bus info of the bus given.
+  private openBusPage(busId, route) {
+    let tryModal = this.modalctrl.create(BusPage, {busId: busId, routeName: route});
+    tryModal.present();
+  }
 
-
-
-
-
-
+  //Opens a bus stop page with the details of the bus stop
+  private openBusStopPage(busStopId, busStopName) {
+    let tryModal = this.modalctrl.create(BusStopPage, {stopId: busStopId, stopName: busStopName});
+    tryModal.present();
+  }
 
 }
