@@ -33,25 +33,42 @@ var BusPage = (function () {
         this.serverService = serverService;
         this.title = 'Bus';
         this.capacityInput = true;
+        this.capacityShown = false;
         this.title = navParams.get('routeName');
         this.busId = navParams.get('busId');
         this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
             _this.nextBusStops = busInfo.arrivalTimes;
             _this.capacity = busInfo.capacity;
-            _this.writeCapacityDisplay(busInfo.capacity);
+            if (_this.distanceClose(busInfo.location, { latitude: 0.0, longitude: 0.0 })) {
+                _this.capacityInput = true;
+            }
+            else {
+                _this.writeCapacityDisplay(busInfo.capacity);
+            }
         }, function (rejected) {
             console.log(rejected);
-            _this.capacity = "Can't connect to server";
+            _this.capacity = "UNKNOWN";
             _this.writeCapacityDisplay("UNKNOWN");
             _this.nextBusStops = [];
         });
-        //this.infoUpdater();
+        this.infoUpdater();
     }
     BusPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad ' + this.nextBusStops);
     };
     BusPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
+    };
+    BusPage.prototype.distanceClose = function (busPosition, userPosition) {
+        function toRadians(n) { return n * Math.PI / 180; }
+        var R = 6371e3;
+        var theta1 = toRadians(busPosition.latitude);
+        var theta2 = toRadians(userPosition.latitude);
+        var deltaTheta = toRadians(userPosition.latitude - busPosition.latitude);
+        var deltaLamda = toRadians(userPosition.longitude - busPosition.longitude);
+        var a = (Math.pow(Math.sin(deltaTheta / 2), 2)) + (Math.cos(theta1) * Math.cos(theta2) * (Math.pow(Math.sin(deltaLamda / 2), 2)));
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c < 50;
     };
     BusPage.prototype.infoUpdater = function () {
         var _this = this;
@@ -76,42 +93,38 @@ var BusPage = (function () {
         });
     };
     BusPage.prototype.inputCapacity = function (number) {
-        this.capacity = capacities[number];
-        console.log(capacities[number]);
-        this.writeCapacityDisplay(capacities[number]);
+        this.sub_capacity = capacities[number];
     };
     BusPage.prototype.submitCapacity = function () {
-        this.serverService.setCapacity(this.busId, this.capacity);
+        this.serverService.setCapacity(this.busId, this.sub_capacity);
         this.capacityInput = false;
+        this.writeCapacityDisplay(this.capacity);
     };
     BusPage.prototype.dismissCapacity = function () {
+        this.writeCapacityDisplay(this.capacity);
         this.capacityInput = false;
     };
     BusPage.prototype.writeCapacityDisplay = function (capacity) {
         switch (capacity) {
-            case "UNKNOWN":
-                this.capacityDisplay = "The capacity of this bus is currently unknown";
-                this.capacityDisplayStyle = { 'background-color': 'white' };
-                break;
             case "EMPTY":
                 this.capacityDisplay = "This bus is empty";
-                this.capacityDisplayStyle = { 'background-color': 'green' };
+                this.capacityShown = true;
                 break;
             case "QUIET":
                 this.capacityDisplay = "This bus is quiet";
-                this.capacityDisplayStyle = { 'background-color': 'white' };
+                this.capacityShown = true;
                 break;
             case "BUSY":
                 this.capacityDisplay = "This bus is busy";
-                this.capacityDisplayStyle = { 'background-color': 'white' };
+                this.capacityShown = true;
                 break;
             case "FULL":
                 this.capacityDisplay = "This bus is full";
-                this.capacityDisplayStyle = { 'background-color': 'white' };
+                this.capacityShown = true;
                 break;
             default:
-                this.capacityDisplay = "If this displays, refresh the app.";
-                this.capacityDisplayStyle = { 'background-color': 'red' };
+                this.capacityDisplay = "";
+                this.capacityShown = false;
         }
     };
     BusPage = __decorate([

@@ -23,10 +23,11 @@ export class BusPage {
   public busId;
   public title = 'Bus';
   public capacity: string;
+  public sub_capacity: string;
   public capacityDisplay: string;
   public capacityInput = true;
-  public capacityDisplayStyle: object;
-  nextBusStops: Array<{ busStopId: number, busStopsName: string, arrivalTime: string }>;
+  public capacityShown = false;
+  public nextBusStops: Array<{ busStopId: number, busStopsName: string, arrivalTime: string }>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public serverService: ServerProvider) {
     this.title = navParams.get('routeName');
@@ -34,14 +35,18 @@ export class BusPage {
     this.getBusInfo(navParams.get('busId')).then(busInfo => {
       this.nextBusStops = busInfo.arrivalTimes;
       this.capacity = busInfo.capacity;
-      this.writeCapacityDisplay(busInfo.capacity);
+      if(this.distanceClose(busInfo.location, {latitude: 0.0, longitude: 0.0})){
+        this.capacityInput = true;
+      } else {
+        this.writeCapacityDisplay(busInfo.capacity);
+      }
     }, rejected => {
       console.log(rejected);
-      this.capacity =  "Can't connect to server";
+      this.capacity =  "UNKNOWN";
       this.writeCapacityDisplay("UNKNOWN");
       this.nextBusStops = [];
     });
-    //this.infoUpdater();
+    this.infoUpdater();
   }
 
   ionViewDidLoad() {
@@ -50,6 +55,18 @@ export class BusPage {
 
   closeModal() {
     this.viewctrl.dismiss();
+  }
+
+  public distanceClose(busPosition, userPosition){
+    function toRadians(n: number): number { return n * Math.PI / 180; }
+    const R = 6371e3;
+    const theta1 = toRadians(busPosition.latitude);
+    const theta2 = toRadians(userPosition.latitude);
+    const deltaTheta = toRadians(userPosition.latitude - busPosition.latitude);
+    const deltaLamda = toRadians(userPosition.longitude - busPosition.longitude);
+    const a = (Math.sin(deltaTheta / 2) ** 2) + (Math.cos(theta1) * Math.cos(theta2) * (Math.sin(deltaLamda / 2) ** 2));
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c < 50;
   }
 
   private infoUpdater() {
@@ -75,45 +92,41 @@ export class BusPage {
   }
 
   private inputCapacity(number) {
-    this.capacity = capacities[number];
-    console.log(capacities[number]);
-    this.writeCapacityDisplay(capacities[number]);
+    this.sub_capacity = capacities[number];
   }
 
   private submitCapacity() {
-    this.serverService.setCapacity(this.busId, this.capacity);
+    this.serverService.setCapacity(this.busId, this.sub_capacity);
     this.capacityInput = false;
+    this.writeCapacityDisplay(this.capacity);
   }
 
   private dismissCapacity() {
+    this.writeCapacityDisplay(this.capacity);
     this.capacityInput = false;
   }
 
   private writeCapacityDisplay(capacity){
     switch(capacity){
-      case "UNKNOWN":
-        this.capacityDisplay = "The capacity of this bus is currently unknown";
-        this.capacityDisplayStyle = {'background-color': 'white'};
-        break;
       case "EMPTY":
         this.capacityDisplay = "This bus is empty";
-        this.capacityDisplayStyle = {'background-color': 'green'};
+        this.capacityShown = true;
         break;
       case "QUIET":
         this.capacityDisplay = "This bus is quiet";
-        this.capacityDisplayStyle = {'background-color': 'white'};
+        this.capacityShown = true;
         break;
       case "BUSY":
         this.capacityDisplay = "This bus is busy";
-        this.capacityDisplayStyle = {'background-color': 'white'};
+        this.capacityShown = true;
         break;
       case "FULL":
         this.capacityDisplay = "This bus is full";
-        this.capacityDisplayStyle = {'background-color': 'white'};
+        this.capacityShown = true;
         break;
       default:
-        this.capacityDisplay = "If this displays, refresh the app.";
-        this.capacityDisplayStyle = {'background-color': 'red'};
+        this.capacityDisplay = "";
+        this.capacityShown = false;
     }
   }
 }
