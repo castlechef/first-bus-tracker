@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
-import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angular';
+import {Component} from '@angular/core';
+import {ViewController, IonicPage, NavController, NavParams} from 'ionic-angular';
 import {ServerProvider} from '../../providers/server-provider';
-import { BusInfo } from '../../busInfo.interface';
+import {BusInfo} from '../../busInfo.interface';
+
 /**
  * Generated class for the BusPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
+
+
+enum capacities {'UNKNOWN', 'EMPTY', 'QUIET','BUSY', 'FULL'}
 
 @IonicPage()
 @Component({
@@ -16,12 +20,13 @@ import { BusInfo } from '../../busInfo.interface';
 })
 export class BusPage {
 
-  public title = "Bus";
   public busId;
-  private capacities = ["UNKNOWN", "EMPTY", "QUIET", "BUSY", "FULL"];
-  nextBusStops: Array<{ busStopId: number, busStopsName: string, arrivalTime: string }>;
-
+  public title = 'Bus';
   public capacity: string;
+  public capacityDisplay: string;
+  public capacityInput = true;
+  public capacityDisplayStyle: object;
+  nextBusStops: Array<{ busStopId: number, busStopsName: string, arrivalTime: string }>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public serverService: ServerProvider) {
     this.title = navParams.get('routeName');
@@ -29,12 +34,14 @@ export class BusPage {
     this.getBusInfo(navParams.get('busId')).then(busInfo => {
       this.nextBusStops = busInfo.arrivalTimes;
       this.capacity = busInfo.capacity;
+      this.writeCapacityDisplay(busInfo.capacity);
     }, rejected => {
       console.log(rejected);
-      this.capacity = "UNKNOWN";
+      this.capacity =  "Can't connect to server";
+      this.writeCapacityDisplay("UNKNOWN");
       this.nextBusStops = [];
     });
-    this.infoUpdater();
+    //this.infoUpdater();
   }
 
   ionViewDidLoad() {
@@ -50,6 +57,7 @@ export class BusPage {
       this.getBusInfo(this.busId).then(busInfo => {
         this.nextBusStops = busInfo.arrivalTimes;
         this.capacity = busInfo.capacity;
+        this.writeCapacityDisplay(busInfo.capacity);
       }, rejected => {
         console.log(rejected);
       });
@@ -66,7 +74,46 @@ export class BusPage {
     });
   }
 
-  private inputCapacity(number){
-    this.serverService.setCapacity(this.busId, this.capacities[number]);
+  private inputCapacity(number) {
+    this.capacity = capacities[number];
+    console.log(capacities[number]);
+    this.writeCapacityDisplay(capacities[number]);
+  }
+
+  private submitCapacity() {
+    this.serverService.setCapacity(this.busId, this.capacity);
+    this.capacityInput = false;
+  }
+
+  private dismissCapacity() {
+    this.capacityInput = false;
+  }
+
+  private writeCapacityDisplay(capacity){
+    switch(capacity){
+      case "UNKNOWN":
+        this.capacityDisplay = "The capacity of this bus is currently unknown";
+        this.capacityDisplayStyle = {'background-color': 'white'};
+        break;
+      case "EMPTY":
+        this.capacityDisplay = "This bus is empty";
+        this.capacityDisplayStyle = {'background-color': 'green'};
+        break;
+      case "QUIET":
+        this.capacityDisplay = "This bus is quiet";
+        this.capacityDisplayStyle = {'background-color': 'white'};
+        break;
+      case "BUSY":
+        this.capacityDisplay = "This bus is busy";
+        this.capacityDisplayStyle = {'background-color': 'white'};
+        break;
+      case "FULL":
+        this.capacityDisplay = "This bus is full";
+        this.capacityDisplayStyle = {'background-color': 'white'};
+        break;
+      default:
+        this.capacityDisplay = "If this displays, refresh the app.";
+        this.capacityDisplayStyle = {'background-color': 'red'};
+    }
   }
 }

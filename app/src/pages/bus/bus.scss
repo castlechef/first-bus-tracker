@@ -6,6 +6,11 @@ page-bus {
   .capacity {
     position: absolute;
     bottom: 0px;
+    width: 100%;
+    background-color: #e91c63;
   }
 
+  ion-item.item.item-block.item-md.item-range {
+    background-color: #e91c63;
+  }
 }
