@@ -16,6 +16,14 @@ import { ServerProvider } from '../../providers/server-provider';
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
+var capacities;
+(function (capacities) {
+    capacities[capacities["UNKNOWN"] = 0] = "UNKNOWN";
+    capacities[capacities["EMPTY"] = 1] = "EMPTY";
+    capacities[capacities["QUIET"] = 2] = "QUIET";
+    capacities[capacities["BUSY"] = 3] = "BUSY";
+    capacities[capacities["FULL"] = 4] = "FULL";
+})(capacities || (capacities = {}));
 var BusPage = (function () {
     function BusPage(navCtrl, navParams, viewctrl, serverService) {
         var _this = this;
@@ -23,40 +31,21 @@ var BusPage = (function () {
         this.navParams = navParams;
         this.viewctrl = viewctrl;
         this.serverService = serverService;
-        this.title = "Bus";
-        this.capacities = [{
-                "data": {
-                    "capacity": "UNKNOWN"
-                }
-            }, {
-                "data": {
-                    "capacity": "EMPTY"
-                }
-            }, {
-                "data": {
-                    "capacity": "QUIET"
-                }
-            }, {
-                "data": {
-                    "capacity": "BUSY"
-                }
-            }, {
-                "data": {
-                    "capacity": "FULL"
-                }
-            }];
+        this.title = 'Bus';
         this.capacityInput = true;
         this.title = navParams.get('routeName');
         this.busId = navParams.get('busId');
         this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
             _this.nextBusStops = busInfo.arrivalTimes;
             _this.capacity = busInfo.capacity;
+            _this.writeCapacityDisplay(busInfo.capacity);
         }, function (rejected) {
             console.log(rejected);
-            _this.capacity = "UNKNOWN";
+            _this.capacity = "Can't connect to server";
+            _this.writeCapacityDisplay("UNKNOWN");
             _this.nextBusStops = [];
         });
-        this.infoUpdater();
+        //this.infoUpdater();
     }
     BusPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad ' + this.nextBusStops);
@@ -70,6 +59,7 @@ var BusPage = (function () {
             _this.getBusInfo(_this.busId).then(function (busInfo) {
                 _this.nextBusStops = busInfo.arrivalTimes;
                 _this.capacity = busInfo.capacity;
+                _this.writeCapacityDisplay(busInfo.capacity);
             }, function (rejected) {
                 console.log(rejected);
             });
@@ -86,11 +76,43 @@ var BusPage = (function () {
         });
     };
     BusPage.prototype.inputCapacity = function (number) {
-        this.capacity = this.capacities[number].data.capacity;
-        this.serverService.setCapacity(this.busId, this.capacities[number]);
+        this.capacity = capacities[number];
+        console.log(capacities[number]);
+        this.writeCapacityDisplay(capacities[number]);
     };
-    BusPage.prototype.closeCapacity = function () {
+    BusPage.prototype.submitCapacity = function () {
+        this.serverService.setCapacity(this.busId, this.capacity);
         this.capacityInput = false;
+    };
+    BusPage.prototype.dismissCapacity = function () {
+        this.capacityInput = false;
+    };
+    BusPage.prototype.writeCapacityDisplay = function (capacity) {
+        switch (capacity) {
+            case "UNKNOWN":
+                this.capacityDisplay = "The capacity of this bus is currently unknown";
+                this.capacityDisplayStyle = { 'background-color': 'white' };
+                break;
+            case "EMPTY":
+                this.capacityDisplay = "This bus is empty";
+                this.capacityDisplayStyle = { 'background-color': 'green' };
+                break;
+            case "QUIET":
+                this.capacityDisplay = "This bus is quiet";
+                this.capacityDisplayStyle = { 'background-color': 'white' };
+                break;
+            case "BUSY":
+                this.capacityDisplay = "This bus is busy";
+                this.capacityDisplayStyle = { 'background-color': 'white' };
+                break;
+            case "FULL":
+                this.capacityDisplay = "This bus is full";
+                this.capacityDisplayStyle = { 'background-color': 'white' };
+                break;
+            default:
+                this.capacityDisplay = "If this displays, refresh the app.";
+                this.capacityDisplayStyle = { 'background-color': 'red' };
+        }
     };
     BusPage = __decorate([
         IonicPage(),

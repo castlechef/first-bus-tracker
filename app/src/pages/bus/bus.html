@@ -8,7 +8,7 @@
 
   <ion-navbar color="custPink">
     <ion-title>
-      {{capacity}}
+      {{title}}
     </ion-title>
 
     <ion-buttons start>
@@ -18,6 +18,9 @@
     </ion-buttons>
 
   </ion-navbar>
+  <ion-toolbar capacityShown ng-style="{'background-color': 'blue'}">
+    <ion-title>{{capacityDisplay}}</ion-title>
+  </ion-toolbar>
 
 </ion-header>
 
@@ -30,15 +33,16 @@
     </button>
   </ion-list>
   <div *ngIf="capacityInput" class="capacity" style="display: block">
+    <ion-title>How full is this bus?</ion-title>
     <ion-item>
-      <ion-range [debounce]="1000" min="1" max="4" snaps="true" color="custPink" [(ngModel)]="sliderValue" (ionChange)="inputCapacity(sliderValue)">
+      <ion-range min="1" max="4" snaps="true" color="white" [(ngModel)]="sliderValue" (ionChange)="inputCapacity(sliderValue)">
         <ion-label range-left>Empty</ion-label>
         <ion-label range-right>Full</ion-label>
         <ion-buttons range-right>
-          <button ion-button color="light" (click)="closeCapacity()">
+          <button ion-button color="light" (click)="submitCapacity()">
             OK
           </button>
-          <button ion-button color="light" (click)="closeCapacity()">
+          <button ion-button color="light" (click)="dismissCapacity()">
             Dismiss
           </button>
         </ion-buttons>
