@@ -33,6 +33,7 @@ export class BusPage {
     this.title = navParams.get('routeName');
     this.busId = navParams.get('busId');
     this.getBusInfo(navParams.get('busId')).then(busInfo => {
+      console.log(busInfo);
       this.nextBusStops = busInfo.arrivalTimes;
       this.capacity = busInfo.capacity;
       if(this.distanceClose(busInfo.location, {latitude: 0.0, longitude: 0.0})){
