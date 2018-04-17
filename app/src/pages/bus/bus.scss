@@ -13,4 +13,16 @@ page-bus {
   ion-item.item.item-block.item-md.item-range {
     background-color: #e91c63;
   }
+
+  ion-label.bottom.label.label-md {
+    color: white;
+    font-size: x-large;
+    padding: 3px 0px;
+    margin: auto;
+    width: fit-content;
+  }
+
+  .indicator{
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
 }
