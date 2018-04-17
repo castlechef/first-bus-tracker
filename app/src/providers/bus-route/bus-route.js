@@ -26,8 +26,8 @@ var BusRouteProvider = (function () {
                 resolve(_this.busRoutes);
             })
                 .catch(function (err) {
-                console.log('trying to get bus routes, but no data? server not connected?');
-                reject();
+                console.log("Error in getBusRoutes", err);
+                reject(err);
             });
         });
     };
@@ -39,8 +39,8 @@ var BusRouteProvider = (function () {
                 resolve(_this.sections);
             })
                 .catch(function (err) {
-                console.log('trying to get bus route sections, but no data? server not connected?');
-                reject();
+                console.log("Error in getSections", err);
+                reject(err);
             });
         });
     };
@@ -74,10 +74,10 @@ var BusRouteProvider = (function () {
     BusRouteProvider.URL = "http://10.0.0.4:" + 8080 + "/busRoutes";
     BusRouteProvider = BusRouteProvider_1 = __decorate([
         Injectable(),
-        __metadata("design:paramtypes", [typeof (_a = typeof HttpClient !== "undefined" && HttpClient) === "function" && _a || Object])
+        __metadata("design:paramtypes", [HttpClient])
     ], BusRouteProvider);
     return BusRouteProvider;
-    var BusRouteProvider_1, _a;
+    var BusRouteProvider_1;
 }());
 export { BusRouteProvider };
 //# sourceMappingURL=bus-route.js.map

@@ -84,10 +84,9 @@ var ServerProvider = (function () {
     };
     ServerProvider = __decorate([
         Injectable(),
-        __metadata("design:paramtypes", [typeof (_a = typeof HttpClient !== "undefined" && HttpClient) === "function" && _a || Object])
+        __metadata("design:paramtypes", [HttpClient])
     ], ServerProvider);
     return ServerProvider;
-    var _a;
 }());
 export { ServerProvider };
 //# sourceMappingURL=server-provider.js.map

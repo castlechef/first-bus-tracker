@@ -24,8 +24,8 @@ export class BusRouteProvider {
           resolve(this.busRoutes);
         })
         .catch(err => {
-          console.log('trying to get bus routes, but no data? server not connected?');
-          reject();
+          console.log("Error in getBusRoutes", err);
+          reject(err);
         });
     });
   }
@@ -37,8 +37,8 @@ export class BusRouteProvider {
           resolve(this.sections);
         })
         .catch(err => {
-          console.log('trying to get bus route sections, but no data? server not connected?');
-          reject();
+          console.log("Error in getSections", err);
+          reject(err);
         });
     });
   }
