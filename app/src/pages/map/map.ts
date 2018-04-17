@@ -47,9 +47,6 @@ export class MapPage {
   private busMarkers: Map<number, google.maps.Marker>;
   //colors for the bus routes
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
-  //kept to allow the page to unsubscribe from subscriptions when it's destroyed
-  private busSubscription;
-  private stopsSubscription;
 
   /**
    * imports all the necessary parameters
@@ -72,8 +69,6 @@ export class MapPage {
 
   //Unsubscribe from the server's updates when the page is closed
   ngOnDestroy() {
-    this.busSubscription.unsubscribe();
-    this.stopsSubscription.unsubscribe();
   }
 
   //Functions which run when the page is opened

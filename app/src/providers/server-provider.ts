@@ -12,7 +12,7 @@ import {StopInfo} from '../stopInfo.interface';
 export class ServerProvider {
   // url for the api where the data is coming from
   //private _url: string = 'http://localhost:8080/';
-  private _url: string = `http://10.0.0.4:${8080}/`;
+  private _url: string = `http://localhost:${8080}/`;
   private buses: Bus[];
 
   constructor(private http: HttpClient) {
@@ -73,10 +73,25 @@ export class ServerProvider {
         .toPromise()
         .then(body => {
           resolve(body.data);
-        }).catch(e => {
-        reject(e);
-      });
+        })
+        .catch(e => {
+          reject(e.message);
+        });
     })
+  }
+
+  getStops(): Promise<Stop[]> {
+    return new Promise<Stop[]>((resolve, reject) => {
+      this.http
+        .get<any>(this._url.concat('busStops/'))
+        .toPromise()
+        .then(body => {
+          resolve(body.data);
+        })
+        .catch(e => {
+          reject(e.message);
+        });
+    });
   }
 
   setCapacity(busId, capacity){

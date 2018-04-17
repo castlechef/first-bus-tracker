@@ -3,8 +3,8 @@ import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
-import { Page1 } from '../pages/page1/page1';
 import {MapPage} from '../pages/map/map';
+import {BusStopListPage} from '../pages/bus-stop-list/bus-stop-list';
 
 
 @Component({
@@ -20,8 +20,8 @@ export class MyApp {
   constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen) {
     // used for an example of ngFor and navigation
     this.pages = [
-      { title: 'Page One', component: Page1 },
-      { title: 'Map', component: MapPage }
+      { title: 'Map', component: MapPage },
+      { title: 'Bus Stops', component: BusStopListPage }
     ];
 
   }

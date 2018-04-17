@@ -25,30 +25,25 @@ var BusStopListPage = (function () {
         this.viewctrl = viewctrl;
         this.modalctrl = modalctrl;
         this.serverService = serverService;
-        this.title = "Bus Stops";
+        this.title = 'Bus Stops';
         //navParams : stopId stopName
-        this.getBusStops().then(function (array) {
-            _this.busStops = array;
-        }, function (rejected) {
-            console.log(rejected);
+        this.busStops = [];
+        this.serverService.getStops()
+            .then(function (array) {
+            _this.busStops = array.sort(function (s1, s2) { return s1.busStopName > s2.busStopName ? 1 : -1; });
+        }, function (err) {
+            console.log('error getting bus stops', err.message);
             _this.busStops = [];
         });
     }
+    BusStopListPage.prototype.ionViewWillEnter = function () {
+        this.viewctrl.showBackButton(false);
+    };
     BusStopListPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad BusStopPage');
     };
     BusStopListPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
-    };
-    BusStopListPage.prototype.getBusStops = function () {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this.serverService.getBusStopLocations().then(function (data) {
-                resolve(data);
-            }, function (rejected) {
-                reject(rejected);
-            });
-        });
     };
     BusStopListPage.prototype.openBusStop = function (busStop) {
         var tryModal = this.modalctrl.create(BusStopPage, { stopId: busStop.busStopId, stopName: busStop.busStopName });

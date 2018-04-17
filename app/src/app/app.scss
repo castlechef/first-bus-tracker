@@ -33,6 +33,11 @@ modal-wrapper {
     top: 0;
     left: 0;
     width: 25%;
+    min-width: 350px;
     height: 100%;
   }
+}
+
+.scroll-content {
+  overflow-y: auto;
 }
