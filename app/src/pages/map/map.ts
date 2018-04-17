@@ -279,13 +279,13 @@ export class MapPage {
   //Gets the buses from the server, adds the to the map - set to update automatically
   private addBuses() {
     setInterval(() => {
-      this.serverService.getBusLocations().then((buses) => {
+      this.serverService.getBusLocations()/*.then((buses) => {
         for (let i = 0; i < buses.length; i++) {
           this.addBus(buses[i]);
         }
       }, rejected => {
         console.log(rejected);
-      });
+      });*/
     }, 1000);
   }
 
