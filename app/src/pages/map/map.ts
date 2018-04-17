@@ -5,6 +5,7 @@ import {BusPage} from '../bus/bus';
 import {ServerProvider} from '../../providers/server-provider';
 import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus-route';
 import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover';
+import {} from 'googlemaps';
 import {Stop} from '../../stops.interface';
 import {Bus} from '../../bus.interface';
 
