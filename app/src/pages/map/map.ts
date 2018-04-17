@@ -8,6 +8,7 @@ import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover'
 import {} from 'googlemaps';
 import {Stop} from '../../stops.interface';
 import {Bus} from '../../bus.interface';
+import {SettingsProvider} from '../../providers/settings/settings';
 
 
 /**
@@ -60,7 +61,9 @@ export class MapPage {
               public modalctrl: ModalController,
               public serverService: ServerProvider,
               private busRouteProvider: BusRouteProvider,
-              private popoverCtrl: PopoverController) {
+              private popoverCtrl: PopoverController,
+              private settings: SettingsProvider
+  ) {
     this.busIntervals = new Map<number, any>();
     this.busStopMarkers = new Map<number, google.maps.Marker>();
     this.busRouteSectionLines = new Map<number, google.maps.Polyline>();
