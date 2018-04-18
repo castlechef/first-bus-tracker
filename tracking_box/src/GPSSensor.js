@@ -1,19 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const SerialPort = require("serialport");
 const events_1 = require("events");
 const NMEA_1 = require("./NMEA");
+const child_process_1 = require("child_process");
 class GPSSensor extends events_1.EventEmitter {
     constructor() {
         super();
         this.lines = new GPSLines();
-        this.port = new SerialPort('/dev/ttyAMA0', {
+        /*this.port = new SerialPort('/dev/ttyAMA0', {
             baudRate: 9600
-        });
+        });*/
+        this.port = child_process_1.spawn('cat', ['<', '/dev/ttyAMA0']).stdout;
         this.port.on('data', this.handleData.bind(this));
     }
     handleData(data) {
         this.lines.appendData(data);
+        console.log(this.lines.lines);
         if (this.lines.containsLocationData()) {
             const position = this.lines.extractLatestPosition();
             this.emitLocationUpdate(position);
@@ -40,7 +42,7 @@ class GPSLines {
         return line.replace(/\s/g, '');
     }
     appendData(rawData) {
-        this.lines += GPSLines.formatLine(rawData);
+        this.lines += GPSLines.formatLine(rawData).replace('\n', '').replace('\r', '');
     }
     containsLocationData() {
         return this.matchesGPSFormat();

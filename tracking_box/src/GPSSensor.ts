@@ -2,6 +2,7 @@ import * as SerialPort from 'serialport';
 import {EventEmitter} from 'events';
 import {NMEA} from './NMEA';
 import {GPSPosition} from './GPSPosition';
+import {spawn} from 'child_process';
 
 export class GPSSensor extends EventEmitter {
     private lines: GPSLines;
@@ -10,15 +11,16 @@ export class GPSSensor extends EventEmitter {
     constructor() {
         super();
         this.lines = new GPSLines();
-        this.port = new SerialPort('/dev/ttyAMA0', {
+        /*this.port = new SerialPort('/dev/ttyAMA0', {
             baudRate: 9600
-        });
+        });*/
+        this.port = spawn('cat', ['<', '/dev/ttyAMA0']).stdout;
         this.port.on('data', this.handleData.bind(this));
     }
 
     private handleData(data: any): void {
         this.lines.appendData(data);
-
+        console.log(this.lines.lines);
         if (this.lines.containsLocationData()) {
             const position = this.lines.extractLatestPosition();
             this.emitLocationUpdate(position);
@@ -55,7 +57,7 @@ export class GPSLines {
     }
 
     public appendData(rawData: any): void {
-        this.lines += GPSLines.formatLine(rawData);
+        this.lines += GPSLines.formatLine(rawData).replace('\n', '').replace('\r', '');
     }
 
     public containsLocationData(): boolean {
