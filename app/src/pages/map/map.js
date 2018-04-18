@@ -43,31 +43,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { IonicPage, ModalController, NavController, NavParams, PopoverController } from 'ionic-angular';
+import { Events, IonicPage, LoadingController, ModalController, NavController, NavParams, PopoverController } from 'ionic-angular';
 import { BusStopPage } from '../bus-stop/bus-stop';
 import { BusPage } from '../bus/bus';
-import { ServerProvider } from '../../providers/server-provider';
 import { BusRouteProvider } from '../../providers/bus-route/bus-route';
 import { MapOptionsPopoverPage } from '../map-options-popover/map-options-popover';
 import { SettingsProvider } from '../../providers/settings/settings';
+import { BusProvider } from '../../providers/bus/bus';
+import { BusStopProvider } from '../../providers/bus-stop/bus-stop';
+import { Geolocation } from '@ionic-native/geolocation';
 var MapPage = (function () {
-    /**
-     * imports all the necessary parameters
-     * @param {NavController} navCtrl - for navigation
-     * @param {NavParams} navParams - to pass parameters around the navcontroller
-     * @param {ModalController} modalctrl - to handle modals
-     * @param {ServerProvider} serverService - for communicating with the server
-     */
-    function MapPage(navCtrl, navParams, modalctrl, serverService, busRouteProvider, popoverCtrl, settings) {
+    function MapPage(navCtrl, navParams, modalCtrl, loadingCtrl, popoverCtrl, settings, events, busRouteProvider, busProvider, busStopProvider, geolocation) {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
-        this.modalctrl = modalctrl;
-        this.serverService = serverService;
-        this.busRouteProvider = busRouteProvider;
+        this.modalCtrl = modalCtrl;
+        this.loadingCtrl = loadingCtrl;
         this.popoverCtrl = popoverCtrl;
         this.settings = settings;
-        //colors for the bus routes
+        this.events = events;
+        this.busRouteProvider = busRouteProvider;
+        this.busProvider = busProvider;
+        this.busStopProvider = busStopProvider;
+        this.geolocation = geolocation;
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
+        this.loadingSpinner = this.loadingCtrl.create({
+            content: 'Loading map...'
+        });
         this.busIntervals = new Map();
         this.busStopMarkers = new Map();
         this.busRouteSectionLines = new Map();
@@ -75,40 +76,75 @@ var MapPage = (function () {
     }
     //Unsubscribe from the server's updates when the page is closed
     MapPage.prototype.ngOnDestroy = function () {
+        console.log('being destroyed!');
+        this.events.unsubscribe('buses:added');
+        this.events.unsubscribe('BusProvider:newBuses');
     };
     //Functions which run when the page is opened
     MapPage.prototype.ionViewDidLoad = function () {
-        var _this = this;
-        this.loadMap()
-            .then(function (latLng) {
-            if (latLng != null)
-                _this.addUserPositionMarker(latLng);
-            //this.updateBusRouteBeingUsed();
-            _this.setupMapElements();
-        });
+        this.startShitUp();
     };
-    /*
-     * Gets the user's position and calls createmap with it. If user's position request is denied creates map with bath spa station as the center
-     * @return - a promise saying that the map was created successfully
-     */
-    MapPage.prototype.loadMap = function () {
-        var _this = this;
-        var geo = navigator.geolocation;
-        return new Promise(function (resolve) {
-            geo.getCurrentPosition(function (position) {
-                var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                _this.createMap(latLng);
-                resolve(latLng);
-            }, function () {
-                var latLng = new google.maps.LatLng(51.377981, -2.359026);
-                _this.createMap(latLng);
-                console.log('Permission denied');
-                resolve(null);
+    MapPage.prototype.startShitUp = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var latLng, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 6, , 7]);
+                        return [4 /*yield*/, this.loadingSpinner.present()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.loadMap()];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.loadingSpinner.dismissAll()];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, this.setupMapElements()];
+                    case 4:
+                        _a.sent();
+                        return [4 /*yield*/, this.getUserPosition()];
+                    case 5:
+                        latLng = _a.sent();
+                        this.addUserPositionMarker(latLng);
+                        this.map.setCenter(latLng);
+                        return [3 /*break*/, 7];
+                    case 6:
+                        e_1 = _a.sent();
+                        return [3 /*break*/, 7];
+                    case 7: return [2 /*return*/];
+                }
             });
         });
     };
-    //Creates the initial map centered around latLng
-    MapPage.prototype.createMap = function (latLng) {
+    MapPage.prototype.updateMapCentre = function (_a) {
+        var latitude = _a.latitude, longitude = _a.longitude;
+        this.map.setCenter(new google.maps.LatLng(latitude, longitude));
+    };
+    MapPage.prototype.getUserPosition = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var geoPosition, _a, latitude, longitude, e_2;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.geolocation.getCurrentPosition()];
+                    case 1:
+                        geoPosition = _b.sent();
+                        _a = geoPosition.coords, latitude = _a.latitude, longitude = _a.longitude;
+                        return [2 /*return*/, new google.maps.LatLng(latitude, longitude)];
+                    case 2:
+                        e_2 = _b.sent();
+                        console.log('cannot get user position :(');
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MapPage.prototype.loadMap = function () {
+        var _this = this;
+        var latLng = new google.maps.LatLng(51.377981, -2.359026);
         var mapOptions = {
             center: latLng,
             zoom: 15,
@@ -128,6 +164,11 @@ var MapPage = (function () {
                 }]
         };
         this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+        return new Promise(function (resolve) {
+            google.maps.event.addListenerOnce(_this.map, 'idle', function () {
+                resolve();
+            });
+        });
     };
     //Adds the user's position to the map if available to the app, and sets it to update automatically
     MapPage.prototype.addUserPositionMarker = function (latLng) {
@@ -175,9 +216,11 @@ var MapPage = (function () {
                         popover = this.popoverCtrl.create(MapOptionsPopoverPage, {
                             mapPage: this
                         });
-                        popover.present({
-                            ev: event
-                        });
+                        return [4 /*yield*/, popover.present({
+                                ev: event
+                            })];
+                    case 6:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -185,31 +228,43 @@ var MapPage = (function () {
     };
     MapPage.prototype.setupMapElements = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            var busRoutes, e_1;
+            var sleep, busRoutes, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                        sleep = function (millis) {
+                            return new Promise(function (resolve) {
+                                setTimeout(resolve);
+                            });
+                        };
+                        _a.label = 1;
                     case 1:
+                        _a.trys.push([1, 5, , 8]);
+                        return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
+                    case 2:
                         busRoutes = _a.sent();
                         this.routeStates = busRoutes.map(function (_a) {
                             var busRouteName = _a.busRouteName;
                             return ({ busRouteName: busRouteName, active: true });
                         });
-                        this.setupMapRoutes();
+                        return [4 /*yield*/, this.setupMapRoutes()];
+                    case 3:
+                        _a.sent();
                         this.setupMapBuses();
-                        this.setupMapBusStops();
-                        return [3 /*break*/, 3];
-                    case 2:
-                        e_1 = _a.sent();
-                        setTimeout(function () {
-                            _this.setupMapElements();
-                            return;
-                        }, 1000);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                        return [4 /*yield*/, this.setupMapBusStops()];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 8];
+                    case 5:
+                        e_3 = _a.sent();
+                        return [4 /*yield*/, sleep(1000)];
+                    case 6:
+                        _a.sent();
+                        return [4 /*yield*/, this.setupMapElements()];
+                    case 7:
+                        _a.sent();
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
@@ -273,7 +328,9 @@ var MapPage = (function () {
                             fillOpacity: 0
                         });
                         roundabout.setMap(this.map);
-                        this.updateBusRoutesVisibility();
+                        return [4 /*yield*/, this.updateBusRoutesVisibility()];
+                    case 2:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -281,20 +338,21 @@ var MapPage = (function () {
     };
     MapPage.prototype.setupMapBuses = function () {
         var _this = this;
-        setInterval(function () {
-            _this.buses = _this.serverService.getBusLocations();
+        this.events.subscribe('BusProvider:newBuses', function (buses) {
+            _this.buses = buses;
             _this.addBusesToMap();
-        }, 1000);
+        });
     };
     MapPage.prototype.setupMapBusStops = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var _a;
+            var _a, e_4;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
+                        _b.trys.push([0, 2, , 3]);
                         _a = this;
-                        return [4 /*yield*/, this.serverService.getBusStopLocations()];
+                        return [4 /*yield*/, this.busStopProvider.getBusStops()];
                     case 1:
                         _a.busStops = _b.sent();
                         this.busStops.forEach(function (busStop) {
@@ -310,7 +368,12 @@ var MapPage = (function () {
                             google.maps.event.addListener(stopMarker, 'click', function () { return _this.openBusStopPage(busStop.busStopId, busStop.busStopName); });
                         });
                         this.updateBusStopsVisibility();
-                        return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_4 = _b.sent();
+                        alert('error here!');
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
@@ -323,21 +386,28 @@ var MapPage = (function () {
     MapPage.prototype.updateBusRoutesVisibility = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var sectionsUsed;
+            var sectionsUsed_1, e_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getSectionsUsed()];
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.getSectionsUsed()];
                     case 1:
-                        sectionsUsed = _a.sent();
+                        sectionsUsed_1 = _a.sent();
                         this.busRouteSectionLines.forEach(function (polyline, sectionId) {
-                            if (sectionsUsed.indexOf(sectionId) !== -1) {
+                            if (sectionsUsed_1.indexOf(sectionId) !== -1) {
                                 polyline.setMap(_this.map);
                             }
                             else {
                                 polyline.setMap(null);
                             }
                         });
-                        return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_5 = _a.sent();
+                        console.log('how about here?');
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
@@ -371,7 +441,8 @@ var MapPage = (function () {
                 var busStopId = _a.busStopId;
                 return id === busStopId;
             })
-                .routes.some(function (route) { return _this.getRoutesToShow().indexOf(route.name) !== -1; });
+                .routes
+                .some(function (route) { return _this.getRoutesToShow().indexOf(route.name) !== -1; });
         };
         this.busStopMarkers.forEach(function (stopMarker, id) {
             if (shouldShowStop(id)) {
@@ -485,12 +556,12 @@ var MapPage = (function () {
     };
     //Opens the bus page with the bus info of the bus given.
     MapPage.prototype.openBusPage = function (busId, route) {
-        var tryModal = this.modalctrl.create(BusPage, { busId: busId, routeName: route });
+        var tryModal = this.modalCtrl.create(BusPage, { busId: busId, routeName: route });
         tryModal.present();
     };
     //Opens a bus stop page with the details of the bus stop
     MapPage.prototype.openBusStopPage = function (busStopId, busStopName) {
-        var tryModal = this.modalctrl.create(BusStopPage, { stopId: busStopId, stopName: busStopName });
+        var tryModal = this.modalCtrl.create(BusStopPage, { stopId: busStopId, stopName: busStopName });
         tryModal.present();
     };
     __decorate([
@@ -501,16 +572,19 @@ var MapPage = (function () {
         IonicPage(),
         Component({
             selector: 'page-map',
-            templateUrl: 'map.html',
-            providers: [ServerProvider]
+            templateUrl: 'map.html'
         }),
         __metadata("design:paramtypes", [NavController,
             NavParams,
             ModalController,
-            ServerProvider,
-            BusRouteProvider,
+            LoadingController,
             PopoverController,
-            SettingsProvider])
+            SettingsProvider,
+            Events,
+            BusRouteProvider,
+            BusProvider,
+            BusStopProvider,
+            Geolocation])
     ], MapPage);
     return MapPage;
 }());

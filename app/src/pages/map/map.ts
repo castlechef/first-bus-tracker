@@ -1,14 +1,15 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {IonicPage, ModalController, NavController, NavParams, PopoverController} from 'ionic-angular';
+import {Events, IonicPage, Loading, LoadingController, ModalController, NavController, NavParams, PopoverController} from 'ionic-angular';
 import {BusStopPage} from '../bus-stop/bus-stop';
 import {BusPage} from '../bus/bus';
-import {ServerProvider} from '../../providers/server-provider';
 import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus-route';
 import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover';
 import {} from 'googlemaps';
-import {Stop} from '../../stops.interface';
 import {Bus} from '../../bus.interface';
 import {SettingsProvider} from '../../providers/settings/settings';
+import {BusProvider} from '../../providers/bus/bus';
+import {BusStop, BusStopProvider} from '../../providers/bus-stop/bus-stop';
+import {Geolocation} from '@ionic-native/geolocation';
 
 
 /**
@@ -24,8 +25,7 @@ declare var google;
 @IonicPage()
 @Component({
   selector: 'page-map',
-  templateUrl: 'map.html',
-  providers: [ServerProvider]
+  templateUrl: 'map.html'
 })
 
 export class MapPage {
@@ -33,37 +33,32 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
+  private loadingSpinner: Loading;
   private busIntervals: Map<number, any>;
   private buses: Bus[];
-  private busStops: Stop[];
+  private busStops: BusStop[];
   public routeStates: { busRouteName: string, active: boolean }[];
 
-  //in case server fails stuff gets put into the errorMessage - isn't used for anything currently
-  public errorMessage;
-  //maps bus stop IDs to their markers to allow markers to be manipulated later
   private busStopMarkers: Map<number, google.maps.Marker>;
-  //maps busroute segements to strings to allow them to be hidden/revealed later
   private busRouteSectionLines: Map<number, google.maps.Polyline>;
-  //collection of bus markers to empty whenever server is called
   private busMarkers: Map<number, google.maps.Marker>;
-  //colors for the bus routes
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
 
-  /**
-   * imports all the necessary parameters
-   * @param {NavController} navCtrl - for navigation
-   * @param {NavParams} navParams - to pass parameters around the navcontroller
-   * @param {ModalController} modalctrl - to handle modals
-   * @param {ServerProvider} serverService - for communicating with the server
-   */
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
-              public modalctrl: ModalController,
-              public serverService: ServerProvider,
-              private busRouteProvider: BusRouteProvider,
+              public modalCtrl: ModalController,
+              private loadingCtrl: LoadingController,
               private popoverCtrl: PopoverController,
-              private settings: SettingsProvider
+              private settings: SettingsProvider,
+              private events: Events,
+              private busRouteProvider: BusRouteProvider,
+              private busProvider: BusProvider,
+              private busStopProvider: BusStopProvider,
+              private geolocation: Geolocation
   ) {
+    this.loadingSpinner = this.loadingCtrl.create({
+      content: 'Loading map...'
+    });
     this.busIntervals = new Map<number, any>();
     this.busStopMarkers = new Map<number, google.maps.Marker>();
     this.busRouteSectionLines = new Map<number, google.maps.Polyline>();
@@ -72,40 +67,46 @@ export class MapPage {
 
   //Unsubscribe from the server's updates when the page is closed
   ngOnDestroy() {
+    console.log('being destroyed!');
+    this.events.unsubscribe('buses:added');
+    this.events.unsubscribe('BusProvider:newBuses')
   }
 
   //Functions which run when the page is opened
   ionViewDidLoad() {
-    this.loadMap()
-      .then((latLng) => {
-        if (latLng != null) this.addUserPositionMarker(latLng);
-        //this.updateBusRouteBeingUsed();
-        this.setupMapElements();
-      });
+    this.startShitUp();
   }
 
-  /*
-   * Gets the user's position and calls createmap with it. If user's position request is denied creates map with bath spa station as the center
-   * @return - a promise saying that the map was created successfully
-   */
-  private loadMap(): Promise<object> {
-    let geo = navigator.geolocation;
-    return new Promise<object>(resolve => {
-      geo.getCurrentPosition((position) => {
-        let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-        this.createMap(latLng);
-        resolve(latLng);
-      }, () => {
-        let latLng = new google.maps.LatLng(51.377981, -2.359026);
-        this.createMap(latLng);
-        console.log('Permission denied');
-        resolve(null);
-      });
-    });
+  private async startShitUp() {
+    try {
+      await this.loadingSpinner.present();
+      await this.loadMap();
+      await this.loadingSpinner.dismissAll();
+      await this.setupMapElements();
+      const latLng = await this.getUserPosition();
+      this.addUserPositionMarker(latLng);
+      this.map.setCenter(latLng);
+    } catch(e) {
+
+    }
   }
 
-  //Creates the initial map centered around latLng
-  private createMap(latLng: Object) {
+  private updateMapCentre({latitude, longitude}) {
+    this.map.setCenter(new google.maps.LatLng(latitude, longitude));
+  }
+
+  private async getUserPosition(): Promise<google.maps.LatLng> {
+    try {
+      const geoPosition = await this.geolocation.getCurrentPosition();
+      const {latitude, longitude} = geoPosition.coords;
+      return new google.maps.LatLng(latitude, longitude);
+    } catch(e) {
+      console.log('cannot get user position :(');
+    }
+  }
+
+  private loadMap(): Promise<void> {
+    const latLng = new google.maps.LatLng(51.377981, -2.359026);
     const mapOptions = {
       center: latLng,
       zoom: 15,
@@ -124,12 +125,16 @@ export class MapPage {
         }]
       }]
     };
-
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+    return new Promise<void>(resolve => {
+      google.maps.event.addListenerOnce(this.map, 'idle', () => {
+        resolve();
+      })
+    });
   }
 
   //Adds the user's position to the map if available to the app, and sets it to update automatically
-  private addUserPositionMarker(latLng) {
+  private addUserPositionMarker(latLng: google.maps.LatLng): void {
     let userPosition = new google.maps.Marker({
       map: this.map,
       position: latLng,
@@ -146,10 +151,10 @@ export class MapPage {
     });
   }
 
-  private async presentOptionsPopover(event: UIEvent) {
+  private async presentOptionsPopover(event: UIEvent): Promise<void> {
     if (!this.routeStates) {
       let busRoutes;
-      try{
+      try {
         busRoutes = await this.busRouteProvider.getBusRoutes();
       } catch (err) {
         console.log("Can't get bus routes", err);
@@ -161,29 +166,33 @@ export class MapPage {
     const popover = this.popoverCtrl.create(MapOptionsPopoverPage, {
       mapPage: this
     });
-    popover.present({
+    await popover.present({
       ev: event
     });
   }
 
-  private async setupMapElements() {
+  private async setupMapElements(): Promise<void> {
+    const sleep: (number) => Promise<void> = (millis: number) => {
+      return new Promise<void>(resolve => {
+        setTimeout(resolve);
+      });
+    };
+
     try {
       const busRoutes = await this.busRouteProvider.getBusRoutes();
       this.routeStates = busRoutes.map(({busRouteName}) => ({busRouteName, active: true}));
 
-      this.setupMapRoutes();
+      await this.setupMapRoutes();
       this.setupMapBuses();
-      this.setupMapBusStops();
+      await this.setupMapBusStops();
 
     } catch(e) {
-      setTimeout(() => {
-        this.setupMapElements();
-        return;
-      }, 1000)
+      await sleep(1000);
+      await this.setupMapElements();
     }
   }
 
-  private async setupMapRoutes() {
+  private async setupMapRoutes(): Promise<void> {
     const sections: Section[] = await this.busRouteProvider.getSections();
     console.log('setting up map routes');
 
@@ -234,32 +243,35 @@ export class MapPage {
       fillOpacity: 0
     });
     roundabout.setMap(this.map);
-    this.updateBusRoutesVisibility();
-
+    await this.updateBusRoutesVisibility();
   }
 
   private setupMapBuses() {
-    setInterval(() => {
-      this.buses = this.serverService.getBusLocations();
+    this.events.subscribe('BusProvider:newBuses', buses => {
+      this.buses = buses;
       this.addBusesToMap();
-    }, 1000)
+    });
   }
 
   private async setupMapBusStops() {
-    this.busStops = await this.serverService.getBusStopLocations();
-    this.busStops.forEach(busStop => {
-      const stopMarker = new google.maps.Marker({
-        position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
-        title: busStop.busStopName,
-        icon: {
-          url: './assets/icon/busStop.png',
-          scaledSize: new google.maps.Size(42,42)
-        }
+    try {
+      this.busStops = await this.busStopProvider.getBusStops();
+      this.busStops.forEach(busStop => {
+        const stopMarker = new google.maps.Marker({
+          position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
+          title: busStop.busStopName,
+          icon: {
+            url: './assets/icon/busStop.png',
+            scaledSize: new google.maps.Size(42,42)
+          }
+        });
+        this.busStopMarkers.set(busStop.busStopId,stopMarker);
+        google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
       });
-      this.busStopMarkers.set(busStop.busStopId,stopMarker);
-      google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
-    });
-    this.updateBusStopsVisibility();
+      this.updateBusStopsVisibility();
+    } catch(e) {
+      alert('error here!');
+    }
   }
 
   public updateMapElementsVisibility() {
@@ -269,15 +281,19 @@ export class MapPage {
   }
 
   private async updateBusRoutesVisibility() {
-    const sectionsUsed = await this.getSectionsUsed();
+    try {
+      const sectionsUsed = await this.getSectionsUsed();
 
-    this.busRouteSectionLines.forEach((polyline, sectionId) => {
-      if (sectionsUsed.indexOf(sectionId) !== -1) {
-        polyline.setMap(this.map);
-      } else {
-        polyline.setMap(null);
-      }
-    });
+      this.busRouteSectionLines.forEach((polyline, sectionId) => {
+        if (sectionsUsed.indexOf(sectionId) !== -1) {
+          polyline.setMap(this.map);
+        } else {
+          polyline.setMap(null);
+        }
+      });
+    } catch(e) {
+      console.log('how about here?');
+    }
   }
 
   private updateBusesVisibility() {
@@ -303,7 +319,8 @@ export class MapPage {
     const shouldShowStop = (id): boolean => {
       return this.busStops
         .find(({busStopId}) => id === busStopId)
-        .routes.some(route => this.getRoutesToShow().indexOf(route.name) !== -1);
+        .routes
+        .some(route => this.getRoutesToShow().indexOf(route.name) !== -1);
     };
 
     this.busStopMarkers.forEach((stopMarker, id) => {
@@ -390,13 +407,13 @@ export class MapPage {
 
   //Opens the bus page with the bus info of the bus given.
   private openBusPage(busId, route) {
-    let tryModal = this.modalctrl.create(BusPage, {busId: busId, routeName: route});
+    let tryModal = this.modalCtrl.create(BusPage, {busId: busId, routeName: route});
     tryModal.present();
   }
 
   //Opens a bus stop page with the details of the bus stop
   private openBusStopPage(busStopId, busStopName) {
-    let tryModal = this.modalctrl.create(BusStopPage, {stopId: busStopId, stopName: busStopName});
+    let tryModal = this.modalCtrl.create(BusStopPage, {stopId: busStopId, stopName: busStopName});
     tryModal.present();
   }
 

@@ -1,15 +1,11 @@
 import {Component} from '@angular/core';
-import {AlertController, IonicPage, ModalController, NavController, NavParams, ViewController} from 'ionic-angular';
-import {ServerProvider} from '../../providers/server-provider';
+import {AlertController, Events, IonicPage, ModalController, NavController, NavParams, ViewController} from 'ionic-angular';
 import {BusStopPage} from '../bus-stop/bus-stop';
-import {Stop} from '../../stops.interface';
 import {SettingsProvider} from '../../providers/settings/settings';
+import {BusStop, BusStopProvider} from '../../providers/bus-stop/bus-stop';
 
 /**
  * Generated class for the BusStopListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
  */
 
 @IonicPage()
@@ -21,22 +17,24 @@ export class BusStopListPage {
 
   public title = 'Bus Stops';
 
-  busStops: Stop[];
+  busStops: BusStop[];
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     public viewctrl: ViewController,
     public modalctrl: ModalController,
-    public serverService: ServerProvider,
     private alertCtrl: AlertController,
-    private settings: SettingsProvider
+    private settings: SettingsProvider,
+    private events: Events,
+    private busStopProvider: BusStopProvider
   ) {
+
     //navParams : stopId stopName
     this.busStops = [];
-    this.serverService.getStops()
-      .then(array => {
-        this.busStops = array;
+    this.busStopProvider.getBusStops()
+      .then(busStops => {
+        this.busStops = busStops;
         this.setupBusStops();
         this.setupFavs();
       }, err => {

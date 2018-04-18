@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
-import {ViewController, IonicPage, NavController, NavParams, ModalController} from 'ionic-angular';
+import {ViewController, IonicPage, NavParams, ModalController} from 'ionic-angular';
 import {BusPage} from '../bus/bus';
-import { ServerProvider} from '../../providers/server-provider';
+import {BusStop, BusStopProvider} from '../../providers/bus-stop/bus-stop';
 
 /**
  * Generated class for the BusStopPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
  */
 
 @IonicPage()
@@ -18,52 +15,54 @@ import { ServerProvider} from '../../providers/server-provider';
 export class BusStopPage {
 
   public title = "Bus Stop";
+  private busStop: BusStop;
+  private busStopName: string;
   private stopId;
+  private interval: any;
 
-  buses: Array<{routeName: string, arrivalTime: string, busId: number}>;
-
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController, public serverService: ServerProvider) {
+  constructor(public navParams: NavParams, public viewctrl: ViewController, public modalctrl: ModalController, private busStopProvider: BusStopProvider) {
     //navParams : stopId stopName
     this.title = navParams.get('stopName');
     this.stopId = navParams.get('stopId');
-    this.getBusStopData(navParams.get('stopId')).then( array =>{
-      this.buses = array;
-    }, rejected => {
-      this.buses = [];
-      console.log(rejected);
-    });
-    this.infoUpdater();
+    this.updateCurrentBusStop();
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad' + this.navParams.get('stopId'));
+    console.log('Bus stop page loaded ' + this.stopId);
   }
 
-  closeModal(){
+  ngOnDestroy() {
+    console.log('bus stop page being destroyed');
+    clearInterval(this.interval);
+  }
+
+  private closeModal() {
     this.viewctrl.dismiss();
   }
 
   private infoUpdater() {
-    setInterval(() => {
-      this.getBusStopData(this.stopId).then(stopInfo => {
-        this.buses = stopInfo;
-      }, rejected => {
-        console.log(rejected);
-      });
-    }, 1000)
+    this.interval = setInterval(() => {
+      this.updateCurrentBusStop();
+    }, 1000);
   }
 
-  private getBusStopData(stopId) : Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>{
-    return new Promise<Array<{routeName: string, arrivalTime: string, busId: number}>>((resolve, reject)=>{
-      this.serverService.getStopInfo(stopId).then(data=>{
-        resolve(data.arrivals);
-      }, rejected => {
-        reject(rejected);
-      });
-    });
+  private async updateCurrentBusStop() {
+    if (!this.busStop) {
+      this.busStop = {
+        busStopId: this.stopId,
+        busStopName: this.busStopName,
+        location: undefined,
+        arrivals: []
+      };
+    }
+    try {
+      this.busStop = await this.busStopProvider.getBusStop(this.stopId);
+    } catch(e) {
+      console.log('cannot update current bus stop');
+    }
   }
 
-  openBus(bus){
+  private openBusPage(bus) {
     let tryModal = this.modalctrl.create(BusPage, {busId: bus.busId, routeName: bus.busRoute});
     tryModal.present();
   }

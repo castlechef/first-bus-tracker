@@ -26,7 +26,7 @@ var BusRouteProvider = (function () {
                 resolve(_this.busRoutes);
             })
                 .catch(function (err) {
-                console.log("Error in getBusRoutes", err);
+                //console.log("Error in getBusRoutes", err);
                 reject(err);
             });
         });
@@ -67,12 +67,12 @@ var BusRouteProvider = (function () {
                     reject();
                 }
             }).catch(function (error) {
-                console.log("error in updateDataFromServer", error);
-                reject(error);
+                //console.log("error in updateDataFromServer", error);
+                reject();
             });
         });
     };
-    BusRouteProvider.URL = "http://localhost:" + 8080 + "/busRoutes";
+    BusRouteProvider.URL = "http://10.0.0.4:" + 8080 + "/busRoutes";
     BusRouteProvider = BusRouteProvider_1 = __decorate([
         Injectable(),
         __metadata("design:paramtypes", [HttpClient])

@@ -8,18 +8,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Component } from '@angular/core';
-import { ServerProvider } from '../../providers/server-provider';
 import { NavController } from 'ionic-angular';
 var Page2 = (function () {
     /**
      * imports all the necessary parameters
      * @param {NavController} navCtrl - for navigation
-     * @param {ServerProvider} serverService - for getting buses
      * @param {StopsProvider} stopsService - for getting bus stops
      */
-    function Page2(navCtrl, serverService) {
+    function Page2(navCtrl) {
         this.navCtrl = navCtrl;
-        this.serverService = serverService;
         this.buses = [];
         this.stops = [];
         //this.loadBuses();
@@ -61,10 +58,9 @@ var Page2 = (function () {
     Page2 = __decorate([
         Component({
             selector: 'page-page2',
-            templateUrl: 'page2.html',
-            providers: [ServerProvider]
+            templateUrl: 'page2.html'
         }),
-        __metadata("design:paramtypes", [NavController, ServerProvider])
+        __metadata("design:paramtypes", [NavController])
     ], Page2);
     return Page2;
 }());
