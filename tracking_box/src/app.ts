@@ -2,7 +2,7 @@ import * as Lcd from 'lcd';
 import {GPSSensor} from './GPSSensor';
 import {GPSPosition} from './GPSPosition';
 
-const gpsSensor = new GPSSensor();
+//const gpsSensor = new GPSSensor();
 
 
 const LCD_OPTIONS = {
@@ -23,11 +23,32 @@ lcd.on('ready', () => {
     }, 1000)
 });
 
-gpsSensor.on('location', (location: GPSPosition) => {
+import {spawn} from 'child_process';
+import {NMEA} from './NMEA';
+
+const cat = spawn('cat', ['<', '/dev/ttyAMA0']);
+
+let lines;
+cat.stdout.on('data', data => {
+    let str = data.toString();
+    lines += str;
+    if (lines.indexOf('GPGGA') !== lines.lastIndexOf('GPGGA')) {
+        lines = lines.split('GPGGA');
+        if (lines.length < 3) return;
+        lines.splice(1, 1);
+        let line = lines.splice(1, 1);
+        lines = lines.join('GPGGA');
+        let nmea = new NMEA();
+        const pos = nmea.parse(line);
+        console.log('position', pos);
+    }
+});
+
+/*gpsSensor.on('location', (location: GPSPosition) => {
     console.log(location);
     lcd.setCursor(0, 1);
     lcd.print('gomme some dd');
-});
+});*/
 
 
 function exitHandler(options, err) {
