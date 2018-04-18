@@ -3,9 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Lcd = require("lcd");
 const GPSSensor_1 = require("./GPSSensor");
 const gpsSensor = new GPSSensor_1.GPSSensor();
-gpsSensor.on('location', (location) => {
-    console.log(location);
-});
 const LCD_OPTIONS = {
     rs: 25,
     e: 24,
@@ -13,10 +10,20 @@ const LCD_OPTIONS = {
     cols: 16,
     rows: 2
 };
+let i = 0;
 const lcd = new Lcd(LCD_OPTIONS);
 lcd.on('ready', () => {
     lcd.setCursor(0, 0);
     lcd.print('hello world');
+    setInterval(() => {
+        lcd.setCursor(12, 0);
+        lcd.print(`${++i}`);
+    });
+});
+gpsSensor.on('location', (location) => {
+    console.log(location);
+    lcd.setCursor(0, 1);
+    lcd.print('gomme some dd');
 });
 function exitHandler(options, err) {
     if (lcd) {
