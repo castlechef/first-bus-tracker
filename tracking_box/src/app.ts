@@ -20,7 +20,7 @@ lcd.on('ready', () => {
     setInterval(() => {
         lcd.setCursor(12, 0);
         lcd.print(`${++i}`);
-    })
+    }, 1000)
 });
 
 gpsSensor.on('location', (location: GPSPosition) => {
