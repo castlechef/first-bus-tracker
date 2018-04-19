@@ -32,9 +32,6 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
-  private busStopUrl = './assets/icon/busStop.png';
-  private busUrl = './assets/icon/bus.png';
-
   private busIntervals: Map<number, any>;
   private buses: Bus[];
   private busStops: Stop[];
@@ -174,39 +171,6 @@ export class MapPage {
       this.setupMapRoutes();
       this.setupMapBuses();
       this.setupMapBusStops();
-      this.map.addListener('zoom_changed', () => {
-        if ((this.map.zoom) >= 15){
-          this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(64,64),
-              anchor: new google.maps.Point(32,50)});
-          });
-          this.busStopMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busStopUrl,
-            scaledSize: new google.maps.Size(42, 42)});
-          });
-        } else if (12 < (this.map.zoom) && (this.map.zoom) < 15){
-          this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-            scaledSize: new google.maps.Size(48,48),
-            anchor: new google.maps.Point(24,34)});
-          });
-          this.busStopMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(30, 30)});
-          });
-        } else {
-          this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(30,30),
-              anchor: new google.maps.Point(15,20)});
-          });
-          this.busStopMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(15, 15)});
-          });
-        }
-      });
 
     } catch(e) {
       setTimeout(() => {
