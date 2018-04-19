@@ -25,10 +25,12 @@ export class BusPage {
   private title = 'Bus';
   private bus: Bus;
   private capacity: string;
+  private sliderValue: any;
   private sub_capacity: string;
   private capacityDisplay: string;
   private capacityInput = true;
   private capacityShown = false;
+  private interval: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, private busProvider: BusProvider) {
     this.title = navParams.get('routeName');
@@ -54,6 +56,10 @@ export class BusPage {
     console.log('ionViewDidLoad');
   }
 
+  ngOnDestroy() {
+    if (this.interval) clearInterval(this.interval);
+  }
+
   closeModal() {
     this.viewctrl.dismiss();
   }
@@ -71,7 +77,7 @@ export class BusPage {
   }
 
   private infoUpdater() {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.busProvider.getBus(this.busId)
         .then((bus: Bus) => {
           this.bus = bus;
@@ -84,12 +90,16 @@ export class BusPage {
   }
 
   private inputCapacity(number) {
-    this.sub_capacity = capacities[number];
+    if (number === undefined) {
+      this.sub_capacity = capacities[1];
+    } else {
+      this.sub_capacity = capacities[number];
+    }
   }
 
   private submitCapacity() {
+    this.inputCapacity(this.sliderValue);
     this.busProvider.updateCapacity(this.sub_capacity, this.busId);
-    //this.serverService.setCapacity(this.busId, this.sub_capacity);
     this.capacityInput = false;
     this.writeCapacityDisplay(this.capacity);
   }

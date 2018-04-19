@@ -55,7 +55,7 @@ var BusRouteProvider = (function () {
     BusRouteProvider.prototype.updateDataFromServer = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.http.get("http://" + HOST + "/busRoutes").toPromise().then(function (data) {
+            _this.http.get(HOST + "/busRoutes").toPromise().then(function (data) {
                 var body = data;
                 if (body.status === 'success') {
                     _this.sections = body.data.sections;

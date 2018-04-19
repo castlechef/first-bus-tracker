@@ -55,6 +55,10 @@ var BusPage = (function () {
     BusPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad');
     };
+    BusPage.prototype.ngOnDestroy = function () {
+        if (this.interval)
+            clearInterval(this.interval);
+    };
     BusPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
     };
@@ -71,7 +75,7 @@ var BusPage = (function () {
     };
     BusPage.prototype.infoUpdater = function () {
         var _this = this;
-        setInterval(function () {
+        this.interval = setInterval(function () {
             _this.busProvider.getBus(_this.busId)
                 .then(function (bus) {
                 _this.bus = bus;
@@ -82,11 +86,16 @@ var BusPage = (function () {
         }, 1000);
     };
     BusPage.prototype.inputCapacity = function (number) {
-        this.sub_capacity = capacities[number];
+        if (number === undefined) {
+            this.sub_capacity = capacities[1];
+        }
+        else {
+            this.sub_capacity = capacities[number];
+        }
     };
     BusPage.prototype.submitCapacity = function () {
+        this.inputCapacity(this.sliderValue);
         this.busProvider.updateCapacity(this.sub_capacity, this.busId);
-        //this.serverService.setCapacity(this.busId, this.sub_capacity);
         this.capacityInput = false;
         this.writeCapacityDisplay(this.capacity);
     };

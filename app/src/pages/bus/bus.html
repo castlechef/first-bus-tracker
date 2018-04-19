@@ -35,7 +35,7 @@
   <div *ngIf="capacityInput" class="capacity" style="display: block">
     <ion-label class="bottom">How full is this bus?</ion-label>
     <ion-item>
-      <ion-range min="1" max="4" snaps="true" color="white" [(ngModel)]="sliderValue" (ionChange)="inputCapacity(sliderValue)">
+      <ion-range min="1" max="4" snaps="true" color="white" [(ngModel)]="sliderValue">
         <ion-label range-left style="color: white">Empty</ion-label>
         <ion-label range-right style="color: white">Full</ion-label>
         <ion-buttons range-right>

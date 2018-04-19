@@ -2,6 +2,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app.module';
 
-export const HOST: string = 'localhost:8080';
+export const HOST: string = 'localhost/api';
 
 platformBrowserDynamic().bootstrapModule(AppModule);

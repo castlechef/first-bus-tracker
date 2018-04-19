@@ -58,7 +58,7 @@ var BusStopProvider = (function () {
             var body;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.http.get("http://" + HOST + "/busStops").toPromise()];
+                    case 0: return [4 /*yield*/, this.http.get(HOST + "/busStops").toPromise()];
                     case 1:
                         body = _a.sent();
                         if (body.status === 'success') {
@@ -77,7 +77,7 @@ var BusStopProvider = (function () {
             var body;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.http.get("http://" + HOST + "/busStops/" + id).toPromise()];
+                    case 0: return [4 /*yield*/, this.http.get(HOST + "/busStops/" + id).toPromise()];
                     case 1:
                         body = _a.sent();
                         if (body.status === 'success') {

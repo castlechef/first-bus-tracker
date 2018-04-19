@@ -26,6 +26,16 @@ const data: { busStops: IBusStop[] } = require('./data/busStops.json');
 export const busStops = new BusStops(data.busStops);
 export const buses = new Buses(busStops);
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*"); // keep this if your api accepts cross-origin requests
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Access-Token");
+    next();
+});
+
+app.use('/api', (req, res, next) => {
+    res.redirect(req.url.replace('/api', ''));
+});
+
 app.locals.buses = buses;
 app.locals.busStops = busStops;
 

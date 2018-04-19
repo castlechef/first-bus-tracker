@@ -22,6 +22,14 @@ exports.app = express();
 const data = require('./data/busStops.json');
 exports.busStops = new busStops_2.BusStops(data.busStops);
 exports.buses = new buses_2.Buses(exports.busStops);
+exports.app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*"); // keep this if your api accepts cross-origin requests
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Access-Token");
+    next();
+});
+exports.app.use('/api', (req, res, next) => {
+    res.redirect(req.url.replace('/api', ''));
+});
 exports.app.locals.buses = exports.buses;
 exports.app.locals.busStops = exports.busStops;
 exports.app.use(bodyParser.json());

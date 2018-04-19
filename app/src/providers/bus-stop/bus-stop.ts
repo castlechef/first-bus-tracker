@@ -14,7 +14,7 @@ export class BusStopProvider {
   }
 
   public async getBusStops(): Promise<BusStop[]> {
-    const body = await this.http.get(`http://${HOST}/busStops`).toPromise() as any;
+    const body = await this.http.get(`${HOST}/busStops`).toPromise() as any;
     if (body.status === 'success') {
       return body.data;
     } else {
@@ -23,7 +23,7 @@ export class BusStopProvider {
   }
 
   public async getBusStop(id: number): Promise<BusStop> {
-    const body = await this.http.get(`http://${HOST}/busStops/${id}`).toPromise() as any;
+    const body = await this.http.get(`${HOST}/busStops/${id}`).toPromise() as any;
     if (body.status === 'success') {
       return body.data;
     } else {

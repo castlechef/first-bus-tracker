@@ -53,7 +53,7 @@ export class BusProvider {
 
   private async getBusesFromServer(): Promise<Bus[]> {
     const body = await this.http
-      .get(`http://${HOST}/buses`)
+      .get(`${HOST}/buses`)
       .toPromise() as any;
     return body.data;
   }
@@ -62,7 +62,7 @@ export class BusProvider {
   public async getBus(busId: number): Promise<Bus> {
     try {
       const body = await this.http
-        .get(`http://${HOST}/buses/${busId}`)
+        .get(`${HOST}/buses/${busId}`)
         .toPromise() as any;
       return body.data;
     } catch(e) {
@@ -73,14 +73,14 @@ export class BusProvider {
   public async updateCapacity(capacity: string, busId: number): Promise<boolean> {
     try {
       const body = await this.http
-        .put(`http://${HOST}/buses/${busId}/capacity`, {
-          data: {capacity:'FULL'}
+        .put(`${HOST}/buses/${busId}/capacity`, {
+          data: {capacity:capacity}
         })
         .toPromise() as any;
       return (body.status !== 'failure');
     } catch(e) {
-      console.log(`BusProvider: cannot put bus capacity ${busId}, ${capacity}`);
-      console.log(e.message);
+      alert(`BusProvider: cannot put bus capacity ${busId}, ${capacity}`);
+      document.body.innerText = e.zoneAwareStack;
       return false;
     }
   }

@@ -53,7 +53,7 @@ export class BusRouteProvider {
 
   private updateDataFromServer(): Promise<void> {
     return new Promise<any>((resolve, reject) => {
-      this.http.get(`http://${HOST}/busRoutes`).toPromise().then(data => {
+      this.http.get(`${HOST}/busRoutes`).toPromise().then(data => {
         const body = data as any;
         if (body.status === 'success') {
           this.sections = body.data.sections;
