@@ -22,6 +22,8 @@ import { BusPageModule } from '../pages/bus/bus.module';
 import { BusStopPageModule } from '../pages/bus-stop/bus-stop.module';
 import { BusStopListPageModule } from '../pages/bus-stop-list/bus-stop-list.module';
 import { MapOptionsPopoverPageModule } from '../pages/map-options-popover/map-options-popover.module';
+import { SettingsProvider } from '../providers/settings/settings';
+import { IonicStorageModule } from '@ionic/storage';
 var AppModule = (function () {
     function AppModule() {
     }
@@ -35,6 +37,7 @@ var AppModule = (function () {
             imports: [
                 BrowserModule,
                 IonicModule.forRoot(MyApp, {}, { links: [] }),
+                IonicStorageModule.forRoot(),
                 MapPageModule,
                 BusPageModule,
                 BusStopPageModule,
@@ -57,7 +60,8 @@ var AppModule = (function () {
                 ServerProvider,
                 Geolocation,
                 { provide: ErrorHandler, useClass: IonicErrorHandler },
-                BusRouteProvider
+                BusRouteProvider,
+                SettingsProvider
             ]
         })
     ], AppModule);

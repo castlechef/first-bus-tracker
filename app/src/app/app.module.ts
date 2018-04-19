@@ -19,6 +19,8 @@ import {BusPageModule} from '../pages/bus/bus.module';
 import {BusStopPageModule} from '../pages/bus-stop/bus-stop.module';
 import {BusStopListPageModule} from '../pages/bus-stop-list/bus-stop-list.module';
 import {MapOptionsPopoverPageModule} from '../pages/map-options-popover/map-options-popover.module';
+import { SettingsProvider } from '../providers/settings/settings';
+import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,7 @@ import {MapOptionsPopoverPageModule} from '../pages/map-options-popover/map-opti
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp, {}, { links: [] }),
+    IonicStorageModule.forRoot(),
     MapPageModule,
     BusPageModule,
     BusStopPageModule,
@@ -51,7 +54,8 @@ import {MapOptionsPopoverPageModule} from '../pages/map-options-popover/map-opti
     ServerProvider,
     Geolocation,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
-    BusRouteProvider
+    BusRouteProvider,
+    SettingsProvider
   ]
 })
 export class AppModule { }
