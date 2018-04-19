@@ -1,14 +1,13 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Location} from '../bus/bus';
+import {HOST} from '../../app/main';
 
 /*
   Generated class for the BusRouteProvider provider.
 */
 @Injectable()
 export class BusRouteProvider {
-
-  private static readonly URL = `http://10.0.0.4:${8080}/busRoutes`;
 
   private sections: Section[];
   private busRoutes: BusRoute[];
@@ -54,7 +53,7 @@ export class BusRouteProvider {
 
   private updateDataFromServer(): Promise<void> {
     return new Promise<any>((resolve, reject) => {
-      this.http.get(BusRouteProvider.URL).toPromise().then(data => {
+      this.http.get(`http://${HOST}/busRoutes`).toPromise().then(data => {
         const body = data as any;
         if (body.status === 'success') {
           this.sections = body.data.sections;

@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HOST } from '../../app/main';
 /*
   Generated class for the BusRouteProvider provider.
 */
@@ -17,7 +18,6 @@ var BusRouteProvider = (function () {
         this.http = http;
         this.hasReceivedData = false;
     }
-    BusRouteProvider_1 = BusRouteProvider;
     BusRouteProvider.prototype.getBusRoutes = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
@@ -55,7 +55,7 @@ var BusRouteProvider = (function () {
     BusRouteProvider.prototype.updateDataFromServer = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.http.get(BusRouteProvider_1.URL).toPromise().then(function (data) {
+            _this.http.get("http://" + HOST + "/busRoutes").toPromise().then(function (data) {
                 var body = data;
                 if (body.status === 'success') {
                     _this.sections = body.data.sections;
@@ -72,13 +72,11 @@ var BusRouteProvider = (function () {
             });
         });
     };
-    BusRouteProvider.URL = "http://10.0.0.4:" + 8080 + "/busRoutes";
-    BusRouteProvider = BusRouteProvider_1 = __decorate([
+    BusRouteProvider = __decorate([
         Injectable(),
         __metadata("design:paramtypes", [HttpClient])
     ], BusRouteProvider);
     return BusRouteProvider;
-    var BusRouteProvider_1;
 }());
 export { BusRouteProvider };
 //# sourceMappingURL=bus-route.js.map

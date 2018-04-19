@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
+import {HOST} from '../../app/main';
 
 /*
   Generated class for the BusProvider provider.
@@ -52,7 +53,7 @@ export class BusProvider {
 
   private async getBusesFromServer(): Promise<Bus[]> {
     const body = await this.http
-      .get('http://10.0.0.4:8080/buses')
+      .get(`http://${HOST}/buses`)
       .toPromise() as any;
     return body.data;
   }
@@ -61,7 +62,7 @@ export class BusProvider {
   public async getBus(busId: number): Promise<Bus> {
     try {
       const body = await this.http
-        .get(`http://10.0.0.4:8080/buses/${busId}`)
+        .get(`http://${HOST}/buses/${busId}`)
         .toPromise() as any;
       return body.data;
     } catch(e) {
@@ -72,7 +73,7 @@ export class BusProvider {
   public async updateCapacity(capacity: string, busId: string): Promise<boolean> {
     try {
       const body = this.http
-        .put(`http://10.0.0.4:8080/buses/${busId}/capacity`, {
+        .put(`http://${HOST}/buses/${busId}/capacity`, {
           data: {capacity}
         })
         .toPromise() as any;

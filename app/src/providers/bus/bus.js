@@ -45,6 +45,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
+import { HOST } from '../../app/main';
 /*
   Generated class for the BusProvider provider.
 */
@@ -109,7 +110,7 @@ var BusProvider = (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.http
-                            .get('http://10.0.0.4:8080/buses')
+                            .get("http://" + HOST + "/buses")
                             .toPromise()];
                     case 1:
                         body = _a.sent();
@@ -127,7 +128,7 @@ var BusProvider = (function () {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
                         return [4 /*yield*/, this.http
-                                .get("http://10.0.0.4:8080/buses/" + busId)
+                                .get("http://" + HOST + "/buses/" + busId)
                                 .toPromise()];
                     case 1:
                         body = _a.sent();
@@ -147,7 +148,7 @@ var BusProvider = (function () {
             return __generator(this, function (_a) {
                 try {
                     body = this.http
-                        .put("http://10.0.0.4:8080/buses/" + busId + "/capacity", {
+                        .put("http://" + HOST + "/buses/" + busId + "/capacity", {
                         data: { capacity: capacity }
                     })
                         .toPromise();

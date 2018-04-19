@@ -1,6 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Location} from '../bus/bus';
+import {HOST} from '../../app/main';
 
 /*
   Generated class for the BusStopProvider provider.
@@ -13,7 +14,7 @@ export class BusStopProvider {
   }
 
   public async getBusStops(): Promise<BusStop[]> {
-    const body = await this.http.get(`http://10.0.0.4:8080/busStops`).toPromise() as any;
+    const body = await this.http.get(`http://${HOST}/busStops`).toPromise() as any;
     if (body.status === 'success') {
       return body.data;
     } else {
@@ -22,7 +23,7 @@ export class BusStopProvider {
   }
 
   public async getBusStop(id: number): Promise<BusStop> {
-    const body = await this.http.get(`http://10.0.0.4:8080/busStops/${id}`).toPromise() as any;
+    const body = await this.http.get(`http://${HOST}/busStops/${id}`).toPromise() as any;
     if (body.status === 'success') {
       return body.data;
     } else {
