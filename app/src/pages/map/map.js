@@ -64,6 +64,8 @@ var MapPage = (function () {
         this.serverService = serverService;
         this.busRouteProvider = busRouteProvider;
         this.popoverCtrl = popoverCtrl;
+        this.busStopUrl = './assets/icon/busStop.png';
+        this.busUrl = './assets/icon/bus.png';
         //colors for the bus routes
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
         this.busIntervals = new Map();
@@ -199,6 +201,41 @@ var MapPage = (function () {
                         this.setupMapRoutes();
                         this.setupMapBuses();
                         this.setupMapBusStops();
+                        this.map.addListener('zoom_changed', function () {
+                            if ((_this.map.zoom) >= 15) {
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busUrl,
+                                        scaledSize: new google.maps.Size(64, 64),
+                                        anchor: new google.maps.Point(32, 50) });
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(42, 42) });
+                                });
+                            }
+                            else if (12 < (_this.map.zoom) && (_this.map.zoom) < 15) {
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busUrl,
+                                        scaledSize: new google.maps.Size(48, 48),
+                                        anchor: new google.maps.Point(24, 34) });
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(30, 30) });
+                                });
+                            }
+                            else {
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busUrl,
+                                        scaledSize: new google.maps.Size(30, 30),
+                                        anchor: new google.maps.Point(15, 20) });
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(15, 15) });
+                                });
+                            }
+                        });
                         return [3 /*break*/, 3];
                     case 2:
                         e_1 = _a.sent();
