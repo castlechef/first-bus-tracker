@@ -70,16 +70,17 @@ export class BusProvider {
     }
   }
 
-  public async updateCapacity(capacity: string, busId: string): Promise<boolean> {
+  public async updateCapacity(capacity: string, busId: number): Promise<boolean> {
     try {
-      const body = this.http
+      const body = await this.http
         .put(`http://${HOST}/buses/${busId}/capacity`, {
-          data: {capacity}
+          data: {capacity:'FULL'}
         })
         .toPromise() as any;
       return (body.status !== 'failure');
     } catch(e) {
       console.log(`BusProvider: cannot put bus capacity ${busId}, ${capacity}`);
+      console.log(e.message);
       return false;
     }
   }
@@ -100,7 +101,7 @@ export type BusDepartureTime = {
 export type BusArrivalTime = {
   busStopId: number;
   busStopName: string;
-  departureTime: string;
+  arrivalTime: string;
 }
 
 export type Bus = {

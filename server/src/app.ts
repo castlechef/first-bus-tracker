@@ -16,7 +16,7 @@ const corsOptions: cors.CorsOptions = {
     credentials: true,
     methods: 'GET,PUT,POST',
     origin: '*',
-    preflightContinue: false
+    preflightContinue: true
 };
 
 export const app = express();

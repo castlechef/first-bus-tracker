@@ -66,6 +66,8 @@ var MapPage = (function () {
         this.busStopProvider = busStopProvider;
         this.geolocation = geolocation;
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
+        this.busUrl = './assets/icon/bus.png';
+        this.busStopUrl = './assets/icon/busStop.png';
         this.loadingSpinner = this.loadingCtrl.create({
             content: 'Loading map...'
         });
@@ -228,6 +230,7 @@ var MapPage = (function () {
     };
     MapPage.prototype.setupMapElements = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
             var sleep, busRoutes, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -239,7 +242,7 @@ var MapPage = (function () {
                         };
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 5, , 8]);
+                        _a.trys.push([1, 5, 8, 9]);
                         return [4 /*yield*/, this.busRouteProvider.getBusRoutes()];
                     case 2:
                         busRoutes = _a.sent();
@@ -254,7 +257,7 @@ var MapPage = (function () {
                         return [4 /*yield*/, this.setupMapBusStops()];
                     case 4:
                         _a.sent();
-                        return [3 /*break*/, 8];
+                        return [3 /*break*/, 9];
                     case 5:
                         e_3 = _a.sent();
                         return [4 /*yield*/, sleep(1000)];
@@ -263,8 +266,45 @@ var MapPage = (function () {
                         return [4 /*yield*/, this.setupMapElements()];
                     case 7:
                         _a.sent();
-                        return [3 /*break*/, 8];
-                    case 8: return [2 /*return*/];
+                        return [3 /*break*/, 9];
+                    case 8:
+                        this.map.addListener('zoom_changed', function () {
+                            if ((_this.map.zoom) >= 15) {
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busUrl,
+                                        scaledSize: new google.maps.Size(64, 64),
+                                        anchor: new google.maps.Point(32, 50) });
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(42, 42) });
+                                });
+                            }
+                            else if (12 < (_this.map.zoom) && (_this.map.zoom) < 15) {
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busUrl,
+                                        scaledSize: new google.maps.Size(48, 48),
+                                        anchor: new google.maps.Point(24, 34) });
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(30, 30) });
+                                });
+                            }
+                            else {
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busUrl,
+                                        scaledSize: new google.maps.Size(30, 30),
+                                        anchor: new google.maps.Point(15, 20) });
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(15, 15) });
+                                });
+                            }
+                        });
+                        return [7 /*endfinally*/];
+                    case 9: return [2 /*return*/];
                 }
             });
         });

@@ -144,21 +144,26 @@ var BusProvider = (function () {
     };
     BusProvider.prototype.updateCapacity = function (capacity, busId) {
         return __awaiter(this, void 0, void 0, function () {
-            var body;
+            var body, e_3;
             return __generator(this, function (_a) {
-                try {
-                    body = this.http
-                        .put("http://" + HOST + "/buses/" + busId + "/capacity", {
-                        data: { capacity: capacity }
-                    })
-                        .toPromise();
-                    return [2 /*return*/, (body.status !== 'failure')];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.http
+                                .put("http://" + HOST + "/buses/" + busId + "/capacity", {
+                                data: { capacity: 'FULL' }
+                            })
+                                .toPromise()];
+                    case 1:
+                        body = _a.sent();
+                        return [2 /*return*/, (body.status !== 'failure')];
+                    case 2:
+                        e_3 = _a.sent();
+                        console.log("BusProvider: cannot put bus capacity " + busId + ", " + capacity);
+                        console.log(e_3.message);
+                        return [2 /*return*/, false];
+                    case 3: return [2 /*return*/];
                 }
-                catch (e) {
-                    console.log("BusProvider: cannot put bus capacity " + busId + ", " + capacity);
-                    return [2 /*return*/, false];
-                }
-                return [2 /*return*/];
             });
         });
     };

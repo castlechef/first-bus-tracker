@@ -27,9 +27,9 @@
     <ion-title>{{capacityDisplay}}</ion-title>
   </ion-toolbar>
   <ion-list>
-    <button ion-item *ngFor="let stop of nextBusStops">
-      {{ stop.busStopsName }}
-      {{stop.arrivalTime}}
+    <button ion-item *ngFor="let arrival of bus.arrivalTimes">
+      <ion-label class="number">{{arrival.arrivalTime}}</ion-label>
+      <ion-label>{{ arrival.busStopName }}</ion-label>
     </button>
   </ion-list>
   <div *ngIf="capacityInput" class="capacity" style="display: block">

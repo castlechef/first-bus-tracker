@@ -1076,8 +1076,8 @@
     {
       "busStopName": "Dorchester Street (Eastbound)",
       "location": {
-        "latitude": 51.3780439,
-        "longitude": -2.359031
+        "latitude": 51.378000,
+        "longitude": -2.359039
       },
       "routes": [
         {

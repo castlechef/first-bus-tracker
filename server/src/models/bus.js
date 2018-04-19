@@ -175,7 +175,7 @@ class Bus {
             .map(({ busStop, arrivalTime }) => {
             return {
                 busStopId: busStop.id,
-                busStopsName: busStop.name,
+                busStopName: busStop.name,
                 arrivalTime: convertUnixTimeToNiceTime(arrivalTime)
             };
         });

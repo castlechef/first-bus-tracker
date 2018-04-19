@@ -16,7 +16,7 @@ const corsOptions = {
     credentials: true,
     methods: 'GET,PUT,POST',
     origin: '*',
-    preflightContinue: false
+    preflightContinue: true
 };
 exports.app = express();
 const data = require('./data/busStops.json');
