@@ -25,8 +25,8 @@
 <ion-content>
   <ion-list>
     <button ion-item *ngFor="let bus of buses" (click)="openBus(bus)">
-      {{ bus.routeName }}
-      {{bus.arrivalTime}}
+      <ion-label class="number">{{bus.arrivalTime}}</ion-label>
+      <ion-label>{{ bus.routeName }}</ion-label>
     </button>
   </ion-list>
 </ion-content>

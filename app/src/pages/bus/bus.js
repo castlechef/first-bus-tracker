@@ -37,6 +37,7 @@ var BusPage = (function () {
         this.title = navParams.get('routeName');
         this.busId = navParams.get('busId');
         this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
+            console.log(busInfo);
             _this.nextBusStops = busInfo.arrivalTimes;
             _this.capacity = busInfo.capacity;
             if (_this.distanceClose(busInfo.location, { latitude: 0.0, longitude: 0.0 })) {

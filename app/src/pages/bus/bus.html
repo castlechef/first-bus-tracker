@@ -28,8 +28,8 @@
   </ion-toolbar>
   <ion-list>
     <button ion-item *ngFor="let stop of nextBusStops">
-      {{ stop.busStopsName }}
-      {{stop.arrivalTime}}
+      <ion-label class="number">{{stop.arrivalTime}}</ion-label>
+      <ion-label>{{ stop.busStopsName }}</ion-label>
     </button>
   </ion-list>
   <div *ngIf="capacityInput" class="capacity" style="display: block">

@@ -48,6 +48,8 @@ export class MapPage {
   private busMarkers: Map<number, google.maps.Marker>;
   //colors for the bus routes
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
+  private busUrl = './assets/icon/bus.png';
+  private busStopUrl = './assets/icon/busStop.png';
 
   /**
    * imports all the necessary parameters
@@ -174,7 +176,39 @@ export class MapPage {
       this.setupMapRoutes();
       this.setupMapBuses();
       this.setupMapBusStops();
-
+      this.map.addListener('zoom_changed', () => {
+        if ((this.map.zoom) >= 15){
+          this.busMarkers.forEach(marker =>{
+            marker.setIcon({url: this.busUrl,
+              scaledSize: new google.maps.Size(64,64),
+              anchor: new google.maps.Point(32,50)});
+          });
+          this.busStopMarkers.forEach(marker =>{
+            marker.setIcon({url: this.busStopUrl,
+              scaledSize: new google.maps.Size(42, 42)});
+          });
+        } else if (12 < (this.map.zoom) && (this.map.zoom) < 15){
+          this.busMarkers.forEach(marker =>{
+            marker.setIcon({url: this.busUrl,
+              scaledSize: new google.maps.Size(48,48),
+              anchor: new google.maps.Point(24,34)});
+          });
+          this.busStopMarkers.forEach(marker =>{
+            marker.setIcon({url: this.busStopUrl,
+              scaledSize: new google.maps.Size(30, 30)});
+          });
+        } else {
+          this.busMarkers.forEach(marker =>{
+            marker.setIcon({url: this.busUrl,
+              scaledSize: new google.maps.Size(30,30),
+              anchor: new google.maps.Point(15,20)});
+          });
+          this.busStopMarkers.forEach(marker =>{
+            marker.setIcon({url: this.busStopUrl,
+              scaledSize: new google.maps.Size(15, 15)});
+          });
+        }
+      });
     } catch(e) {
       setTimeout(() => {
         this.setupMapElements();
