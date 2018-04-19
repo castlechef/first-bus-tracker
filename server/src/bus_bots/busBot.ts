@@ -57,7 +57,7 @@ export class BusBot {
         this.currentLocation = nextLocation;
         const options = {
             method: 'POST',
-            uri: 'http://localhost:8080/buses',
+            uri: 'http://firstbustracker.ddns.net/api/buses',
             body: {
                 data: {
                     location: nextLocation.toJSON(),
@@ -97,7 +97,7 @@ export class BusBot {
         this.move();
         const options = {
             method: 'PUT',
-            uri: `http://localhost:8080/buses/${this.busId}/location`,
+            uri: `http://firstbustracker.ddns.net/api/buses/${this.busId}/location`,
             body: {
                 data: {
                     location: this.currentLocation.toJSON()
