@@ -54,6 +54,7 @@
     "@types/jasmine": "^2.8.6",
     "@types/node": "^8.0.45",
     "angular2-template-loader": "^0.6.2",
+    "cordova": "^8.0.0",
     "express": "^4.16.2",
     "html-loader": "^0.5.1",
     "ionic": "3.19.0",
