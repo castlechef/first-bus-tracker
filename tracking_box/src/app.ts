@@ -28,19 +28,19 @@ import {NMEA} from './NMEA';
 
 const cat = spawn('cat', ['<', '/dev/ttyAMA0']);
 
-let lines;
+let lines = [];
+let incomplete = '';
 cat.stdout.on('data', data => {
-    let str = data.toString();
-    lines += str;
-    if (lines.indexOf('GPGGA') !== lines.lastIndexOf('GPGGA')) {
-        lines = lines.split('GPGGA');
-        if (lines.length < 3) return;
-        lines.splice(1, 1);
-        let line = lines.splice(1, 1);
-        lines = lines.join('GPGGA');
-        let nmea = new NMEA();
-        const pos = nmea.parse(line);
-        console.log('position', pos);
+    let str = data.toString().replace('\n', '').replace('\r', '');
+    incomplete += str;
+    if (incomplete.substring(1).indexOf('$') !== -1) {
+        let parts = incomplete.split('$');
+        parts.splice(0, 1);
+        let thingIWant = '$' + parts.splice(0, 1);
+        incomplete = '$' + parts.join('$');
+        if (thingIWant.startsWith('$GPGGA')) {
+            console.log(new NMEA().parse(thingIWant));
+        }
     }
 });
 
