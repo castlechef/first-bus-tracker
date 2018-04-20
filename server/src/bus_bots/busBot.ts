@@ -6,6 +6,9 @@ import * as rp from 'request-promise';
 import randomBetweenNumbers = Utils.Numeric.randomBetweenNumbers;
 import Timer = NodeJS.Timer;
 
+const host = 'http://localhost/api';
+//const host = 'http://firstbustracker.ddns.net/api';
+
 export class BusBot {
     private routeName: BusRouteName;
     //private routeStops: BusStop[];
@@ -18,7 +21,7 @@ export class BusBot {
     private milliseconds: number;
     private waypoints: Location[];
 
-    constructor(routeName: BusRouteName, mph: number | string, milliseconds: number) {
+    constructor(routeName: BusRouteName, mph: number | string, milliseconds: number, frac: number) {
         if (typeof milliseconds === 'string') milliseconds = parseInt(milliseconds);
         this.milliseconds = milliseconds;
         this.speed = this.milesPerHourToMetersPerSecond(mph);
@@ -28,7 +31,10 @@ export class BusBot {
         //this.routeStops = busStops.getStopsWithRoute(routeName);
         this.waypoints = this.getPointsOfRoute();
         //if (this.routeStops.length < 2) throw new Error('Bus route must have at least 2 stops');
-        this.waypointIndex = Math.floor(randomBetweenNumbers(0, this.waypoints.length));
+        this.waypointIndex = 0;
+        const length = Location.distanceBetweenN(this.waypoints);
+        this.moveDistance(length * frac);
+        //this.waypointIndex = Math.floor(randomBetweenNumbers(0, this.waypoints.length));
         console.log('Total route length: ' + Location.distanceBetweenN(this.waypoints));
     }
 
@@ -57,7 +63,7 @@ export class BusBot {
         this.currentLocation = nextLocation;
         const options = {
             method: 'POST',
-            uri: 'http://localhost:8080/buses',
+            uri: `${host}/buses`,
             body: {
                 data: {
                     location: nextLocation.toJSON(),
@@ -97,7 +103,7 @@ export class BusBot {
         this.move();
         const options = {
             method: 'PUT',
-            uri: `http://localhost:8080/buses/${this.busId}/location`,
+            uri: `${host}/buses/${this.busId}/location`,
             body: {
                 data: {
                     location: this.currentLocation.toJSON()
@@ -127,6 +133,16 @@ export class BusBot {
             distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
         }
         this.currentLocation = this.currentLocation.moveInDirectionOf(this.peakNextLocation(), distanceToMove);
+    }
+
+    private moveDistance(distanceToMove: number) {
+        this.currentLocation = this.getNextLocation();
+        let distanceToNextPosition: number = this.peakNextLocation().distanceFrom(this.currentLocation);
+        while (distanceToMove > distanceToNextPosition) {
+            distanceToMove -= distanceToNextPosition;
+            this.currentLocation = this.getNextLocation();
+            distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
+        }
     }
 
     private peakNextLocation(): Location {
@@ -167,12 +183,16 @@ function dashedToSpaced(dashed: string): string {
     return dashed.split('-').join(' ');
 }
 
-const {busRoute, interval = 100, mph = '25'} = getOptionsFromArray(process.argv.slice(2));
+const {busRoute, interval = 1000, mph = '25'} = getOptionsFromArray(process.argv.slice(2));
 console.log('mph', mph);
 
-const b = new BusBot(busRoute, parseInt(mph), interval);
-b.startFollowing().then(() => {
-    setTimeout(() => {
-        b.runPutRequestOnInterval();
-    }, interval);
+const fracs = [0, 0.5];
+fracs.forEach(frac => {
+    const b = new BusBot('U1X', parseInt(mph), interval, frac);
+    b.startFollowing().then(() => {
+        setTimeout(() => {
+            b.runPutRequestOnInterval();
+        }, interval);
+    });
 });
+

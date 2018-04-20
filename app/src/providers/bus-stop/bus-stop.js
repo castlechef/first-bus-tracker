@@ -42,86 +42,60 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { Component } from '@angular/core';
-import { ViewController, IonicPage, NavParams, ModalController } from 'ionic-angular';
-import { BusPage } from '../bus/bus';
-import { BusStopProvider } from '../../providers/bus-stop/bus-stop';
-/**
- * Generated class for the BusStopPage page.
- */
-var BusStopPage = (function () {
-    function BusStopPage(navParams, viewctrl, modalctrl, busStopProvider) {
-        this.navParams = navParams;
-        this.viewctrl = viewctrl;
-        this.modalctrl = modalctrl;
-        this.busStopProvider = busStopProvider;
-        this.title = "Bus Stop";
-        //navParams : stopId stopName
-        this.title = navParams.get('stopName');
-        this.stopId = navParams.get('stopId');
-        this.updateCurrentBusStop();
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HOST } from '../../app/main';
+/*
+  Generated class for the BusStopProvider provider.
+*/
+var BusStopProvider = (function () {
+    function BusStopProvider(http) {
+        this.http = http;
+        console.log('Hello BusStopProvider Provider');
     }
-    BusStopPage.prototype.ionViewDidLoad = function () {
-        console.log('Bus stop page loaded ' + this.stopId);
-    };
-    BusStopPage.prototype.ngOnDestroy = function () {
-        console.log('bus stop page being destroyed');
-        clearInterval(this.interval);
-    };
-    BusStopPage.prototype.closeModal = function () {
-        this.viewctrl.dismiss();
-    };
-    BusStopPage.prototype.infoUpdater = function () {
-        var _this = this;
-        this.interval = setInterval(function () {
-            _this.updateCurrentBusStop();
-        }, 1000);
-    };
-    BusStopPage.prototype.updateCurrentBusStop = function () {
+    BusStopProvider.prototype.getBusStops = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, e_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (!this.busStop) {
-                            this.busStop = {
-                                busStopId: this.stopId,
-                                busStopName: this.busStopName,
-                                location: undefined,
-                                arrivals: []
-                            };
-                        }
-                        _b.label = 1;
+            var body;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.http.get(HOST + "/busStops").toPromise()];
                     case 1:
-                        _b.trys.push([1, 3, , 4]);
-                        _a = this;
-                        return [4 /*yield*/, this.busStopProvider.getBusStop(this.stopId)];
-                    case 2:
-                        _a.busStop = _b.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
-                        e_1 = _b.sent();
-                        console.log('cannot update current bus stop');
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        body = _a.sent();
+                        if (body.status === 'success') {
+                            return [2 /*return*/, body.data];
+                        }
+                        else {
+                            return [2 /*return*/, []];
+                        }
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    BusStopPage.prototype.openBus = function (bus) {
-        var tryModal = this.modalctrl.create(BusPage, { busId: bus.busId, routeName: bus.routeName });
-
-        tryModal.present();
+    BusStopProvider.prototype.getBusStop = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var body;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.http.get(HOST + "/busStops/" + id).toPromise()];
+                    case 1:
+                        body = _a.sent();
+                        if (body.status === 'success') {
+                            return [2 /*return*/, body.data];
+                        }
+                        else {
+                            throw new Error('getBusStop error in provider');
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
-    BusStopPage = __decorate([
-        IonicPage(),
-        Component({
-            selector: 'page-bus-stop',
-            templateUrl: 'bus-stop.html',
-        }),
-        __metadata("design:paramtypes", [NavParams, ViewController, ModalController, BusStopProvider])
-    ], BusStopPage);
-    return BusStopPage;
+    BusStopProvider = __decorate([
+        Injectable(),
+        __metadata("design:paramtypes", [HttpClient])
+    ], BusStopProvider);
+    return BusStopProvider;
 }());
-export { BusStopPage };
+export { BusStopProvider };
 //# sourceMappingURL=bus-stop.js.map

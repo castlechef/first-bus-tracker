@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {ViewController, IonicPage, NavController, NavParams} from 'ionic-angular';
 import {ServerProvider} from '../../providers/server-provider';
 import {BusInfo} from '../../busInfo.interface';
+import {Bus, BusProvider} from '../../providers/bus/bus';
 
 /**
  * Generated class for the BusPage page.
@@ -20,38 +21,43 @@ enum capacities {'UNKNOWN', 'EMPTY', 'QUIET','BUSY', 'FULL'}
 })
 export class BusPage {
 
-  public busId;
-  public title = 'Bus';
-  public capacity: string;
-  public sub_capacity: string;
-  public capacityDisplay: string;
-  public capacityInput = true;
-  public capacityShown = false;
-  public nextBusStops: Array<{ busStopId: number, busStopsName: string, arrivalTime: string }>;
+  private busId: number;
+  private title = 'Bus';
+  private bus: Bus;
+  private capacity: string;
+  private sliderValue: any;
+  private sub_capacity: string;
+  private capacityDisplay: string;
+  private capacityInput = true;
+  private capacityShown = false;
+  private interval: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, public serverService: ServerProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewctrl: ViewController, private busProvider: BusProvider) {
     this.title = navParams.get('routeName');
     this.busId = navParams.get('busId');
-    this.getBusInfo(navParams.get('busId')).then(busInfo => {
-      console.log(busInfo);
-      this.nextBusStops = busInfo.arrivalTimes;
-      this.capacity = busInfo.capacity;
-      if(this.distanceClose(busInfo.location, {latitude: 0.0, longitude: 0.0})){
-        this.capacityInput = true;
-      } else {
-        this.writeCapacityDisplay(busInfo.capacity);
-      }
-    }, rejected => {
-      console.log(rejected);
-      this.capacity =  "UNKNOWN";
-      this.writeCapacityDisplay("UNKNOWN");
-      this.nextBusStops = [];
-    });
+    this.bus = {busId: this.busId, location: undefined, routeName: this.title, arrivalTimes: []};
+
+    this.busProvider.getBus(this.busId)
+      .then((bus: Bus) => {
+        this.bus = bus;
+        if (this.distanceClose(bus.location, {latitude: 0, longitude: 0})) {
+          this.capacityInput = true;
+        } else {
+          this.writeCapacityDisplay(bus.capacity);
+        }
+      })
+      .catch(err => {
+        this.capacity = "UNKNOWN";
+      });
     this.infoUpdater();
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad ' + this.nextBusStops);
+    console.log('ionViewDidLoad');
+  }
+
+  ngOnDestroy() {
+    if (this.interval) clearInterval(this.interval);
   }
 
   closeModal() {
@@ -71,33 +77,29 @@ export class BusPage {
   }
 
   private infoUpdater() {
-    setInterval(() => {
-      this.getBusInfo(this.busId).then(busInfo => {
-        this.nextBusStops = busInfo.arrivalTimes;
-        this.capacity = busInfo.capacity;
-        this.writeCapacityDisplay(busInfo.capacity);
-      }, rejected => {
-        console.log(rejected);
-      });
+    this.interval = setInterval(() => {
+      this.busProvider.getBus(this.busId)
+        .then((bus: Bus) => {
+          this.bus = bus;
+          this.writeCapacityDisplay(bus.capacity);
+        })
+        .catch(err => {
+
+        });
     }, 1000)
   }
 
-  private getBusInfo(busId): Promise<BusInfo> {
-    return new Promise<BusInfo>((resolve, reject) => {
-      this.serverService.getBusInfo(busId).then(data => {
-        resolve(data);
-      }, rejected => {
-        reject(rejected);
-      });
-    });
-  }
-
   private inputCapacity(number) {
-    this.sub_capacity = capacities[number];
+    if (number === undefined) {
+      this.sub_capacity = capacities[1];
+    } else {
+      this.sub_capacity = capacities[number];
+    }
   }
 
   private submitCapacity() {
-    this.serverService.setCapacity(this.busId, this.sub_capacity);
+    this.inputCapacity(this.sliderValue);
+    this.busProvider.updateCapacity(this.sub_capacity, this.busId);
     this.capacityInput = false;
     this.writeCapacityDisplay(this.capacity);
   }

@@ -10,13 +10,14 @@ import * as cors from 'cors';
 import * as logger from 'morgan';
 import {Utils} from './utils/utils';
 import RouteError = Utils.routes.RouteError;
+import {Bus} from './models/bus';
 
 const corsOptions: cors.CorsOptions = {
     allowedHeaders: ['Origin'],
     credentials: true,
     methods: 'GET,PUT,POST',
     origin: '*',
-    preflightContinue: false
+    preflightContinue: true
 };
 
 export const app = express();
@@ -26,12 +27,22 @@ const data: { busStops: IBusStop[] } = require('./data/busStops.json');
 export const busStops = new BusStops(data.busStops);
 export const buses = new Buses(busStops);
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*"); // keep this if your api accepts cross-origin requests
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Access-Token");
+    next();
+});
+
+app.use('/api', (req, res, next) => {
+    res.redirect(req.url.replace('/api', ''));
+});
+
 app.locals.buses = buses;
 app.locals.busStops = busStops;
 
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
-app.use(logger('dev'));
+//app.use(logger('dev'));
 
 app.use('/buses', busesRoute);
 app.use('/busStops', busStopsRoute);
@@ -44,3 +55,14 @@ app.use('*', (err, req, res, next) => {
         next();
     }
 });
+
+setInterval((() => {
+    const now = Date.now();
+    const acceptableTime = now - (5 * 1000);
+    app.locals.buses.buses.forEach((bus: Bus) => {
+        if (bus.latestMovementDate < acceptableTime) {
+            console.log('removing old bus');
+            app.locals.buses.removeBus(bus.id);
+        }
+    });
+}), 1000);

@@ -1,13 +1,13 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {Location} from '../bus/bus';
+import {HOST} from '../../app/main';
 
 /*
   Generated class for the BusRouteProvider provider.
 */
 @Injectable()
 export class BusRouteProvider {
-
-  private static readonly URL = `http://localhost:${8080}/busRoutes`;
 
   private sections: Section[];
   private busRoutes: BusRoute[];
@@ -24,7 +24,7 @@ export class BusRouteProvider {
           resolve(this.busRoutes);
         })
         .catch(err => {
-          console.log("Error in getBusRoutes", err);
+          //console.log("Error in getBusRoutes", err);
           reject(err);
         });
     });
@@ -53,7 +53,7 @@ export class BusRouteProvider {
 
   private updateDataFromServer(): Promise<void> {
     return new Promise<any>((resolve, reject) => {
-      this.http.get(BusRouteProvider.URL).toPromise().then(data => {
+      this.http.get(`${HOST}/busRoutes`).toPromise().then(data => {
         const body = data as any;
         if (body.status === 'success') {
           this.sections = body.data.sections;
@@ -64,8 +64,8 @@ export class BusRouteProvider {
           reject();
         }
       }).catch(error => {
-        console.log("error in updateDataFromServer", error);
-        reject(error);
+        //console.log("error in updateDataFromServer", error);
+        reject(/*error*/);
       });
     });
   }
@@ -80,8 +80,5 @@ export interface BusRoute {
 export interface Section {
   sectionId: number;
   sectionDescription: string;
-  positions: {
-    latitude: number,
-    longitude: number
-  }[]
+  positions: Location[]
 }

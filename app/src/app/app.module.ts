@@ -7,7 +7,6 @@ import { Page1 } from '../pages/page1/page1';
 
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-import { ServerProvider} from '../providers/server-provider';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -21,6 +20,13 @@ import {BusStopListPageModule} from '../pages/bus-stop-list/bus-stop-list.module
 import {MapOptionsPopoverPageModule} from '../pages/map-options-popover/map-options-popover.module';
 import { SettingsProvider } from '../providers/settings/settings';
 import { IonicStorageModule } from '@ionic/storage';
+import {MapPage} from '../pages/map/map';
+import {BusPage} from '../pages/bus/bus';
+import {BusStopPage} from '../pages/bus-stop/bus-stop';
+import {MapOptionsPopoverPage} from '../pages/map-options-popover/map-options-popover';
+import {BusStopListPage} from '../pages/bus-stop-list/bus-stop-list';
+import { BusStopProvider } from '../providers/bus-stop/bus-stop';
+import { BusProvider } from '../providers/bus/bus';
 
 @NgModule({
   declarations: [
@@ -32,12 +38,12 @@ import { IonicStorageModule } from '@ionic/storage';
     BrowserModule,
     IonicModule.forRoot(MyApp, {}, { links: [] }),
     IonicStorageModule.forRoot(),
+    HttpClientModule,
     MapPageModule,
     BusPageModule,
     BusStopPageModule,
     BusStopListPageModule,
-    MapOptionsPopoverPageModule,
-    HttpClientModule
+    MapOptionsPopoverPageModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -51,11 +57,12 @@ import { IonicStorageModule } from '@ionic/storage';
     BrowserModule,
     HttpClient,
     HttpClientModule,
-    ServerProvider,
     Geolocation,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     BusRouteProvider,
-    SettingsProvider
+    SettingsProvider,
+    BusStopProvider,
+    BusProvider
   ]
 })
 export class AppModule { }

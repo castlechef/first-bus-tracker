@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { Component } from '@angular/core';
 import { ViewController, IonicPage, NavController, NavParams } from 'ionic-angular';
-import { ServerProvider } from '../../providers/server-provider';
+import { BusProvider } from '../../providers/bus/bus';
 /**
  * Generated class for the BusPage page.
  *
@@ -25,37 +25,39 @@ var capacities;
     capacities[capacities["FULL"] = 4] = "FULL";
 })(capacities || (capacities = {}));
 var BusPage = (function () {
-    function BusPage(navCtrl, navParams, viewctrl, serverService) {
+    function BusPage(navCtrl, navParams, viewctrl, busProvider) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.viewctrl = viewctrl;
-        this.serverService = serverService;
+        this.busProvider = busProvider;
         this.title = 'Bus';
         this.capacityInput = true;
         this.capacityShown = false;
         this.title = navParams.get('routeName');
         this.busId = navParams.get('busId');
-        this.getBusInfo(navParams.get('busId')).then(function (busInfo) {
-            console.log(busInfo);
-            _this.nextBusStops = busInfo.arrivalTimes;
-            _this.capacity = busInfo.capacity;
-            if (_this.distanceClose(busInfo.location, { latitude: 0.0, longitude: 0.0 })) {
+        this.bus = { busId: this.busId, location: undefined, routeName: this.title, arrivalTimes: [] };
+        this.busProvider.getBus(this.busId)
+            .then(function (bus) {
+            _this.bus = bus;
+            if (_this.distanceClose(bus.location, { latitude: 0, longitude: 0 })) {
                 _this.capacityInput = true;
             }
             else {
-                _this.writeCapacityDisplay(busInfo.capacity);
+                _this.writeCapacityDisplay(bus.capacity);
             }
-        }, function (rejected) {
-            console.log(rejected);
+        })
+            .catch(function (err) {
             _this.capacity = "UNKNOWN";
-            _this.writeCapacityDisplay("UNKNOWN");
-            _this.nextBusStops = [];
         });
         this.infoUpdater();
     }
     BusPage.prototype.ionViewDidLoad = function () {
-        console.log('ionViewDidLoad ' + this.nextBusStops);
+        console.log('ionViewDidLoad');
+    };
+    BusPage.prototype.ngOnDestroy = function () {
+        if (this.interval)
+            clearInterval(this.interval);
     };
     BusPage.prototype.closeModal = function () {
         this.viewctrl.dismiss();
@@ -73,31 +75,27 @@ var BusPage = (function () {
     };
     BusPage.prototype.infoUpdater = function () {
         var _this = this;
-        setInterval(function () {
-            _this.getBusInfo(_this.busId).then(function (busInfo) {
-                _this.nextBusStops = busInfo.arrivalTimes;
-                _this.capacity = busInfo.capacity;
-                _this.writeCapacityDisplay(busInfo.capacity);
-            }, function (rejected) {
-                console.log(rejected);
+        this.interval = setInterval(function () {
+            _this.busProvider.getBus(_this.busId)
+                .then(function (bus) {
+                _this.bus = bus;
+                _this.writeCapacityDisplay(bus.capacity);
+            })
+                .catch(function (err) {
             });
         }, 1000);
     };
-    BusPage.prototype.getBusInfo = function (busId) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this.serverService.getBusInfo(busId).then(function (data) {
-                resolve(data);
-            }, function (rejected) {
-                reject(rejected);
-            });
-        });
-    };
     BusPage.prototype.inputCapacity = function (number) {
-        this.sub_capacity = capacities[number];
+        if (number === undefined) {
+            this.sub_capacity = capacities[1];
+        }
+        else {
+            this.sub_capacity = capacities[number];
+        }
     };
     BusPage.prototype.submitCapacity = function () {
-        this.serverService.setCapacity(this.busId, this.sub_capacity);
+        this.inputCapacity(this.sliderValue);
+        this.busProvider.updateCapacity(this.sub_capacity, this.busId);
         this.capacityInput = false;
         this.writeCapacityDisplay(this.capacity);
     };
@@ -134,7 +132,7 @@ var BusPage = (function () {
             selector: 'page-bus',
             templateUrl: 'bus.html',
         }),
-        __metadata("design:paramtypes", [NavController, NavParams, ViewController, ServerProvider])
+        __metadata("design:paramtypes", [NavController, NavParams, ViewController, BusProvider])
     ], BusPage);
     return BusPage;
 }());

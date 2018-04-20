@@ -12,28 +12,24 @@ import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
+import { Events } from 'ionic-angular';
 var ServerProvider = (function () {
-    function ServerProvider(http) {
+    function ServerProvider(http, events) {
         this.http = http;
+        this.events = events;
         // url for the api where the data is coming from
         //private _url: string = 'http://localhost:8080/';
-        this._url = "http://localhost:" + 8080 + "/";
+        this._url = "http://10.0.0.4:" + 8080 + "/";
+        console.log('starting a new server provider now!');
         this.buses = [];
         this.startBusFetchingBuses();
+        this.id = Math.random();
     }
+    ServerProvider.prototype.ngOnDestroy = function () {
+        console.log('being destroyed');
+        clearInterval(this.busInterval);
+    };
     ServerProvider.prototype.startBusFetchingBuses = function () {
-        var _this = this;
-        setInterval(function () {
-            _this.http
-                .get(_this._url.concat('buses'))
-                .toPromise()
-                .then(function (body) {
-                _this.buses = body.data;
-            })
-                .catch(function (e) {
-                console.log('Error fetching buses data', e.message);
-            });
-        }, 1000);
     };
     // gets buses data and maps it to the observable Bus
     ServerProvider.prototype.getBusLocations = function () {
@@ -105,7 +101,7 @@ var ServerProvider = (function () {
     };
     ServerProvider = __decorate([
         Injectable(),
-        __metadata("design:paramtypes", [HttpClient])
+        __metadata("design:paramtypes", [HttpClient, Events])
     ], ServerProvider);
     return ServerProvider;
 }());

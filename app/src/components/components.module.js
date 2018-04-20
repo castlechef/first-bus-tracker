@@ -5,24 +5,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { MapPage } from './map';
-import { ComponentsModule } from '../../components/components.module';
-var MapPageModule = (function () {
-    function MapPageModule() {
+import { NetworkWarningComponent } from './network-warning/network-warning';
+import { IonicModule } from 'ionic-angular';
+import { Network } from '@ionic-native/network';
+var ComponentsModule = (function () {
+    function ComponentsModule() {
     }
-    MapPageModule = __decorate([
+    ComponentsModule = __decorate([
         NgModule({
-            declarations: [
-                MapPage,
-            ],
+            declarations: [NetworkWarningComponent],
             imports: [
-                IonicPageModule.forChild(MapPage),
-                ComponentsModule
+                IonicModule
             ],
+            exports: [NetworkWarningComponent],
+            providers: [Network]
         })
-    ], MapPageModule);
-    return MapPageModule;
+    ], ComponentsModule);
+    return ComponentsModule;
 }());
-export { MapPageModule };
-//# sourceMappingURL=map.module.js.map
+export { ComponentsModule };
+//# sourceMappingURL=components.module.js.map

@@ -43,32 +43,30 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Component } from '@angular/core';
-import { AlertController, IonicPage, ModalController, NavController, NavParams, ViewController } from 'ionic-angular';
-import { ServerProvider } from '../../providers/server-provider';
+import { AlertController, Events, IonicPage, ModalController, NavController, NavParams, ViewController } from 'ionic-angular';
 import { BusStopPage } from '../bus-stop/bus-stop';
 import { SettingsProvider } from '../../providers/settings/settings';
+import { BusStopProvider } from '../../providers/bus-stop/bus-stop';
 /**
  * Generated class for the BusStopListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
  */
 var BusStopListPage = (function () {
-    function BusStopListPage(navCtrl, navParams, viewctrl, modalctrl, serverService, alertCtrl, settings) {
+    function BusStopListPage(navCtrl, navParams, viewctrl, modalctrl, alertCtrl, settings, events, busStopProvider) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.viewctrl = viewctrl;
         this.modalctrl = modalctrl;
-        this.serverService = serverService;
         this.alertCtrl = alertCtrl;
         this.settings = settings;
+        this.events = events;
+        this.busStopProvider = busStopProvider;
         this.title = 'Bus Stops';
         //navParams : stopId stopName
         this.busStops = [];
-        this.serverService.getStops()
-            .then(function (array) {
-            _this.busStops = array;
+        this.busStopProvider.getBusStops()
+            .then(function (busStops) {
+            _this.busStops = busStops;
             _this.setupBusStops();
             _this.setupFavs();
         }, function (err) {
@@ -167,9 +165,10 @@ var BusStopListPage = (function () {
             NavParams,
             ViewController,
             ModalController,
-            ServerProvider,
             AlertController,
-            SettingsProvider])
+            SettingsProvider,
+            Events,
+            BusStopProvider])
     ], BusStopListPage);
     return BusStopListPage;
 }());

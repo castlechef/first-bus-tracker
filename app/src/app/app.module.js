@@ -11,7 +11,6 @@ import { MyApp } from './app.component';
 import { Page1 } from '../pages/page1/page1';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-import { ServerProvider } from '../providers/server-provider';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Geolocation } from '@ionic-native/geolocation';
@@ -24,6 +23,8 @@ import { BusStopListPageModule } from '../pages/bus-stop-list/bus-stop-list.modu
 import { MapOptionsPopoverPageModule } from '../pages/map-options-popover/map-options-popover.module';
 import { SettingsProvider } from '../providers/settings/settings';
 import { IonicStorageModule } from '@ionic/storage';
+import { BusStopProvider } from '../providers/bus-stop/bus-stop';
+import { BusProvider } from '../providers/bus/bus';
 var AppModule = (function () {
     function AppModule() {
     }
@@ -38,12 +39,12 @@ var AppModule = (function () {
                 BrowserModule,
                 IonicModule.forRoot(MyApp, {}, { links: [] }),
                 IonicStorageModule.forRoot(),
+                HttpClientModule,
                 MapPageModule,
                 BusPageModule,
                 BusStopPageModule,
                 BusStopListPageModule,
-                MapOptionsPopoverPageModule,
-                HttpClientModule
+                MapOptionsPopoverPageModule
             ],
             bootstrap: [IonicApp],
             entryComponents: [
@@ -57,11 +58,12 @@ var AppModule = (function () {
                 BrowserModule,
                 HttpClient,
                 HttpClientModule,
-                ServerProvider,
                 Geolocation,
                 { provide: ErrorHandler, useClass: IonicErrorHandler },
                 BusRouteProvider,
-                SettingsProvider
+                SettingsProvider,
+                BusStopProvider,
+                BusProvider
             ]
         })
     ], AppModule);

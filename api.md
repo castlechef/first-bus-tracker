@@ -37,7 +37,8 @@ Allows clients to get the latest list of buses and their locations.
                         "latitude": 53.003444,
                         "longitude": -2.273507
                     },
-                    "routeName": "U2"
+                    "routeName": "U2",
+                    "bearing": 182.254
                 },
                 {
                     "busId": 2,
@@ -45,7 +46,8 @@ Allows clients to get the latest list of buses and their locations.
                         "latitude": 53.9643824,
                         "longitude": -2.295362
                     },
-                    "routeName": "U2"
+                    "routeName": "U2",
+                    "bearing": 15.391
                 },
                 {
                     "busId": 3,
@@ -53,7 +55,8 @@ Allows clients to get the latest list of buses and their locations.
                         "latitude": 53.837285,
                         "longitude": -2.276247
                     },
-                    "routeName": "U1X"
+                    "routeName": "U1X",
+                    "bearing": 322.278
                 }
             ]
         }
@@ -168,6 +171,7 @@ departure times.
                     "longitude": -2.273507
                 },
                 "routeName": "U1",
+                "bearing": 182.254,
                 "capacity": "FULL",
                 "departureTimes": [
                     {

@@ -1,11 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import { ServerProvider } from '../../providers/server-provider';
 import { NavController } from 'ionic-angular';
 
 @Component({
   selector: 'page-page2',
-  templateUrl: 'page2.html',
-  providers: [ServerProvider]
+  templateUrl: 'page2.html'
 })
 export class Page2 implements OnInit {
   public buses: any = [];
@@ -18,10 +16,9 @@ export class Page2 implements OnInit {
   /**
    * imports all the necessary parameters
    * @param {NavController} navCtrl - for navigation
-   * @param {ServerProvider} serverService - for getting buses
    * @param {StopsProvider} stopsService - for getting bus stops
    */
-  constructor(public navCtrl: NavController, public serverService: ServerProvider){
+  constructor(public navCtrl: NavController){
     //this.loadBuses();
   }
 
