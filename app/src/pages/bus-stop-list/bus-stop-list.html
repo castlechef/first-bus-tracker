@@ -19,9 +19,14 @@
 
 <ion-content>
   <ion-list>
-    <ion-item (press)="presentConfirm(busStop)" *ngFor="let busStop of busStops" (click)="openBusStop(busStop)">
-      {{ busStop.busStopName }}
-      <ion-icon *ngIf="busStop.isFav" color="gold" name="star"></ion-icon>
+    <ion-item *ngFor="let busStop of busStops" >
+      <button (click)="openBusStop(busStop)">
+        {{ busStop.busStopName }}
+      </button>
+      <button (click)="presentConfirm(busStop)">
+        <ion-icon *ngIf="!busStop.isFav" color="white" name="star"></ion-icon>
+        <ion-icon *ngIf="busStop.isFav" color="gold" name="star"></ion-icon>
+      </button>
     </ion-item>
   </ion-list>
 </ion-content>
