@@ -98,7 +98,6 @@ export class Location implements JSONable {
         return new Location({latitude: toDegrees(latitudeResult), longitude: toDegrees(longitudeResult)});
     }
 
-
     public static distanceBetweenN(locations: Location[]) {
         let total = 0;
         for (let i = 0; i < locations.length - 1; i++) {

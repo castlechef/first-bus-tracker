@@ -34,6 +34,7 @@ export class Bus implements JSONable {
     private busStopDepartureTimes: BusStopDeparture[];
     private busStopArrivalTimes: BusStopArrival[];
     private busCapacity: BusCapacity;
+    private bearing: number;
 
     constructor(id: busId, location: Location, busRouteName: BusRouteName, busStops: BusStop[]) {
         if (typeof id !== 'number' || !(location instanceof Location)) throw new Error('invalid parameter');
@@ -48,6 +49,7 @@ export class Bus implements JSONable {
         this.busStopArrivalTimes = [];
         this.busCapacity = new BusCapacity();
         this.updateLocation(location);
+        this.bearing = undefined;
     }
 
     private establishRoutePosition(): void {
@@ -105,8 +107,10 @@ export class Bus implements JSONable {
 
     public updateLocation(location: Location): void {
         if (!(location instanceof Location)) throw new Error('invalid location');
+        if (this.locations.length > 0) {
+            this.bearing = this.getLatestLocation().bearingTo(location);
+        }
         this.locations.push(location);
-
         if (!this.establishedRoutePosition) {
             this.establishRoutePosition();
         } else {
@@ -195,7 +199,8 @@ export class Bus implements JSONable {
         return {
             busId: this.id,
             location: this.getLatestLocation().toJSON(),
-            routeName: this.busRoute
+            routeName: this.busRoute,
+            bearing: this.bearing
         };
     }
 
@@ -234,6 +239,7 @@ export class Bus implements JSONable {
             busId: this.id,
             location: this.getLatestLocation().toJSON(),
             routeName: this.busRoute,
+            bearing: this.bearing,
             capacity: this.busCapacity.toJSON(),
             departureTimes,
             arrivalTimes

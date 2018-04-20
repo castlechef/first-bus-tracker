@@ -21,6 +21,7 @@ class Bus {
         this.busStopArrivalTimes = [];
         this.busCapacity = new busCapacity_1.BusCapacity();
         this.updateLocation(location);
+        this.bearing = undefined;
     }
     establishRoutePosition() {
         const stopsInRange = this.getStopsWithinRange(Bus.PROXIMITY_TO_STOP_AT_STOP);
@@ -72,6 +73,9 @@ class Bus {
     updateLocation(location) {
         if (!(location instanceof location_1.Location))
             throw new Error('invalid location');
+        if (this.locations.length > 0) {
+            this.bearing = this.getLatestLocation().bearingTo(location);
+        }
         this.locations.push(location);
         if (!this.establishedRoutePosition) {
             this.establishRoutePosition();
@@ -147,7 +151,8 @@ class Bus {
         return {
             busId: this.id,
             location: this.getLatestLocation().toJSON(),
-            routeName: this.busRoute
+            routeName: this.busRoute,
+            bearing: this.bearing
         };
     }
     toDetailedJSON() {
@@ -183,6 +188,7 @@ class Bus {
             busId: this.id,
             location: this.getLatestLocation().toJSON(),
             routeName: this.busRoute,
+            bearing: this.bearing,
             capacity: this.busCapacity.toJSON(),
             departureTimes,
             arrivalTimes
