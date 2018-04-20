@@ -24,7 +24,7 @@ var capacities;
     capacities[capacities["BUSY"] = 3] = "BUSY";
     capacities[capacities["FULL"] = 4] = "FULL";
 })(capacities || (capacities = {}));
-var BusPage = (function () {
+var BusPage = /** @class */ (function () {
     function BusPage(navCtrl, navParams, viewctrl, busProvider) {
         var _this = this;
         this.navCtrl = navCtrl;
@@ -32,7 +32,7 @@ var BusPage = (function () {
         this.viewctrl = viewctrl;
         this.busProvider = busProvider;
         this.title = 'Bus';
-        this.capacityInput = true;
+        this.capacityInput = false;
         this.capacityShown = false;
         this.title = navParams.get('routeName');
         this.busId = navParams.get('busId');
@@ -40,7 +40,7 @@ var BusPage = (function () {
         this.busProvider.getBus(this.busId)
             .then(function (bus) {
             _this.bus = bus;
-            if (_this.distanceClose(bus.location, { latitude: 0, longitude: 0 })) {
+            if (_this.distanceClose(bus.location, _this.navParams.get('userPosition'))) {
                 _this.capacityInput = true;
             }
             else {
