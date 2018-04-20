@@ -24,7 +24,7 @@
 
 <ion-content>
   <ion-list>
-    <button ion-item *ngFor="let bus of busStop.arrivals" (click)="openBus(bus)">
+    <button ion-item *ngFor="let bus of busStop.arrivals" (click)="openBusPage(bus)">
       <ion-label class="number">{{bus.arrivalTime}}</ion-label>
       <ion-label>{{ bus.routeName }}</ion-label>
     </button>
