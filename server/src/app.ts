@@ -41,7 +41,7 @@ app.locals.busStops = busStops;
 
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
-app.use(logger('dev'));
+//app.use(logger('dev'));
 
 app.use('/buses', busesRoute);
 app.use('/busStops', busStopsRoute);

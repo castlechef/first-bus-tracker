@@ -5,9 +5,8 @@ import {BusPage} from '../bus/bus';
 import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus-route';
 import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover';
 import {} from 'googlemaps';
-import {Bus} from '../../bus.interface';
 import {SettingsProvider} from '../../providers/settings/settings';
-import {BusProvider} from '../../providers/bus/bus';
+import {Bus, BusProvider} from '../../providers/bus/bus';
 import {BusStop, BusStopProvider} from '../../providers/bus-stop/bus-stop';
 import {Geolocation} from '@ionic-native/geolocation';
 
@@ -38,12 +37,13 @@ export class MapPage {
   private buses: Bus[];
   private busStops: BusStop[];
   public routeStates: { busRouteName: string, active: boolean }[];
+  private currentIcons: {busIcon, busStopIcon};
 
   private busStopMarkers: Map<number, google.maps.Marker>;
   private busRouteSectionLines: Map<number, google.maps.Polyline>;
   private busMarkers: Map<number, google.maps.Marker>;
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
-  private busUrl = './assets/icon/bus.png';
+  private busUrl = './assets/icon/bus.svg';
   private busStopUrl = './assets/icon/busStop.png';
 
   constructor(public navCtrl: NavController,
@@ -194,39 +194,68 @@ export class MapPage {
       await this.setupMapElements();
     } finally {
       this.map.addListener('zoom_changed', () => {
-        if ((this.map.zoom) >= 15){
-          this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(64,64),
-              anchor: new google.maps.Point(32,50)});
+        const icons = this.getCurrentIcons();
+        if (icons !== this.currentIcons) {
+          this.currentIcons = icons;
+          this.busMarkers.forEach(marker => {
+            marker.setIcon(this.currentIcons.busIcon);
           });
-          this.busStopMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(42, 42)});
-          });
-        } else if (12 < (this.map.zoom) && (this.map.zoom) < 15){
-          this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(48,48),
-              anchor: new google.maps.Point(24,34)});
-          });
-          this.busStopMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(30, 30)});
-          });
-        } else {
-          this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(30,30),
-              anchor: new google.maps.Point(15,20)});
-          });
-          this.busStopMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(15, 15)});
+          this.busStopMarkers.forEach(marker => {
+            marker.setIcon(this.currentIcons.busStopIcon);
           });
         }
       });
     }
+  }
+
+  private getCurrentIcons(): {busIcon, busStopIcon} {
+    const values: {minValue: number, busIcon, busStopIcon}[] = [
+      {
+        minValue: 15,
+        busIcon: {
+          url: this.busUrl,
+          scaledSize: new google.maps.Size(64,64),
+          anchor: new google.maps.Point(32,50)
+        },
+        busStopIcon: {
+          url: this.busStopUrl,
+          scaledSize: new google.maps.Size(42, 42)
+        }
+      },
+      {
+        minValue: 12,
+        busIcon: {
+          url: this.busUrl,
+          scaledSize: new google.maps.Size(48,48),
+          anchor: new google.maps.Point(24,34)
+        },
+        busStopIcon: {
+          url: this.busStopUrl,
+          scaledSize: new google.maps.Size(30, 30)
+        }
+      },
+      {
+        minValue: -Infinity,
+        busIcon: {
+          url: this.busUrl,
+          scaledSize: new google.maps.Size(30,30),
+          anchor: new google.maps.Point(15,20)
+        },
+        busStopIcon: {
+          url: this.busStopUrl,
+          scaledSize: new google.maps.Size(15, 15)
+        }
+      }
+    ];
+    let busIcon, busStopIcon;
+    const zoom = this.map.zoom;
+    for (let i = 0; i < values.length; i++) {
+      if (zoom >= values[i].minValue) {
+        ({busIcon, busStopIcon} = values[i]);
+        return {busIcon, busStopIcon};
+      }
+    }
+    return values[0];
   }
 
   private async setupMapRoutes(): Promise<void> {
@@ -294,13 +323,11 @@ export class MapPage {
     try {
       this.busStops = await this.busStopProvider.getBusStops();
       this.busStops.forEach(busStop => {
+        const {busStopIcon} = this.getCurrentIcons();
         const stopMarker = new google.maps.Marker({
           position: new google.maps.LatLng(busStop.location.latitude, busStop.location.longitude),
           title: busStop.busStopName,
-          icon: {
-            url: './assets/icon/busStop.png',
-            scaledSize: new google.maps.Size(42,42)
-          }
+          icon: busStopIcon
         });
         this.busStopMarkers.set(busStop.busStopId,stopMarker);
         google.maps.event.addListener(stopMarker, 'click', () => this.openBusStopPage(busStop.busStopId, busStop.busStopName));
@@ -395,18 +422,57 @@ export class MapPage {
       const busMarker = this.busMarkers.get(bus.busId);
       this.animateMovement(busMarker, bus.location);
     } else {
+      const {busIcon} = this.getCurrentIcons();
       let busMarker = new google.maps.Marker({
         position: new google.maps.LatLng(bus.location.latitude, bus.location.longitude),
         title: bus.routeName,
-        icon: {
-          url: './assets/icon/bus.png',
-          anchor: new google.maps.Point(32,50)
-        }
+        icon: busIcon
       });
       this.busMarkers.set(bus.busId, busMarker);
       google.maps.event.addListener(busMarker, 'click', () => this.openBusPage(bus.busId, bus.routeName));
     }
     this.updateBusesVisibility();
+  }
+
+  private getMeAnSvg(): Element {
+    function addProps(e, props) {
+      for (let prop in props) {
+        let a = document.createAttribute(prop);
+        a.value = props[prop];
+        e.setAttributeNode(a);
+      }
+    }
+    const svg = document.createElement('svg');
+    const svgProps = {
+      xmlns:"http://www.w3.org/2000/svg",
+      version:"1.1",
+      x:"0px",
+      y:"0px",
+      width:"512px",
+      height:"512px",
+      viewBox:"0 0 355.209 355.209",
+      style:"enable-background:new 0 0 355.209 355.209;",
+      'xml:space':"preserve"
+    };
+    addProps(svg, svgProps);
+    const paths = [
+      'M86.94,234.342c-17.69,0-32.025,14.332-32.025,32.022c0,17.691,14.335,32.021,32.025,32.021    c17.695,0,32.027-14.33,32.027-32.021C118.967,248.674,104.635,234.342,86.94,234.342z M86.94,280.288    c-7.69,0-13.921-6.231-13.921-13.922c0-7.693,6.23-13.921,13.921-13.921s13.925,6.228,13.925,13.921    C100.865,274.056,94.63,280.288,86.94,280.288z',
+      'M274.949,234.342c-17.689,0-32.025,14.332-32.025,32.022c0,17.691,14.336,32.021,32.025,32.021    c17.695,0,32.027-14.33,32.027-32.021C306.977,248.674,292.645,234.342,274.949,234.342z M274.949,280.288    c-7.689,0-13.922-6.231-13.922-13.922c0-7.693,6.23-13.921,13.922-13.921s13.926,6.228,13.926,13.921    C288.875,274.056,282.639,280.288,274.949,280.288z" fill="#6b1c5d',
+      'M336.068,56.823H42.101c-10.525,0-20.858,8.438-22.963,18.75L3.827,165.329C1.722,175.642,0,192.69,0,203.215    l0.957,44.014c0,10.523,8.611,19.136,19.136,19.136h29.08c0-20.823,16.941-37.763,37.766-37.763    c20.826,0,37.77,16.939,37.77,37.763h112.475c0-20.823,16.941-37.763,37.766-37.763c20.826,0,37.77,16.939,37.77,37.763h23.352    c10.525,0,19.139-8.612,19.139-19.136V75.959C355.205,65.434,346.594,56.823,336.068,56.823z M90.048,185.407H45.453l7.066-16.738    c1.233-2.921-0.134-6.289-3.055-7.522c-2.923-1.233-6.29,0.135-7.522,3.056l-8.921,21.127    c-16.668-0.736-19.058-6.767-17.708-14.035l5.092-34.401h69.644L90.048,185.407L90.048,185.407z M90.048,115.845H23.521    l4.95-33.441c1.441-7.761,9.078-14.111,16.973-14.111h44.604V115.845z M175.205,185.407H101.53v-48.512h73.675V185.407z     M175.205,115.845H101.53V68.292h73.675V115.845z M260.361,185.407h-73.676v-48.512h73.676V185.407z M260.361,115.845h-73.676    V68.292h73.676V115.845z M343.469,171.055c0,7.894-6.457,14.352-14.352,14.352h-57.275v-48.512h71.627V171.055L343.469,171.055z     M343.469,115.845h-71.627V68.292h57.275c7.895,0,14.352,6.458,14.352,14.353V115.845z" fill="#6b1c5d'
+    ];
+
+    const pathElems = paths.map(path => {
+      const propy = {};
+      propy.d = path;
+      propy.fill = '#6b1c5d';
+      const e = document.createElement('path');
+      //console.log(props);
+      addProps(e, propy);
+      return e;
+    });
+    pathElems.forEach(e => {
+      svg.appendChild(e);
+    });
   }
 
   //Animates the movement of a marker to a new longitude/latitude

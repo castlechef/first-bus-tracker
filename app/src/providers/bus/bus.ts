@@ -108,6 +108,7 @@ export type Bus = {
   busId: number;
   location: Location;
   routeName: string;
+  bearing?: number;
   capacity?: string;
   departureTimes?: BusDepartureTime[];
   arrivalTimes?: BusArrivalTime[];

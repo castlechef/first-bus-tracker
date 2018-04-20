@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const busStops_1 = require("../models/busStops");
-const utils_1 = require("../utils/utils");
 const location_1 = require("../models/location");
 const rp = require("request-promise");
-var randomBetweenNumbers = utils_1.Utils.Numeric.randomBetweenNumbers;
+const host = 'http://localhost/api';
+//const host = 'http://firstbustracker.ddns.net/api';
 class BusBot {
-    constructor(routeName, mph, milliseconds) {
+    constructor(routeName, mph, milliseconds, frac) {
         this.distancePerMove = 30; //metres
         if (typeof milliseconds === 'string')
             milliseconds = parseInt(milliseconds);
@@ -18,7 +18,10 @@ class BusBot {
         //this.routeStops = busStops.getStopsWithRoute(routeName);
         this.waypoints = this.getPointsOfRoute();
         //if (this.routeStops.length < 2) throw new Error('Bus route must have at least 2 stops');
-        this.waypointIndex = Math.floor(randomBetweenNumbers(0, this.waypoints.length));
+        this.waypointIndex = 0;
+        const length = location_1.Location.distanceBetweenN(this.waypoints);
+        this.moveDistance(length * frac);
+        //this.waypointIndex = Math.floor(randomBetweenNumbers(0, this.waypoints.length));
         console.log('Total route length: ' + location_1.Location.distanceBetweenN(this.waypoints));
     }
     getPointsOfRoute() {
@@ -46,7 +49,7 @@ class BusBot {
         this.currentLocation = nextLocation;
         const options = {
             method: 'POST',
-            uri: 'http://firstbustracker.ddns.net/api/buses',
+            uri: `${host}/buses`,
             body: {
                 data: {
                     location: nextLocation.toJSON(),
@@ -85,7 +88,7 @@ class BusBot {
         this.move();
         const options = {
             method: 'PUT',
-            uri: `http://firstbustracker.ddns.net/api/buses/${this.busId}/location`,
+            uri: `${host}/buses/${this.busId}/location`,
             body: {
                 data: {
                     location: this.currentLocation.toJSON()
@@ -114,6 +117,15 @@ class BusBot {
             distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
         }
         this.currentLocation = this.currentLocation.moveInDirectionOf(this.peakNextLocation(), distanceToMove);
+    }
+    moveDistance(distanceToMove) {
+        this.currentLocation = this.getNextLocation();
+        let distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
+        while (distanceToMove > distanceToNextPosition) {
+            distanceToMove -= distanceToNextPosition;
+            this.currentLocation = this.getNextLocation();
+            distanceToNextPosition = this.peakNextLocation().distanceFrom(this.currentLocation);
+        }
     }
     peakNextLocation() {
         return this.waypoints[this.waypointIndex];
@@ -146,12 +158,15 @@ function dashedToCamelCase(dashed) {
 function dashedToSpaced(dashed) {
     return dashed.split('-').join(' ');
 }
-const { busRoute, interval = 100, mph = '25' } = getOptionsFromArray(process.argv.slice(2));
+const { busRoute, interval = 1000, mph = '25' } = getOptionsFromArray(process.argv.slice(2));
 console.log('mph', mph);
-const b = new BusBot(busRoute, parseInt(mph), interval);
-b.startFollowing().then(() => {
-    setTimeout(() => {
-        b.runPutRequestOnInterval();
-    }, interval);
+const fracs = [0, 0.5];
+fracs.forEach(frac => {
+    const b = new BusBot('U1X', parseInt(mph), interval, frac);
+    b.startFollowing().then(() => {
+        setTimeout(() => {
+            b.runPutRequestOnInterval();
+        }, interval);
+    });
 });
 //# sourceMappingURL=busBot.js.map

@@ -8,7 +8,6 @@ const busRoutes_1 = require("./routes/busRoutes");
 const buses_2 = require("./models/buses");
 const busStops_2 = require("./models/busStops");
 const cors = require("cors");
-const logger = require("morgan");
 const utils_1 = require("./utils/utils");
 var RouteError = utils_1.Utils.routes.RouteError;
 const corsOptions = {
@@ -34,7 +33,7 @@ exports.app.locals.buses = exports.buses;
 exports.app.locals.busStops = exports.busStops;
 exports.app.use(bodyParser.json());
 exports.app.use(cors(corsOptions));
-exports.app.use(logger('dev'));
+//app.use(logger('dev'));
 exports.app.use('/buses', buses_1.default);
 exports.app.use('/busStops', busStops_1.default);
 exports.app.use('/busRoutes', busRoutes_1.default);

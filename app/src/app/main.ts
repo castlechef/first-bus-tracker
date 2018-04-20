@@ -2,6 +2,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app.module';
 
-export const HOST: string = 'https://firstbustracker.ddns.net/api';
+export const HOST: string = 'http://localhost/api';
 
 platformBrowserDynamic().bootstrapModule(AppModule);
