@@ -64,7 +64,7 @@ export class BusStopPage {
   }
 
   openBus(bus){
-    let tryModal = this.modalctrl.create(BusPage, {busId: bus.busId, routeName: bus.busRoute});
+    let tryModal = this.modalctrl.create(BusPage, {busId: bus.busId, routeName: bus.routeName});
     tryModal.present();
   }
 }

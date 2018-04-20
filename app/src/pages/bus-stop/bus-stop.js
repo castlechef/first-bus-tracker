@@ -64,7 +64,7 @@ var BusStopPage = (function () {
         });
     };
     BusStopPage.prototype.openBus = function (bus) {
-        var tryModal = this.modalctrl.create(BusPage, { busId: bus.busId, routeName: bus.busRoute });
+        var tryModal = this.modalctrl.create(BusPage, { busId: bus.busId, routeName: bus.routeName });
         tryModal.present();
     };
     BusStopPage = __decorate([

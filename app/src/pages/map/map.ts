@@ -6,6 +6,7 @@ import {ServerProvider} from '../../providers/server-provider';
 import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus-route';
 import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover';
 import {} from 'googlemaps';
+import {} from 'google';
 import {Stop} from '../../stops.interface';
 import {Bus} from '../../bus.interface';
 import {SettingsProvider} from '../../providers/settings/settings';
@@ -49,7 +50,22 @@ export class MapPage {
   //colors for the bus routes
   private colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
   private busUrl = './assets/icon/bus.png';
+  private revBusUrl = './assets/icon/reversedBus.png';
   private busStopUrl = './assets/icon/busStop.png';
+  private busIcons: Array<object> = [{url: this.busUrl,
+    scaledSize: new google.maps.Size(64,64),
+    anchor: new google.maps.Point(32,50)}, {url: this.busUrl,
+    scaledSize: new google.maps.Size(48,48),
+    anchor: new google.maps.Point(24,34)}, {url: this.busUrl,
+    scaledSize: new google.maps.Size(30,30),
+    anchor: new google.maps.Point(15,20)},{url: this.revBusUrl,
+    scaledSize: new google.maps.Size(64,64),
+    anchor: new google.maps.Point(32,50)}, {url: this.revBusUrl,
+    scaledSize: new google.maps.Size(48,48),
+    anchor: new google.maps.Point(24,34)}, {url: this.revBusUrl,
+    scaledSize: new google.maps.Size(30,30),
+    anchor: new google.maps.Point(15,20)}];
+  private zoom = 0;
 
   /**
    * imports all the necessary parameters
@@ -178,34 +194,31 @@ export class MapPage {
       this.setupMapBusStops();
       this.map.addListener('zoom_changed', () => {
         if ((this.map.zoom) >= 15){
-          this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(64,64),
-              anchor: new google.maps.Point(32,50)});
+          this.zoom = 0;
+          this.busMarkers.forEach(marker => {
+            marker.setIcon(this.busIcons[0]);
           });
           this.busStopMarkers.forEach(marker =>{
             marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(42, 42)});
+              scaledSize: new google.maps.Size(42, 42)})
           });
         } else if (12 < (this.map.zoom) && (this.map.zoom) < 15){
+          this.zoom = 1;
           this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(48,48),
-              anchor: new google.maps.Point(24,34)});
+            marker.setIcon(this.busIcons[1])
           });
           this.busStopMarkers.forEach(marker =>{
             marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(30, 30)});
+              scaledSize: new google.maps.Size(30, 30)})
           });
         } else {
+          this.zoom = 2;
           this.busMarkers.forEach(marker =>{
-            marker.setIcon({url: this.busUrl,
-              scaledSize: new google.maps.Size(30,30),
-              anchor: new google.maps.Point(15,20)});
+            marker.setIcon(this.busIcons[2])
           });
           this.busStopMarkers.forEach(marker =>{
             marker.setIcon({url: this.busStopUrl,
-              scaledSize: new google.maps.Size(15, 15)});
+              scaledSize: new google.maps.Size(15, 15)})
           });
         }
       });
@@ -372,7 +385,13 @@ export class MapPage {
 
   private addBusToMap(bus: Bus) {
     if (this.busMarkers.has(bus.busId)) {
-      const busMarker = this.busMarkers.get(bus.busId);
+      let busMarker = this.busMarkers.get(bus.busId);
+      const prev = busMarker.getPosition().lng();
+      if(prev - bus.location.longitude > 0){
+        busMarker.setIcon(this.busIcons[this.zoom]);
+      } else{
+        busMarker.setIcon(this.busIcons[this.zoom + 3]);
+      }
       this.animateMovement(busMarker, bus.location);
     } else {
       let busMarker = new google.maps.Marker({
