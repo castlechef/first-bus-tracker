@@ -66,9 +66,25 @@ var MapPage = (function () {
         this.busStopProvider = busStopProvider;
         this.geolocation = geolocation;
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
-        this.busUrl = './assets/icon/bus.svg';
+
+        this.busUrl = './assets/icon/bus.png';
+        this.revBusUrl = './assets/icon/reversedBus.png';
         this.busStopUrl = './assets/icon/busStop.png';
-        this.loadingSpinner = this.loadingCtrl.create({
+        this.busIcons = [{ url: this.busUrl,
+                scaledSize: new google.maps.Size(64, 64),
+                anchor: new google.maps.Point(32, 50) }, { url: this.busUrl,
+                scaledSize: new google.maps.Size(48, 48),
+                anchor: new google.maps.Point(24, 34) }, { url: this.busUrl,
+                scaledSize: new google.maps.Size(30, 30),
+                anchor: new google.maps.Point(15, 20) }, { url: this.revBusUrl,
+                scaledSize: new google.maps.Size(64, 64),
+                anchor: new google.maps.Point(32, 50) }, { url: this.revBusUrl,
+                scaledSize: new google.maps.Size(48, 48),
+                anchor: new google.maps.Point(24, 34) }, { url: this.revBusUrl,
+                scaledSize: new google.maps.Size(30, 30),
+                anchor: new google.maps.Point(15, 20) }];
+        this.zoom = 0;
+      this.loadingSpinner = this.loadingCtrl.create({
             content: 'Loading map...'
         });
         this.busIntervals = new Map();
@@ -271,11 +287,32 @@ var MapPage = (function () {
                         return [3 /*break*/, 9];
                     case 8:
                         this.map.addListener('zoom_changed', function () {
-                            var icons = _this.getCurrentIcons();
-                            if (icons !== _this.currentIcons) {
-                                _this.currentIcons = icons;
+                          marker.setIcon(_this.currentIcons.busIcon);
+
+                            if ((_this.map.zoom) >= 15) {
+                                _this.zoom = 0;
                                 _this.busMarkers.forEach(function (marker) {
-                                    marker.setIcon(_this.currentIcons.busIcon);
+                                    marker.setIcon(_this.busIcons[0]);
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(42, 42) });
+                                });
+                            }
+                            else if (12 < (_this.map.zoom) && (_this.map.zoom) < 15) {
+                                _this.zoom = 1;
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon(_this.busIcons[1]);
+                                });
+                                _this.busStopMarkers.forEach(function (marker) {
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(30, 30) });
+                                });
+                            }
+                            else {
+                                _this.zoom = 2;
+                                _this.busMarkers.forEach(function (marker) {
+                                    marker.setIcon(_this.busIcons[2]);
                                 });
                                 _this.busStopMarkers.forEach(function (marker) {
                                     marker.setIcon(_this.currentIcons.busStopIcon);
@@ -571,6 +608,13 @@ var MapPage = (function () {
         var _this = this;
         if (this.busMarkers.has(bus.busId)) {
             var busMarker = this.busMarkers.get(bus.busId);
+            var prev = busMarker.getPosition().lng();
+            if (prev - bus.location.longitude > 0) {
+                busMarker.setIcon(this.busIcons[this.zoom]);
+            }
+            else {
+                busMarker.setIcon(this.busIcons[this.zoom + 3]);
+            }
             this.animateMovement(busMarker, bus.location);
         }
         else {
