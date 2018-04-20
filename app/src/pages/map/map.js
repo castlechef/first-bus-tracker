@@ -66,7 +66,6 @@ var MapPage = (function () {
         this.busStopProvider = busStopProvider;
         this.geolocation = geolocation;
         this.colors = ['#bb72e0', '#90b2ed', '#049310', '#f93616', '#ffc36b', '#f7946a', '#ef60ff'];
-
         this.busUrl = './assets/icon/bus.png';
         this.revBusUrl = './assets/icon/reversedBus.png';
         this.busStopUrl = './assets/icon/busStop.png';
@@ -84,7 +83,7 @@ var MapPage = (function () {
                 scaledSize: new google.maps.Size(30, 30),
                 anchor: new google.maps.Point(15, 20) }];
         this.zoom = 0;
-      this.loadingSpinner = this.loadingCtrl.create({
+        this.loadingSpinner = this.loadingCtrl.create({
             content: 'Loading map...'
         });
         this.busIntervals = new Map();
@@ -97,6 +96,7 @@ var MapPage = (function () {
         console.log('being destroyed!');
         this.events.unsubscribe('buses:added');
         this.events.unsubscribe('BusProvider:newBuses');
+        this.locationSubscription.unsubscribe();
     };
     //Functions which run when the page is opened
     MapPage.prototype.ionViewDidLoad = function () {
@@ -150,6 +150,7 @@ var MapPage = (function () {
                     case 1:
                         geoPosition = _b.sent();
                         _a = geoPosition.coords, latitude = _a.latitude, longitude = _a.longitude;
+                        this.userPosition = { latitude: latitude, longitude: longitude };
                         return [2 /*return*/, new google.maps.LatLng(latitude, longitude)];
                     case 2:
                         e_2 = _b.sent();
@@ -190,6 +191,7 @@ var MapPage = (function () {
     };
     //Adds the user's position to the map if available to the app, and sets it to update automatically
     MapPage.prototype.addUserPositionMarker = function (latLng) {
+        var _this = this;
         var userPosition = new google.maps.Marker({
             map: this.map,
             position: latLng,
@@ -200,7 +202,10 @@ var MapPage = (function () {
                 scaledSize: new google.maps.Size(32, 32)
             }
         });
-        navigator.geolocation.watchPosition(function (position) {
+        var watch = this.geolocation.watchPosition();
+        this.locationSubscription = watch.subscribe(function (position) {
+            var _a = position.coords, latitude = _a.latitude, longitude = _a.longitude;
+            _this.userPosition = { latitude: latitude, longitude: longitude };
             userPosition.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
         });
     };
@@ -287,8 +292,6 @@ var MapPage = (function () {
                         return [3 /*break*/, 9];
                     case 8:
                         this.map.addListener('zoom_changed', function () {
-                          marker.setIcon(_this.currentIcons.busIcon);
-
                             if ((_this.map.zoom) >= 15) {
                                 _this.zoom = 0;
                                 _this.busMarkers.forEach(function (marker) {
@@ -315,7 +318,8 @@ var MapPage = (function () {
                                     marker.setIcon(_this.busIcons[2]);
                                 });
                                 _this.busStopMarkers.forEach(function (marker) {
-                                    marker.setIcon(_this.currentIcons.busStopIcon);
+                                    marker.setIcon({ url: _this.busStopUrl,
+                                        scaledSize: new google.maps.Size(15, 15) });
                                 });
                             }
                         });
@@ -714,7 +718,7 @@ var MapPage = (function () {
     };
     //Opens the bus page with the bus info of the bus given.
     MapPage.prototype.openBusPage = function (busId, route) {
-        var tryModal = this.modalCtrl.create(BusPage, { busId: busId, routeName: route });
+        var tryModal = this.modalCtrl.create(BusPage, { busId: busId, routeName: route, userPosition: this.userPosition });
         tryModal.present();
     };
     //Opens a bus stop page with the details of the bus stop

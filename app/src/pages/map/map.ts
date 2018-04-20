@@ -9,7 +9,7 @@ import {} from 'google';
 import {SettingsProvider} from '../../providers/settings/settings';
 import {Bus, BusProvider} from '../../providers/bus/bus';
 import {BusStop, BusStopProvider} from '../../providers/bus-stop/bus-stop';
-import {Geolocation} from '@ionic-native/geolocation';
+import {Geolocation, Geoposition} from '@ionic-native/geolocation';
 
 
 /**
@@ -33,13 +33,14 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
   map: any;
 
+  private locationSubscription: any;
   private loadingSpinner: Loading;
   private busIntervals: Map<number, any>;
   private buses: Bus[];
   private busStops: BusStop[];
   public routeStates: { busRouteName: string, active: boolean }[];
   private currentIcons: {busIcon, busStopIcon};
-  private userPosition;
+  private userPosition: {latitude: number, longitude: number};
 
   private busStopMarkers: Map<number, google.maps.Marker>;
   private busRouteSectionLines: Map<number, google.maps.Polyline>;
@@ -88,7 +89,8 @@ export class MapPage {
   ngOnDestroy() {
     console.log('being destroyed!');
     this.events.unsubscribe('buses:added');
-    this.events.unsubscribe('BusProvider:newBuses')
+    this.events.unsubscribe('BusProvider:newBuses');
+    this.locationSubscription.unsubscribe();
   }
 
   //Functions which run when the page is opened
@@ -118,7 +120,7 @@ export class MapPage {
     try {
       const geoPosition = await this.geolocation.getCurrentPosition();
       const {latitude, longitude} = geoPosition.coords;
-      this.userPosition = geoPosition.coords;
+      this.userPosition = {latitude, longitude};
       return new google.maps.LatLng(latitude, longitude);
     } catch(e) {
       console.log('cannot get user position :(');
@@ -166,7 +168,10 @@ export class MapPage {
       }
     });
 
-    navigator.geolocation.watchPosition((position) => {
+    let watch = this.geolocation.watchPosition();
+    this.locationSubscription = watch.subscribe((position: Geoposition) => {
+      const {latitude, longitude} = position.coords;
+      this.userPosition = {latitude, longitude};
       userPosition.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
     });
   }
