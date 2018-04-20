@@ -176,7 +176,9 @@ export class MapPage {
   private async setupMapElements(): Promise<void> {
     const sleep: (number) => Promise<void> = (millis: number) => {
       return new Promise<void>(resolve => {
-        setTimeout(resolve);
+        setTimeout(() => {
+          resolve();
+        }, millis);
       });
     };
 

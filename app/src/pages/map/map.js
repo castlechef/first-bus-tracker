@@ -237,7 +237,9 @@ var MapPage = (function () {
                     case 0:
                         sleep = function (millis) {
                             return new Promise(function (resolve) {
-                                setTimeout(resolve);
+                                setTimeout(function () {
+                                    resolve();
+                                }, millis);
                             });
                         };
                         _a.label = 1;
