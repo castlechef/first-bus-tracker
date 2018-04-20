@@ -28,7 +28,7 @@ export class BusPage {
   private sliderValue: any;
   private sub_capacity: string;
   private capacityDisplay: string;
-  private capacityInput = true;
+  private capacityInput = false;
   private capacityShown = false;
   private interval: any;
 
@@ -40,7 +40,7 @@ export class BusPage {
     this.busProvider.getBus(this.busId)
       .then((bus: Bus) => {
         this.bus = bus;
-        if (this.distanceClose(bus.location, {latitude: 0, longitude: 0})) {
+        if (this.distanceClose(bus.location, this.navParams.get('userPosition'))) {
           this.capacityInput = true;
         } else {
           this.writeCapacityDisplay(bus.capacity);

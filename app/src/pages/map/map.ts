@@ -5,11 +5,7 @@ import {BusPage} from '../bus/bus';
 import {BusRoute, BusRouteProvider, Section} from '../../providers/bus-route/bus-route';
 import {MapOptionsPopoverPage} from '../map-options-popover/map-options-popover';
 import {} from 'googlemaps';
-
 import {} from 'google';
-import {Stop} from '../../stops.interface';
-import {Bus} from '../../bus.interface';
-
 import {SettingsProvider} from '../../providers/settings/settings';
 import {Bus, BusProvider} from '../../providers/bus/bus';
 import {BusStop, BusStopProvider} from '../../providers/bus-stop/bus-stop';
@@ -43,6 +39,7 @@ export class MapPage {
   private busStops: BusStop[];
   public routeStates: { busRouteName: string, active: boolean }[];
   private currentIcons: {busIcon, busStopIcon};
+  private userPosition;
 
   private busStopMarkers: Map<number, google.maps.Marker>;
   private busRouteSectionLines: Map<number, google.maps.Polyline>;
@@ -121,6 +118,7 @@ export class MapPage {
     try {
       const geoPosition = await this.geolocation.getCurrentPosition();
       const {latitude, longitude} = geoPosition.coords;
+      this.userPosition = geoPosition.coords;
       return new google.maps.LatLng(latitude, longitude);
     } catch(e) {
       console.log('cannot get user position :(');
@@ -561,7 +559,7 @@ export class MapPage {
 
   //Opens the bus page with the bus info of the bus given.
   private openBusPage(busId, route) {
-    let tryModal = this.modalCtrl.create(BusPage, {busId: busId, routeName: route});
+    let tryModal = this.modalCtrl.create(BusPage, {busId: busId, routeName: route, userPosition: this.userPosition});
     tryModal.present();
   }
 
