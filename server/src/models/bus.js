@@ -5,6 +5,7 @@ const utils_1 = require("../utils/utils");
 var convertUnixTimeToNiceTime = utils_1.Utils.time.convertUnixTimeToNiceTime;
 const busCapacity_1 = require("./busCapacity");
 const buses_1 = require("./buses");
+const moment = require("moment");
 class Bus {
     constructor(id, location, busRouteName, busStops) {
         if (typeof id !== 'number' || !(location instanceof location_1.Location))
@@ -27,7 +28,7 @@ class Bus {
         const stopsInRange = this.getStopsWithinRange(Bus.PROXIMITY_TO_STOP_AT_STOP);
         stopsInRange.forEach(s => {
             if (!this.visitedBusStops.some(({ busStop }) => busStop === s)) {
-                this.visitedBusStops.push({ busStop: s, departureTime: Date.now() });
+                this.visitedBusStops.push({ busStop: s, departureTime: moment().unix() * 1000 });
             }
         });
         if (this.visitedBusStops.length < 2)
@@ -71,7 +72,7 @@ class Bus {
         return this.stopsAt(busStop) && this.establishedRoutePosition;
     }
     updateLocation(location) {
-        this.latestMovementDate = Date.now();
+        this.latestMovementDate = moment().unix() * 1000; //Date.now();
         if (!(location instanceof location_1.Location))
             throw new Error('invalid location');
         if (this.locations.length > 0) {
@@ -82,7 +83,7 @@ class Bus {
             this.establishRoutePosition();
         }
         else {
-            let currentTime = Date.now(); // Date in unix time.
+            let currentTime = moment().unix() * 1000; //Date.now(); // Date in unix time.
             if (this.getDistanceToStop(this.getNextBusStop()) <= Bus.PROXIMITY_TO_STOP_AT_STOP) {
                 this.busStopDepartureTimes.push({ busStop: this.nextBusStop, departureTime: currentTime });
                 this.nextBusStop = this.getBusStopAfterStop(this.nextBusStop);
@@ -95,9 +96,9 @@ class Bus {
         this.busCapacity.addValue(capacity);
     }
     updateBusStopArrivalTimes() {
-        let currentTime = Date.now(); // Date in unix time.
+        let currentTime = moment().unix(); //Date.now(); // Date in unix time.
         this.busStopArrivalTimes = this.busStops.map(s => {
-            return { busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED / 1000)) };
+            return { busStop: s, arrivalTime: (currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED))) * 1000 };
         });
     }
     getPredictedArrival(busStop) {

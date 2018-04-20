@@ -6,6 +6,7 @@ import {Utils} from '../utils/utils';
 import convertUnixTimeToNiceTime = Utils.time.convertUnixTimeToNiceTime;
 import {BusCapacity, Capacity} from './busCapacity';
 import {Buses} from './buses';
+import * as moment from 'moment';
 
 export type busId = number;
 
@@ -57,7 +58,7 @@ export class Bus implements JSONable {
         const stopsInRange = this.getStopsWithinRange(Bus.PROXIMITY_TO_STOP_AT_STOP);
         stopsInRange.forEach(s => {
             if (!this.visitedBusStops.some(({busStop}) => busStop === s)) {
-                this.visitedBusStops.push({busStop: s, departureTime: Date.now()});
+                this.visitedBusStops.push({busStop: s, departureTime: moment().unix() * 1000});
             }
         });
         if (this.visitedBusStops.length < 2) return;
@@ -107,7 +108,7 @@ export class Bus implements JSONable {
     }
 
     public updateLocation(location: Location): void {
-        this.latestMovementDate = Date.now();
+        this.latestMovementDate = moment().unix() * 1000;//Date.now();
         if (!(location instanceof Location)) throw new Error('invalid location');
         if (this.locations.length > 0) {
             this.bearing = this.getLatestLocation().bearingTo(location);
@@ -116,7 +117,7 @@ export class Bus implements JSONable {
         if (!this.establishedRoutePosition) {
             this.establishRoutePosition();
         } else {
-            let currentTime = Date.now(); // Date in unix time.
+            let currentTime = moment().unix() * 1000;//Date.now(); // Date in unix time.
 
             if (this.getDistanceToStop(this.getNextBusStop()) <= Bus.PROXIMITY_TO_STOP_AT_STOP) {
                 this.busStopDepartureTimes.push({busStop: this.nextBusStop, departureTime: currentTime});
@@ -132,9 +133,9 @@ export class Bus implements JSONable {
     }
 
     private updateBusStopArrivalTimes() {
-        let currentTime = Date.now(); // Date in unix time.
+        let currentTime = moment().unix();//Date.now(); // Date in unix time.
         this.busStopArrivalTimes = this.busStops.map(s => {
-            return {busStop: s, arrivalTime: currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED / 1000))}
+            return {busStop: s, arrivalTime: (currentTime + (this.getDistanceToStop(s) / (Bus.BUS_SPEED))) * 1000}
         });
     }
 

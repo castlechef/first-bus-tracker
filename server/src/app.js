@@ -10,6 +10,7 @@ const busStops_2 = require("./models/busStops");
 const cors = require("cors");
 const utils_1 = require("./utils/utils");
 var RouteError = utils_1.Utils.routes.RouteError;
+const moment = require("moment");
 const corsOptions = {
     allowedHeaders: ['Origin'],
     credentials: true,
@@ -47,7 +48,7 @@ exports.app.use('*', (err, req, res, next) => {
     }
 });
 setInterval((() => {
-    const now = Date.now();
+    const now = moment().unix() * 1000;
     const acceptableTime = now - (5 * 1000);
     exports.app.locals.buses.buses.forEach((bus) => {
         if (bus.latestMovementDate < acceptableTime) {
