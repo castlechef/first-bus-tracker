@@ -46,4 +46,14 @@ exports.app.use('*', (err, req, res, next) => {
         next();
     }
 });
+setInterval((() => {
+    const now = Date.now();
+    const acceptableTime = now - (5 * 1000);
+    exports.app.locals.buses.buses.forEach((bus) => {
+        if (bus.latestMovementDate < acceptableTime) {
+            console.log('removing old bus');
+            exports.app.locals.buses.removeBus(bus.id);
+        }
+    });
+}), 1000);
 //# sourceMappingURL=app.js.map

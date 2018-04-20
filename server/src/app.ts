@@ -10,6 +10,7 @@ import * as cors from 'cors';
 import * as logger from 'morgan';
 import {Utils} from './utils/utils';
 import RouteError = Utils.routes.RouteError;
+import {Bus} from './models/bus';
 
 const corsOptions: cors.CorsOptions = {
     allowedHeaders: ['Origin'],
@@ -54,3 +55,14 @@ app.use('*', (err, req, res, next) => {
         next();
     }
 });
+
+setInterval((() => {
+    const now = Date.now();
+    const acceptableTime = now - (5 * 1000);
+    app.locals.buses.buses.forEach((bus: Bus) => {
+        if (bus.latestMovementDate < acceptableTime) {
+            console.log('removing old bus');
+            app.locals.buses.removeBus(bus.id);
+        }
+    });
+}), 1000);

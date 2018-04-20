@@ -71,6 +71,7 @@ class Bus {
         return this.stopsAt(busStop) && this.establishedRoutePosition;
     }
     updateLocation(location) {
+        this.latestMovementDate = Date.now();
         if (!(location instanceof location_1.Location))
             throw new Error('invalid location');
         if (this.locations.length > 0) {

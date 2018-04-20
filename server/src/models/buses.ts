@@ -12,7 +12,7 @@ export type BusArrival = {
 
 export class Buses implements JSONable {
     //private busMap: Map<busId, Bus>;
-    private buses: Bus[];
+    public buses: Bus[];
     private idGenerator: IdGenerator;
     private busStops: BusStops
 

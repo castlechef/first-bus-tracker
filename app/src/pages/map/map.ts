@@ -414,6 +414,13 @@ export class MapPage {
   }
 
   private addBusesToMap() {
+    const busIds = this.buses.map(({busId}) => busId);
+    this.busMarkers.forEach((marker: google.maps.Marker, id: number) => {
+      if (!busIds.some(i => i === id)) {
+        marker.setMap(null);
+        this.busMarkers.delete(id);
+      }
+    });
     this.buses.forEach(bus => this.addBusToMap(bus));
   }
 
@@ -434,7 +441,7 @@ export class MapPage {
     this.updateBusesVisibility();
   }
 
-  private getMeAnSvg(): Element {
+  private getMeAnSvg(): void {
     function addProps(e, props) {
       for (let prop in props) {
         let a = document.createAttribute(prop);
@@ -462,7 +469,7 @@ export class MapPage {
     ];
 
     const pathElems = paths.map(path => {
-      const propy = {};
+      const propy = {} as any;
       propy.d = path;
       propy.fill = '#6b1c5d';
       const e = document.createElement('path');

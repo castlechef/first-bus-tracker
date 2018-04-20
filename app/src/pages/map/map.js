@@ -555,6 +555,16 @@ var MapPage = (function () {
     };
     MapPage.prototype.addBusesToMap = function () {
         var _this = this;
+        var busIds = this.buses.map(function (_a) {
+            var busId = _a.busId;
+            return busId;
+        });
+        this.busMarkers.forEach(function (marker, id) {
+            if (!busIds.some(function (i) { return i === id; })) {
+                marker.setMap(null);
+                _this.busMarkers.delete(id);
+            }
+        });
         this.buses.forEach(function (bus) { return _this.addBusToMap(bus); });
     };
     MapPage.prototype.addBusToMap = function (bus) {
