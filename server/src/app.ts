@@ -11,6 +11,7 @@ import * as logger from 'morgan';
 import {Utils} from './utils/utils';
 import RouteError = Utils.routes.RouteError;
 import {Bus} from './models/bus';
+import moment = require('moment');
 
 const corsOptions: cors.CorsOptions = {
     allowedHeaders: ['Origin'],
@@ -57,7 +58,7 @@ app.use('*', (err, req, res, next) => {
 });
 
 setInterval((() => {
-    const now = Date.now();
+    const now = moment().unix() * 1000;
     const acceptableTime = now - (5 * 1000);
     app.locals.buses.buses.forEach((bus: Bus) => {
         if (bus.latestMovementDate < acceptableTime) {
