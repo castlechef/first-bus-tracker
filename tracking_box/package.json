@@ -14,6 +14,8 @@
     "@types/serialport": "^6.0.1"
   },
   "dependencies": {
+    "lcd": "^2.0.3",
+    "onoff": "^3.0.2",
     "serialport": "^6.0.5"
   }
 }

@@ -31,7 +31,7 @@ export class Button {
                 }, mil);
             };
         }
-
+        this.events = new EventEmitter();
         this.button = new Gpio(pin, 'in', 'both');
         this.button.watch(this.handleWatchEvent.bind(this));
         this.events.on(Button.EVENTS.STATE_CHANGED, (state) => {

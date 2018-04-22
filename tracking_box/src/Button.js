@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const onoff = require("onoff");
+const events_1 = require("events");
 const Gpio = onoff.Gpio;
 var BUTTON_STATE;
 (function (BUTTON_STATE) {
@@ -19,6 +20,7 @@ class Button {
                 }, mil);
             };
         }
+        this.events = new events_1.EventEmitter();
         this.button = new Gpio(pin, 'in', 'both');
         this.button.watch(this.handleWatchEvent.bind(this));
         this.events.on(Button.EVENTS.STATE_CHANGED, (state) => {
