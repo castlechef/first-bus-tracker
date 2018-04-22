@@ -52,6 +52,7 @@ class TrackingBox {
             do {
                 console.log('TrackingBox - awaiting route start');
                 yield this.startRoute(busRoute);
+                yield this.button2.waitForPress();
             } while (!(yield this.confirmCancel(busRoute)));
             console.log('TrackingBox - cancel pressed');
             yield this.waitForCancel();
@@ -80,7 +81,7 @@ class TrackingBox {
     }
     showBusRouteOption(busRoute) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, busRoute);
+            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, busRoute + '             ');
         });
     }
     waitForButtonPress() {
@@ -106,18 +107,18 @@ class TrackingBox {
         return __awaiter(this, void 0, void 0, function* () {
             const message = [
                 `ROUTE: ${busRoute}`,
-                'CONFIRM / CANCEL'
+                'CONFIRM   CANCEL'
             ];
-            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, message[0]);
-            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, message[1]);
+            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, message[1]);
+            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, message[0]);
             const button = yield this.waitForButtonPress();
             return button === this.button1;
         });
     }
     startRoute(busRoute) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, `Started ${busRoute}`);
-            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, 'Press to cancel');
+            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, '          Cancel');
+            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, `Started ${busRoute}`);
         });
     }
     waitForCancel() {
@@ -127,8 +128,8 @@ class TrackingBox {
     }
     confirmCancel(routeName) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, 'Confirm cancel');
-            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, `route ${routeName}`);
+            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, 'CONFIRM   CANCEL');
+            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, `Route: ${routeName}`);
             const button = yield this.waitForButtonPress();
             return button === this.button2;
         });
@@ -148,9 +149,14 @@ class BusRoute {
         return BusRoute.ROUTES[this.currentIndex];
     }
     getNextRoute() {
-        return BusRoute.ROUTES[this.currentIndex++];
+        this.incrementRoute();
+        return BusRoute.ROUTES[this.currentIndex];
+    }
+    incrementRoute() {
+        this.currentIndex++;
+        this.currentIndex %= BusRoute.ROUTES.length;
     }
 }
-BusRoute.ROUTES = ['U1', 'U1X', 'U2'];
+BusRoute.ROUTES = ['U1 ', 'U1X', 'U2 '];
 exports.BusRoute = BusRoute;
 //# sourceMappingURL=TrackingBox.js.map

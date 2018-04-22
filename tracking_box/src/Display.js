@@ -47,13 +47,21 @@ class Display {
             }
             else {
                 this.ensureReady().then(() => {
-                    this.lcd.setCursor(col, row);
-                    this.lcd.print(message, (err) => {
+                    this.lcd.setCursor(0, row);
+                    this.lcd.print('                ', (err) => {
                         if (err) {
                             reject(err);
                         }
                         else {
-                            resolve();
+                            this.lcd.setCursor(col, row);
+                            this.lcd.print(message, (err) => {
+                                if (err) {
+                                    reject(err);
+                                }
+                                else {
+                                    resolve();
+                                }
+                            });
                         }
                     });
                 });

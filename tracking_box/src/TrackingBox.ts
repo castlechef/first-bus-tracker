@@ -46,6 +46,7 @@ export class TrackingBox {
         do {
             console.log('TrackingBox - awaiting route start');
             await this.startRoute(busRoute);
+            await this.button2.waitForPress();
         } while (!await this.confirmCancel(busRoute));
         console.log('TrackingBox - cancel pressed');
         await this.waitForCancel();
@@ -70,7 +71,7 @@ export class TrackingBox {
     }
 
     private async showBusRouteOption(busRoute: string): Promise<void> {
-        await this.display.writeMessage(0, Display.ROW.BOTTOM, busRoute);
+        await this.display.writeMessage(0, Display.ROW.BOTTOM, busRoute + '             ');
     }
 
     private waitForButtonPress(): Promise<Button> {
@@ -97,17 +98,17 @@ export class TrackingBox {
     private async confirmStart(busRoute: string): Promise<boolean> {
         const message: [string, string] = [
             `ROUTE: ${busRoute}`,
-            'CONFIRM / CANCEL'
+            'CONFIRM   CANCEL'
         ];
-        await this.display.writeMessage(0, Display.ROW.TOP, message[0]);
-        await this.display.writeMessage(0, Display.ROW.BOTTOM, message[1]);
+        await this.display.writeMessage(0, Display.ROW.TOP, message[1]);
+        await this.display.writeMessage(0, Display.ROW.BOTTOM, message[0]);
         const button: Button = await this.waitForButtonPress();
         return button === this.button1;
     }
 
     private async startRoute(busRoute: string): Promise<void> {
-        await this.display.writeMessage(0, Display.ROW.TOP, `Started ${busRoute}`);
-        await this.display.writeMessage(0, Display.ROW.BOTTOM, 'Press to cancel');
+        await this.display.writeMessage(0, Display.ROW.TOP, '          Cancel');
+        await this.display.writeMessage(0, Display.ROW.BOTTOM, `Started ${busRoute}`);
     }
 
     private async waitForCancel(): Promise<void> {
@@ -115,8 +116,8 @@ export class TrackingBox {
     }
 
     private async confirmCancel(routeName: string): Promise<boolean> {
-        await this.display.writeMessage(0, Display.ROW.TOP, 'Confirm cancel');
-        await this.display.writeMessage(0, Display.ROW.BOTTOM, `route ${routeName}`);
+        await this.display.writeMessage(0, Display.ROW.TOP, 'CONFIRM   CANCEL');
+        await this.display.writeMessage(0, Display.ROW.BOTTOM, `Route: ${routeName}`);
         const button: Button = await this.waitForButtonPress();
         return button === this.button2;
     }
@@ -129,7 +130,7 @@ export class TrackingBox {
 }
 
 export class BusRoute {
-    private static readonly ROUTES = ['U1', 'U1X', 'U2'];
+    private static readonly ROUTES = ['U1 ', 'U1X', 'U2 '];
 
     private currentIndex;
 
@@ -142,6 +143,12 @@ export class BusRoute {
     }
 
     public getNextRoute(): string {
-        return BusRoute.ROUTES[this.currentIndex++];
+        this.incrementRoute();
+        return BusRoute.ROUTES[this.currentIndex];
+    }
+
+    private incrementRoute(): void {
+        this.currentIndex++;
+        this.currentIndex %= BusRoute.ROUTES.length;
     }
 }
