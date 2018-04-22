@@ -19,13 +19,6 @@ class TrackingBox {
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            // STEPS:
-            // get route
-            // select start / cancel
-            // show route, cancel
-            // on error, cancel
-            // loop
-            console.log('TrackingBox - start');
             yield this.init();
             try {
                 while (true) {
@@ -33,29 +26,21 @@ class TrackingBox {
                 }
             }
             catch (e) {
-                console.log('Error in loop!');
+                console.log('Error in main loop', e.message);
                 this.exit();
-                console.log(e.message);
             }
         });
     }
     loop() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('TrackingBox - loop');
             let busRoute;
             do {
-                console.log('TrackingBox - loop, awaiting busRoute selection');
                 busRoute = yield this.getBusRouteSelection();
-                console.log('TrackingBox - have busRoute selection: ' + busRoute);
             } while (!(yield this.confirmStart(busRoute)));
-            console.log('TrackingBox - have confirmed bus route ' + busRoute);
             do {
-                console.log('TrackingBox - awaiting route start');
                 yield this.startRoute(busRoute);
-                yield this.button2.waitForPress();
-            } while (!(yield this.confirmCancel(busRoute)));
-            console.log('TrackingBox - cancel pressed');
-            yield this.waitForCancel();
+                yield this.waitForCancel();
+            } while (!(yield this.definitelyWantsToCancel(busRoute)));
         });
     }
     init() {
@@ -66,11 +51,14 @@ class TrackingBox {
     getBusRouteSelection() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.showStartingOption();
+            let route;
             do {
-                yield this.showBusRouteOption(this.busRoute.currentRoute);
-                this.busRoute.getNextRoute();
+                if (route)
+                    this.busRoute.getNextRoute();
+                route = this.busRoute.currentRoute;
+                yield this.showBusRouteOption(route);
             } while ((yield this.waitForButtonPress()) === this.button2);
-            return this.busRoute.currentRoute;
+            return route;
         });
     }
     showStartingOption() {
@@ -117,7 +105,7 @@ class TrackingBox {
     }
     startRoute(busRoute) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, '          Cancel');
+            yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, '          CANCEL');
             yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, `Started ${busRoute}`);
         });
     }
@@ -126,12 +114,12 @@ class TrackingBox {
             return this.button2.waitForPress();
         });
     }
-    confirmCancel(routeName) {
+    definitelyWantsToCancel(routeName) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.display.writeMessage(0, Display_1.Display.ROW.TOP, 'CONFIRM   CANCEL');
-            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, `Route: ${routeName}`);
+            yield this.display.writeMessage(0, Display_1.Display.ROW.BOTTOM, `Stop route: ${routeName}?`);
             const button = yield this.waitForButtonPress();
-            return button === this.button2;
+            return button.pin === this.button1.pin;
         });
     }
     exit() {

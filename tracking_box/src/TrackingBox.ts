@@ -15,41 +15,28 @@ export class TrackingBox {
     }
 
     public async start() {
-        // STEPS:
-        // get route
-        // select start / cancel
-        // show route, cancel
-        // on error, cancel
-        // loop
-        console.log('TrackingBox - start');
         await this.init();
         try {
             while (true) {
                 await this.loop();
             }
         } catch(e) {
-            console.log('Error in loop!');
+            console.log('Error in main loop', e.message);
             this.exit();
-            console.log(e.message);
         }
     }
 
     private async loop() {
-        console.log('TrackingBox - loop');
         let busRoute: string;
+
         do {
-            console.log('TrackingBox - loop, awaiting busRoute selection');
             busRoute = await this.getBusRouteSelection();
-            console.log('TrackingBox - have busRoute selection: ' + busRoute);
         } while (!await this.confirmStart(busRoute));
-        console.log('TrackingBox - have confirmed bus route ' + busRoute);
+
         do {
-            console.log('TrackingBox - awaiting route start');
             await this.startRoute(busRoute);
-            await this.button2.waitForPress();
-        } while (!await this.confirmCancel(busRoute));
-        console.log('TrackingBox - cancel pressed');
-        await this.waitForCancel();
+            await this.waitForCancel();
+        } while (!await this.definitelyWantsToCancel(busRoute));
     }
 
     private async init() {
@@ -58,11 +45,13 @@ export class TrackingBox {
 
     private async getBusRouteSelection(): Promise<string> {
         await this.showStartingOption();
+        let route: string;
         do {
-            await this.showBusRouteOption(this.busRoute.currentRoute);
-            this.busRoute.getNextRoute();
+            if (route) this.busRoute.getNextRoute();
+            route = this.busRoute.currentRoute;
+            await this.showBusRouteOption(route);
         } while (await this.waitForButtonPress() === this.button2);
-        return this.busRoute.currentRoute;
+        return route;
     }
 
     private async showStartingOption(): Promise<void> {
@@ -107,7 +96,7 @@ export class TrackingBox {
     }
 
     private async startRoute(busRoute: string): Promise<void> {
-        await this.display.writeMessage(0, Display.ROW.TOP, '          Cancel');
+        await this.display.writeMessage(0, Display.ROW.TOP, '          CANCEL');
         await this.display.writeMessage(0, Display.ROW.BOTTOM, `Started ${busRoute}`);
     }
 
@@ -115,11 +104,11 @@ export class TrackingBox {
         return this.button2.waitForPress();
     }
 
-    private async confirmCancel(routeName: string): Promise<boolean> {
+    private async definitelyWantsToCancel(routeName: string): Promise<boolean> {
         await this.display.writeMessage(0, Display.ROW.TOP, 'CONFIRM   CANCEL');
-        await this.display.writeMessage(0, Display.ROW.BOTTOM, `Route: ${routeName}`);
+        await this.display.writeMessage(0, Display.ROW.BOTTOM, `Stop route: ${routeName}?`);
         const button: Button = await this.waitForButtonPress();
-        return button === this.button2;
+        return button.pin === this.button1.pin;
     }
 
     public exit(): void {

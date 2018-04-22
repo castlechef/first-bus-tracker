@@ -16,6 +16,7 @@ export class Button {
     private state: BUTTON_STATE;
     private lastDown: number;
     private blocked: boolean;
+    public pin: number;
     private static readonly BUTTON_DEBOUNCE = 200;
     private static readonly EVENTS = {
         STATE_CHANGED: 'state-changed',
@@ -23,6 +24,7 @@ export class Button {
     };
 
     constructor(pin: number) {
+        this.pin = pin;
         this.blocked = false;
         this.events = new EventEmitter();
         this.button = new Gpio(pin, 'in', 'both');
@@ -34,9 +36,7 @@ export class Button {
         const now = Date.now();
         if (state === BUTTON_STATE.DOWN && !this.blocked) {
             this.blocked = true;
-            console.log(state + ' - ' + this.lastDown + ' - ' + now + ' - ' + (now - this.lastDown));
             if (this.lastDown === undefined || now - this.lastDown > Button.BUTTON_DEBOUNCE) {
-                console.log('PRESSED!');
                 this.events.emit(Button.EVENTS.BUTTON_PRESSED);
             }
             this.lastDown = now;
@@ -45,11 +45,9 @@ export class Button {
     }
 
     public waitForPress(): Promise<void> {
-        console.log('waiting for button press...');
         return new Promise<void>(resolve => {
             this.events.once(Button.EVENTS.BUTTON_PRESSED, () => {
                 resolve();
-                console.log('button pressed');
             });
         });
     }
