@@ -9,17 +9,17 @@ var BUTTON_STATE;
     BUTTON_STATE[BUTTON_STATE["UP"] = 0] = "UP";
     BUTTON_STATE[BUTTON_STATE["UNKNOWN"] = -1] = "UNKNOWN";
 })(BUTTON_STATE = exports.BUTTON_STATE || (exports.BUTTON_STATE = {}));
+function debounce(fun, mil) {
+    var timer;
+    return function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            fun();
+        }, mil);
+    };
+}
 class Button {
     constructor(pin) {
-        function debounce(fun, mil) {
-            var timer;
-            return function () {
-                clearTimeout(timer);
-                timer = setTimeout(function () {
-                    fun();
-                }, mil);
-            };
-        }
         this.events = new events_1.EventEmitter();
         this.button = new Gpio(pin, 'in', 'both');
         this.button.watch(this.handleWatchEvent.bind(this));
@@ -31,13 +31,16 @@ class Button {
     handleWatchEvent(err, state) {
         if (err)
             throw err;
-        if (state === BUTTON_STATE.DOWN) {
-            if (Date.now() - this.lastDown > Button.BUTTON_DEBOUNCE) {
-                console.log('PRESSED!');
-                this.events.emit(Button.EVENTS.BUTTON_PRESSED);
+        let t = this;
+        debounce(() => {
+            if (state === BUTTON_STATE.DOWN) {
+                if (Date.now() - this.lastDown > Button.BUTTON_DEBOUNCE) {
+                    console.log('PRESSED!');
+                    this.events.emit(Button.EVENTS.BUTTON_PRESSED);
+                }
+                this.lastDown = Date.now();
             }
-            this.lastDown = Date.now();
-        }
+        }, 1000)();
     }
     waitForPress() {
         console.log('waiting for button press...');

@@ -9,6 +9,16 @@ export enum BUTTON_STATE {
     UNKNOWN = -1
 }
 
+function debounce(fun, mil){
+    var timer;
+    return function(){
+        clearTimeout(timer);
+        timer = setTimeout(function(){
+            fun();
+        }, mil);
+    };
+}
+
 export class Button {
     private button: any;
     private events: EventEmitter;
@@ -22,15 +32,6 @@ export class Button {
     };
 
     constructor(pin: number) {
-        function debounce(fun, mil){
-            var timer;
-            return function(){
-                clearTimeout(timer);
-                timer = setTimeout(function(){
-                    fun();
-                }, mil);
-            };
-        }
         this.events = new EventEmitter();
         this.button = new Gpio(pin, 'in', 'both');
         this.button.watch(this.handleWatchEvent.bind(this));
@@ -43,13 +44,16 @@ export class Button {
     private handleWatchEvent(err: Error, state: number): void {
         if (err) throw err;
 
-        if (state === BUTTON_STATE.DOWN) {
-            if (Date.now() - this.lastDown > Button.BUTTON_DEBOUNCE) {
-                console.log('PRESSED!');
-                this.events.emit(Button.EVENTS.BUTTON_PRESSED)
+        let t = this;
+        debounce(() => {
+            if (state === BUTTON_STATE.DOWN) {
+                if (Date.now() - this.lastDown > Button.BUTTON_DEBOUNCE) {
+                    console.log('PRESSED!');
+                    this.events.emit(Button.EVENTS.BUTTON_PRESSED)
+                }
+                this.lastDown = Date.now();
             }
-            this.lastDown = Date.now();
-        }
+        }, 1000)();
     }
 
     public waitForPress(): Promise<void> {
