@@ -2,7 +2,9 @@ import * as SerialPort from 'serialport';
 import {EventEmitter} from 'events';
 import {NMEA} from './NMEA';
 import {GPSPosition} from './GPSPosition';
+import {spawn} from 'child_process';
 
+/*
 export class GPSSensor extends EventEmitter {
     private lines: GPSLines;
     private port: SerialPort;
@@ -10,15 +12,16 @@ export class GPSSensor extends EventEmitter {
     constructor() {
         super();
         this.lines = new GPSLines();
-        this.port = new SerialPort('/dev/ttyAMA0', {
+        /*this.port = new SerialPort('/dev/ttyAMA0', {
             baudRate: 9600
-        });
+        });*//*
+        this.port = spawn('cat', ['<', '/dev/ttyAMA0']).stdout;
         this.port.on('data', this.handleData.bind(this));
     }
 
     private handleData(data: any): void {
         this.lines.appendData(data);
-
+        console.log(this.lines.lines);
         if (this.lines.containsLocationData()) {
             const position = this.lines.extractLatestPosition();
             this.emitLocationUpdate(position);
@@ -55,7 +58,7 @@ export class GPSLines {
     }
 
     public appendData(rawData: any): void {
-        this.lines += GPSLines.formatLine(rawData);
+        this.lines += GPSLines.formatLine(rawData).replace('\n', '').replace('\r', '');
     }
 
     public containsLocationData(): boolean {
@@ -77,5 +80,30 @@ export class GPSLines {
 
     private resetLines(): void {
         this.lines = '';
+    }
+}*/
+
+export class GPSSensor extends EventEmitter {
+    constructor() {
+        super();
+
+        const cat = spawn('cat', ['<', '/dev/ttyAMA0']);
+
+        let lines = [];
+        let incomplete = '';
+        cat.stdout.on('data', data => {
+            let str = data.toString().replace('\n', '').replace('\r', '');
+            incomplete += str;
+            if (incomplete.substring(1).indexOf('$') !== -1) {
+                let parts = incomplete.split('$');
+                parts.splice(0, 1);
+                let thingIWant = '$' + parts.splice(0, 1);
+                incomplete = '$' + parts.join('$');
+                if (thingIWant.startsWith('$GPGGA')) {
+                    let position: GPSPosition = new NMEA().parse(thingIWant);
+                    this.emit('location', position);
+                }
+            }
+        });
     }
 }
