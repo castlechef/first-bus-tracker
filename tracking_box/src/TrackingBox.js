@@ -25,6 +25,7 @@ class TrackingBox {
             // show route, cancel
             // on error, cancel
             // loop
+            console.log('TrackingBox - start');
             yield this.init();
             try {
                 while (true) {
@@ -40,13 +41,19 @@ class TrackingBox {
     }
     loop() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('TrackingBox - loop');
             let busRoute;
             do {
+                console.log('TrackingBox - loop, awaiting busRoute selection');
                 busRoute = yield this.getBusRouteSelection();
+                console.log('TrackingBox - have busRoute selection: ' + busRoute);
             } while (!(yield this.confirmStart(busRoute)));
+            console.log('TrackingBox - have confirmed bus route ' + busRoute);
             do {
+                console.log('TrackingBox - awaiting route start');
                 yield this.startRoute(busRoute);
             } while (!(yield this.confirmCancel(busRoute)));
+            console.log('TrackingBox - cancel pressed');
             yield this.waitForCancel();
         });
     }

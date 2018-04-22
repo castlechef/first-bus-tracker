@@ -40,9 +40,11 @@ class Button {
         }
     }
     waitForPress() {
+        console.log('waiting for button press...');
         return new Promise(resolve => {
             this.events.once(Button.EVENTS.BUTTON_PRESSED, () => {
                 resolve();
+                console.log('button pressed');
             });
         });
     }

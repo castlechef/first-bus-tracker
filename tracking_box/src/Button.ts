@@ -53,9 +53,11 @@ export class Button {
     }
 
     public waitForPress(): Promise<void> {
+        console.log('waiting for button press...');
         return new Promise<void>(resolve => {
             this.events.once(Button.EVENTS.BUTTON_PRESSED, () => {
                 resolve();
+                console.log('button pressed');
             });
         });
     }

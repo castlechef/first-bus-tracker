@@ -21,7 +21,7 @@ export class TrackingBox {
         // show route, cancel
         // on error, cancel
         // loop
-
+        console.log('TrackingBox - start');
         await this.init();
         try {
             while (true) {
@@ -35,14 +35,19 @@ export class TrackingBox {
     }
 
     private async loop() {
+        console.log('TrackingBox - loop');
         let busRoute: string;
         do {
+            console.log('TrackingBox - loop, awaiting busRoute selection');
             busRoute = await this.getBusRouteSelection();
+            console.log('TrackingBox - have busRoute selection: ' + busRoute);
         } while (!await this.confirmStart(busRoute));
+        console.log('TrackingBox - have confirmed bus route ' + busRoute);
         do {
+            console.log('TrackingBox - awaiting route start');
             await this.startRoute(busRoute);
         } while (!await this.confirmCancel(busRoute));
-
+        console.log('TrackingBox - cancel pressed');
         await this.waitForCancel();
     }
 
