@@ -34,6 +34,7 @@ class Button {
         return new Promise(resolve => {
             this.events.once(Button.EVENTS.BUTTON_PRESSED, () => {
                 resolve();
+                //console.log('There are ' + this.events.listenerCount(Button.EVENTS.BUTTON_PRESSED) + ' button pressed listeners');
             });
         });
     }

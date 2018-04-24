@@ -89,7 +89,6 @@ export class GPSSensor extends EventEmitter {
 
         const cat = spawn('cat', ['<', '/dev/ttyAMA0']);
 
-        let lines = [];
         let incomplete = '';
         cat.stdout.on('data', data => {
             let str = data.toString().replace('\n', '').replace('\r', '');
@@ -101,7 +100,7 @@ export class GPSSensor extends EventEmitter {
                 incomplete = '$' + parts.join('$');
                 if (thingIWant.startsWith('$GPGGA')) {
                     let position: GPSPosition = new NMEA().parse(thingIWant);
-                    this.emit('location', position);
+                    this.emit('position', position);
                 }
             }
         });

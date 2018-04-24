@@ -10,8 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Button_1 = require("./Button");
 const Display_1 = require("./Display");
+const GPSSensor_1 = require("./GPSSensor");
+const events_1 = require("events");
+const rp = require("request-promise");
 class TrackingBox {
     constructor(displayOpts, buttonPin1, buttonPin2) {
+        this.tracker = new BusLocationTracker();
         this.display = new Display_1.Display(displayOpts);
         this.button1 = new Button_1.Button(buttonPin1);
         this.button2 = new Button_1.Button(buttonPin2);
@@ -37,10 +41,12 @@ class TrackingBox {
             do {
                 busRoute = yield this.getBusRouteSelection();
             } while (!(yield this.confirmStart(busRoute)));
+            this.tracker.startNewRoute(busRoute);
             do {
                 yield this.startRoute(busRoute);
                 yield this.waitForCancel();
             } while (!(yield this.definitelyWantsToCancel(busRoute)));
+            this.tracker.stopCurrentRoute();
         });
     }
     init() {
@@ -147,4 +153,137 @@ class BusRoute {
 }
 BusRoute.ROUTES = ['U1 ', 'U1X', 'U2 '];
 exports.BusRoute = BusRoute;
+class BusLocationTracker {
+    constructor() {
+        this.events = new events_1.EventEmitter();
+        this.gpsSensor = new GPSSensor_1.GPSSensor();
+        this.gpsSensor.on('position', this.handlePositionUpdate.bind(this));
+    }
+    handlePositionUpdate(position) {
+        if (typeof position.lat !== 'number' || isNaN(position.lat)) {
+            position.lat = 51.380901;
+            position.lon = -2.354876;
+        }
+        this.latestPosition = position;
+        this.events.emit('position-updated');
+    }
+    startNewRoute(busRoute) {
+        this.start(busRoute).catch(e => {
+            console.log('error in loop', e.message);
+        });
+    }
+    start(busRoute) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.ensureHasPosition();
+            const busId = yield this.postNewBus(busRoute);
+            if (!busId) {
+                throw new Error('FUCK');
+            }
+            else {
+                this.busId = busId;
+                let success;
+                let stop = false;
+                this.events.once('stopping', () => {
+                    stop = true;
+                });
+                do {
+                    yield this.newPositionFromSensor();
+                    if (stop)
+                        return;
+                    success = yield this.putNewPosition();
+                    console.log('PUT SUCCESS: ' + success);
+                } while (this.latestPosition !== undefined || stop);
+                console.log('exiting loop');
+            }
+        });
+    }
+    ensureHasPosition() {
+        return new Promise(resolve => {
+            if (this.latestPosition) {
+                resolve();
+            }
+            else {
+                this.events.once('position-updated', () => {
+                    resolve();
+                });
+            }
+        });
+    }
+    postNewBus(busRoute) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const opts = {
+                uri: BusLocationTracker.HOST_URL + '/buses',
+                method: 'POST',
+                body: {
+                    data: {
+                        location: {
+                            latitude: this.latestPosition.lat,
+                            longitude: this.latestPosition.lon
+                        },
+                        routeName: busRoute.replace(' ', '')
+                    }
+                },
+                json: true
+            };
+            try {
+                rp(opts);
+                const json = yield rp(opts);
+                const busId = (json && json.data && json.data.busId);
+                console.log(json);
+                if (busId) {
+                    return busId;
+                }
+                else {
+                    throw new Error('fuck.');
+                }
+            }
+            catch (e) {
+                console.log('Error posting bus', e.message);
+            }
+        });
+    }
+    putNewPosition() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const opts = {
+                uri: `${BusLocationTracker.HOST_URL}/buses/${this.busId}/location`,
+                method: 'PUT',
+                body: {
+                    data: {
+                        location: {
+                            latitude: this.latestPosition.lat,
+                            longitude: this.latestPosition.lon
+                        }
+                    }
+                },
+                json: true
+            };
+            try {
+                const json = yield rp(opts);
+                if (json && json.status && json.status === 'success') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            catch (e) {
+                console.log('Error putting data...', e.message);
+                return false;
+            }
+        });
+    }
+    newPositionFromSensor() {
+        return new Promise(resolve => {
+            this.events.once('position-updated', () => {
+                resolve(this.latestPosition);
+            });
+        });
+    }
+    stopCurrentRoute() {
+        this.latestPosition = undefined;
+        this.events.emit('stopping');
+    }
+}
+BusLocationTracker.HOST_URL = 'http://firstbustracker.ddns.net/api';
+exports.BusLocationTracker = BusLocationTracker;
 //# sourceMappingURL=TrackingBox.js.map

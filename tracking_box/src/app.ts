@@ -1,4 +1,3 @@
-import {GPSSensor} from './GPSSensor';
 import {TrackingBox} from './TrackingBox';
 import {DisplayOptions} from './Display';
 
