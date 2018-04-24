@@ -6,8 +6,8 @@ import * as rp from 'request-promise';
 import randomBetweenNumbers = Utils.Numeric.randomBetweenNumbers;
 import Timer = NodeJS.Timer;
 
-const host = 'http://localhost/api';
-//const host = 'http://firstbustracker.ddns.net/api';
+//const host = 'http://localhost/api';
+const host = 'http://firstbustracker.ddns.net/api';
 
 export class BusBot {
     private routeName: BusRouteName;

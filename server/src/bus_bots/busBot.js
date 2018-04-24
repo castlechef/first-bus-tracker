@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const busStops_1 = require("../models/busStops");
 const location_1 = require("../models/location");
 const rp = require("request-promise");
-const host = 'http://localhost/api';
-//const host = 'http://firstbustracker.ddns.net/api';
+//const host = 'http://localhost/api';
+const host = 'http://firstbustracker.ddns.net/api';
 class BusBot {
     constructor(routeName, mph, milliseconds, frac) {
         this.distancePerMove = 30; //metres
